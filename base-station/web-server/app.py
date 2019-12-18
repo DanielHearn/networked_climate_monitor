@@ -1,15 +1,17 @@
-from flask import Flask, render_template, redirect, jsonify
+from flask import Flask, render_template, redirect, jsonify, request
 from random import *
+from tinydb import TinyDB, Query
+db = TinyDB('db.json')
 
 app = Flask(__name__)
 
 
-@app.route('/api/random')
-def random_number():
-    response = {
-        'randomNumber': randint(1, 100)
-    }
-    return jsonify(response)
+@app.route('/api/fruit', methods=["GET", "POST"])
+def fruit():
+    if request.method == "POST":
+        db.insert({'type': 'peach', 'count': 3})
+        return jsonify({'status': 'success'})
+    return jsonify(db.all())
 
 
 @app.route('/', defaults={'path': ''})
