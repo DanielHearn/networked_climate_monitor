@@ -33,21 +33,11 @@ export default {
   methods: {
     addFruit: function() {
       this.axios.post(`/api/fruit`)
-      .then(response => {
-        console.log(response.data)
-      })
-      .catch(e => {
-        console.log(e)
-      })
     },
     getFruit: function() {
       this.axios.get(`/api/fruit`)
       .then(response => {
-        console.log(response)
         this.fruits = response.data
-      })
-      .catch(e => {
-        console.log(e)
       })
     }
   },
