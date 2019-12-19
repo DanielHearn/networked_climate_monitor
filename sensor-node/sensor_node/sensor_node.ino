@@ -1,3 +1,4 @@
+
 #include <RFM69.h>
 #include <RFM69_ATC.h>
 #include <SPIFlash.h>
@@ -9,11 +10,7 @@
 #define NODEID        2
 #define NETWORKID     100
 
-// The transmision frequency of the baord. Change as needed.
 #define FREQUENCY      RF69_433MHZ
-
-// Uncomment if this board is the RFM69HW/HCW not the RFM69W/CW
-#define IS_RFM69HW_HCW
 
 // Serial board rate - just used to print debug messages
 #define SERIAL_BAUD   115200
@@ -38,15 +35,16 @@ unsigned bme_status;
 
 // Setup
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(SERIAL_BAUD);
+  Serial.println("Starting sensor node");
+  
   // Reset the radio
   resetRadio();
   // Initialize the radio
   radio.initialize(FREQUENCY, NODEID, NETWORKID);
-  radio.promiscuous(true);
+  radio.promiscuous(false);
   
   radio.setHighPower(); //must include this only for RFM69HW/HCW!
-  radio.setPowerLevel(31);
     
   bme_status = bme.begin();  
   if (!bme_status) {
@@ -55,7 +53,7 @@ void setup() {
   }
 
   #ifdef ENABLE_ATC
-    radio.enableAutoPower(ATC_RSSI);
+  //  radio.enableAutoPower(ATC_RSSI);
   #endif
 }
 
@@ -121,7 +119,7 @@ void loop() {
       if (Serial) Serial.println("No ACK");
     }
 
-    radio.sleep();
+    //radio.sleep();
     delay(sendInterval);
 }
 

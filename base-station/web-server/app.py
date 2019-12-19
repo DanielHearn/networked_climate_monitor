@@ -6,6 +6,7 @@ app = Flask(__name__)
 
 salt = 'f10026b636'
 
+
 def init_database():
     print('Initialising database')
     db.purge_tables()
@@ -71,9 +72,38 @@ def account():
         return jsonify({'status': 'success'})
     return jsonify(account_data)
 
+@app.route('/api/sensors/<int:sensor_id>/climate-data', methods=["POST", "GET", 'DELETE'])
+def sensor_climate_data(sensor_id=None):
+    sensors_table = db.table('sensors')
+    sensor = sensors_table.search(where('identifier') == sensor_id)
+    if len(sensor) == 1:
+        if request.method == "POST":
+            body = request.json
+            updated_climate_list = sensor[0]['climate_data']
+            updated_climate_list.insert(0, body)
+
+            sensors_table.update({'climate_data': updated_climate_list}, where('identifier') == sensor_id)
+            return jsonify({'status': 'Sensor climate data successfully added.'})
+        if request.method == "DELETE":
+            #sensors_table.remove(where('identifier') == sensor_id)
+            return jsonify({'status': 'Sensor climate data successfully deleted.'})
+        return jsonify(sensor[0]['climate_data'])
+    return jsonify({'status': 'Sensor doesn\'t exist'})
+
+@app.route('/api/sensors/<int:sensor_id>', methods=["GET", 'DELETE'])
+def sensor(sensor_id=None):
+    sensors_table = db.table('sensors')
+    print(sensor_id)
+    sensor = sensors_table.search(where('identifier') == sensor_id)
+    if len(sensor) == 1:
+        if request.method == "DELETE":
+            sensors_table.remove(where('identifier') == sensor_id)
+            return jsonify({'status': 'Sensor successfully deleted.'})
+        return jsonify(sensor)
+    return jsonify({'status': 'Sensor doesn\'t exist'})
 
 @app.route('/api/sensors', methods=["GET", "POST", 'DELETE'])
-def sensors():
+def sensors(sensor_id=None):
     sensors_table = db.table('sensors')
     if request.method == "POST":
         body = request.json
@@ -93,7 +123,6 @@ def sensors():
         return jsonify({'status': 'Sensors successfully deleted.'})
     sensors_data = sensors_table.search(where('identifier').exists())
     return jsonify(sensors_data)
-
 
 @app.route('/api/delete-all', methods=["GET"])
 def delete_all():
