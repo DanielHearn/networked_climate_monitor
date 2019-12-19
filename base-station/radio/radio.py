@@ -14,9 +14,9 @@ def ascii_to_string(ascii_array):
   return converted_string
 
 
-with Radio(FREQ_433MHZ, node_id, network_id, isHighPower=True, verbose=True) as radio:
+with Radio(FREQ_433MHZ, node_id, network_id, isHighPower=True, verbose=False) as radio:
     print ("Starting loop...")
-
+    radio.setPowerLevel(31)
     while True:
 
         for packet in radio.get_packets():

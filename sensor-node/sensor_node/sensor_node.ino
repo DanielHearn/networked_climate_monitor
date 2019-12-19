@@ -44,17 +44,19 @@ void setup() {
   // Initialize the radio
   radio.initialize(FREQUENCY, NODEID, NETWORKID);
   radio.promiscuous(true);
-  #ifdef IS_RFM69HW_HCW
-    radio.setHighPower(); //must include this only for RFM69HW/HCW!
-  #endif
+  
+  radio.setHighPower(); //must include this only for RFM69HW/HCW!
+  radio.setPowerLevel(31);
     
-    // default settings
-    // (you can also pass in a Wire library object like &Wire2)
-    bme_status = bme.begin();  
-    if (!bme_status) {
-        Serial.println("Could not find a valid BME280 sensor, check wiring, address, sensor ID!");
-        while (1);
-    }
+  bme_status = bme.begin();  
+  if (!bme_status) {
+      Serial.println("Could not find a valid BME280 sensor, check wiring, address, sensor ID!");
+      while (1);
+  }
+
+  #ifdef ENABLE_ATC
+    radio.enableAutoPower(ATC_RSSI);
+  #endif
 }
 
 float getBatteryVoltage() {
@@ -119,6 +121,7 @@ void loop() {
       if (Serial) Serial.println("No ACK");
     }
 
+    radio.sleep();
     delay(sendInterval);
 }
 
