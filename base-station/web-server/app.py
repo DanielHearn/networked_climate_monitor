@@ -75,7 +75,6 @@ def account_view():
     users = User.query.all()
     if len(users):
         user = users[0]
-        print(user)
         return jsonify(user.to_dict())
 
 
@@ -93,9 +92,8 @@ def sensor_climate_view(sensor_id=None):
                 climate_data = Climate(sensor_id=sensor_id, battery_voltage=battery_voltage, date=date)
                 db.session.add(climate_data)
                 db.session.commit()
-                print(climate_data)
+
                 climate_id = climate_data.to_dict()['id']
-                print(climate_id)
 
                 for sensor in sensor_data:
                     value = sensor['value']
@@ -111,14 +109,16 @@ def sensor_climate_view(sensor_id=None):
             return jsonify({'status': 'Invalid body data.'})
         if request.method == "DELETE":
             return jsonify({'status': 'Sensor climate data successfully deleted.'})
-        #climate_data = Climate.query.filter_by(sensor_id=sensor_id)
-        climate_data = Climate.query.all()
+        quantity = 20
+        input_quantity = request.args.get('quantity')
+        if input_quantity:
+            quantity = input_quantity
+        climate_data = Climate.query.order_by(Climate.id.desc()).filter_by(sensor_id=sensor_id).limit(quantity)
         climate_dict_list = []
         for climate in climate_data:
             climate_dict = climate.to_dict()
             climate_id = climate_dict['id']
             sensor_data = SensorData.query.filter_by(climate_id=climate_id)
-            print(sensor_data)
             sensor_dict_list = []
             for sensor in sensor_data:
                 sensor_dict = sensor.to_dict()
@@ -189,4 +189,4 @@ def catch_all(path):
 if __name__ == '__main__':
     print('Starting server')
     db.create_all()
-    app.run(debug=True, host='192.168.1.156')
+    app.run(debug=True, host='192.168.1.180')
