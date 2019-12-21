@@ -14,6 +14,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = database_file
 db = SQLAlchemy(app)
 salt = 'f10026b636'
 
+
 def get_unit_from_type(type):
     units = {
         'Humidity': '%',
@@ -32,6 +33,7 @@ class User(db.Model, SerializerMixin):
     def __repr__(self):
         return '<User %r>' % self.email
 
+
 class Sensor(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -39,6 +41,7 @@ class Sensor(db.Model, SerializerMixin):
 
     def __repr__(self):
         return '<Sensor %r>' % self.name
+
 
 class Climate(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -49,6 +52,7 @@ class Climate(db.Model, SerializerMixin):
     def __repr__(self):
         return '<Climate %r>' % self.id
 
+
 class SensorData(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     climate_id = db.Column(db.Integer, db.ForeignKey('climate.id'), nullable=False)
@@ -58,6 +62,7 @@ class SensorData(db.Model, SerializerMixin):
 
     def __repr__(self):
         return '<Sensor Data %r>' % self.id
+
 
 @app.route('/api/account', methods=["GET", "POST"])
 def account_view():
@@ -109,11 +114,29 @@ def sensor_climate_view(sensor_id=None):
             return jsonify({'status': 'Invalid body data.'})
         if request.method == "DELETE":
             return jsonify({'status': 'Sensor climate data successfully deleted.'})
+
         quantity = 20
         input_quantity = request.args.get('quantity')
         if input_quantity:
             quantity = input_quantity
-        climate_data = Climate.query.order_by(Climate.id.desc()).filter_by(sensor_id=sensor_id).limit(quantity)
+
+        range_start = request.args.get('range_start')
+        range_end = request.args.get('range_end')
+        if ((range_start and range_end == None) or (range_start == None and range_end)):
+            return jsonify({'status': 'Invalid date range'})
+        elif range_start and range_end:
+
+            date_start = dateutil.parser.parse(range_start)
+            date_end = dateutil.parser.parse(range_end)
+            print(date_start)
+            print(date_end)
+            climate_data = Climate.query.order_by(Climate.id.desc()).filter(Climate.sensor_id == sensor_id,
+                                                                            Climate.date <= date_end,
+
+                                                                                Climate.date >= date_start)
+        else:
+            climate_data = Climate.query.order_by(Climate.id.desc()).filter_by(sensor_id=sensor_id).limit(quantity)
+
         climate_dict_list = []
         for climate in climate_data:
             climate_dict = climate.to_dict()
