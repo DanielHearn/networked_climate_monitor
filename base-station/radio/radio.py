@@ -51,7 +51,7 @@ def process_packet(packet):
         if control_dict['T'] == 'C':
             print('Type: Climate Data')
             climate_api_object = {
-                'time_data': str(packet.received),
+                'date': str(packet.received),
                 'battery_voltage': control_dict['V'],
                 'climate_data': []
             }
