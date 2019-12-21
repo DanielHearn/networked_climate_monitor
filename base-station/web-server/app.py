@@ -1,132 +1,176 @@
 from flask import Flask, render_template, redirect, jsonify, request
-from tinydb import TinyDB, Query, where
+import os
+from datetime import datetime
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy_serializer import SerializerMixin
+import dateutil.parser
 
-db = TinyDB('db.json')
+project_dir = os.path.dirname(os.path.abspath(__file__))
+database_file = "sqlite:///{}".format(os.path.join(project_dir, "database.db"))
+
 app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = database_file
 
+db = SQLAlchemy(app)
 salt = 'f10026b636'
 
-
-def init_database():
-    print('Initialising database')
-    db.purge_tables()
-    db.purge()
-
-    account_table = db.table('account')
-    account_table.insert({'user': {
-        'email': '',
-        'password': ''
-    }})
-
-    sensors_table = db.table('sensors')
-
-    settings_table = db.table('settings')
-    settings_table.insert({'settings': {
-        'preferred_temperature_unit': 'c'
-    }})
-
-    print('Initialising complete')
-    print(db.all())
-
-
-def create_sensor(identifier, name, climate_data):
-    if climate_data is None:
-        climate_data = []
-    if name is None:
-        name = 'Sensor'
-    sensor = {
-        'identifier': identifier,
-        'name': name,
-        'climate_data': climate_data
+def get_unit_from_type(type):
+    units = {
+        'Humidity': '%',
+        'Temperature': 'c',
+        'Pressure': 'hPa'
     }
-    return sensor
+
+    return units[type]
 
 
-def create_climate_data(time_date, battery_voltage, sensor_data):
-    if sensor_data is None:
-        sensor_data = []
-    climate_data = {
-        'time_date': time_date,
-        'battery_voltage': battery_voltage,
-        'sensor_data': sensor_data
-    }
-    return climate_data
+class User(db.Model, SerializerMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    password = db.Column(db.String(40), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
 
+    def __repr__(self):
+        return '<User %r>' % self.email
 
-def create_sensor_data(type, value, unit):
-    sensor_data = {
-        'type': type,
-        'value': value,
-        'unit': unit
-    }
-    return sensor_data
+class Sensor(db.Model, SerializerMixin):
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    name = db.Column(db.String(40), nullable=False)
 
+    def __repr__(self):
+        return '<Sensor %r>' % self.name
+
+class Climate(db.Model, SerializerMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    sensor_id = db.Column(db.Integer, db.ForeignKey('sensor.id'), nullable=False)
+    battery_voltage = db.Column(db.Float, nullable=False)
+    date = db.Column(db.DateTime, nullable=False)
+
+    def __repr__(self):
+        return '<Climate %r>' % self.id
+
+class SensorData(db.Model, SerializerMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    climate_id = db.Column(db.Integer, db.ForeignKey('climate.id'), nullable=False)
+    value = db.Column(db.Float, nullable=False)
+    type = db.Column(db.String(100), nullable=False)
+    unit = db.Column(db.String(20), nullable=False)
+
+    def __repr__(self):
+        return '<Sensor Data %r>' % self.id
 
 @app.route('/api/account', methods=["GET", "POST"])
-def account():
-    account_table = db.table('account')
-    account_data = account_table.get(where('user').exists())
+def account_view():
     if request.method == "POST":
         body = request.json
-        account_table.update({'user': {'email': body['email'], 'password': body['password']}}, where('user').exists())
-        return jsonify({'status': 'success'})
-    return jsonify(account_data)
+        if body['email'] and body['password']:
+            email = body['email']
+            password = body['password']
+            user = User(email=email, password=password)
+            db.session.add(user)
+            db.session.commit()
+
+            return jsonify({'status': 'success'})
+        return jsonify({'status': 'Invalid body data.'})
+    users = User.query.all()
+    if len(users):
+        user = users[0]
+        print(user)
+        return jsonify(user.to_dict())
+
 
 @app.route('/api/sensors/<int:sensor_id>/climate-data', methods=["POST", "GET", 'DELETE'])
-def sensor_climate_data(sensor_id=None):
-    sensors_table = db.table('sensors')
-    sensor = sensors_table.search(where('identifier') == sensor_id)
-    if len(sensor) == 1:
+def sensor_climate_view(sensor_id=None):
+    sensor = Sensor.query.filter_by(id=sensor_id).first()
+    if sensor:
         if request.method == "POST":
             body = request.json
-            updated_climate_list = sensor[0]['climate_data']
-            updated_climate_list.insert(0, body)
+            if body['battery_voltage'] and body['date'] and body['climate_data']:
+                battery_voltage = body['battery_voltage']
+                date = dateutil.parser.parse(body['date'])
+                sensor_data = body['climate_data']
 
-            sensors_table.update({'climate_data': updated_climate_list}, where('identifier') == sensor_id)
-            return jsonify({'status': 'Sensor climate data successfully added.'})
+                climate_data = Climate(sensor_id=sensor_id, battery_voltage=battery_voltage, date=date)
+                db.session.add(climate_data)
+                db.session.commit()
+                print(climate_data)
+                climate_id = climate_data.to_dict()['id']
+                print(climate_id)
+
+                for sensor in sensor_data:
+                    value = sensor['value']
+                    data_type = sensor['type']
+
+                    unit = get_unit_from_type(data_type)
+
+                    sensor_obj = SensorData(climate_id=climate_id, value=value, type=data_type, unit=unit)
+                    db.session.add(sensor_obj)
+
+                db.session.commit()
+                return jsonify({'status': 'Sensor data successfully created.'})
+            return jsonify({'status': 'Invalid body data.'})
         if request.method == "DELETE":
-            #sensors_table.remove(where('identifier') == sensor_id)
             return jsonify({'status': 'Sensor climate data successfully deleted.'})
-        return jsonify(sensor[0]['climate_data'])
+        #climate_data = Climate.query.filter_by(sensor_id=sensor_id)
+        climate_data = Climate.query.all()
+        climate_dict_list = []
+        for climate in climate_data:
+            climate_dict = climate.to_dict()
+            climate_id = climate_dict['id']
+            sensor_data = SensorData.query.filter_by(climate_id=climate_id)
+            print(sensor_data)
+            sensor_dict_list = []
+            for sensor in sensor_data:
+                sensor_dict = sensor.to_dict()
+                sensor_dict_list.append(sensor_dict)
+            climate_dict['climate_data'] = sensor_dict_list
+
+            climate_dict_list.append(climate_dict)
+        return jsonify(climate_dict_list)
     return jsonify({'status': 'Sensor doesn\'t exist'})
+
 
 @app.route('/api/sensors/<int:sensor_id>', methods=["GET", 'DELETE'])
-def sensor(sensor_id=None):
-    sensors_table = db.table('sensors')
-    print(sensor_id)
-    sensor = sensors_table.search(where('identifier') == sensor_id)
-    if len(sensor) == 1:
+def sensor_view(sensor_id=None):
+    sensor = Sensor.query.filter_by(id=sensor_id).first()
+    if sensor:
         if request.method == "DELETE":
-            sensors_table.remove(where('identifier') == sensor_id)
+            db.session.delete(sensor)
+            db.session.commit()
             return jsonify({'status': 'Sensor successfully deleted.'})
-        return jsonify(sensor)
+        return jsonify(sensor.to_dict())
     return jsonify({'status': 'Sensor doesn\'t exist'})
 
+
 @app.route('/api/sensors', methods=["GET", "POST", 'DELETE'])
-def sensors(sensor_id=None):
-    sensors_table = db.table('sensors')
+def sensors_view():
     if request.method == "POST":
         body = request.json
+        if body['name'] and body['sensor_id'] and body['user_id']:
+            name = body['name']
+            sensor_id = body['sensor_id']
+            user_id = body['user_id']
 
-        if sensors_table.search(where('identifier') == body['identifier']):
-            return jsonify({'status': 'Error', 'Errors': ['Sensor already exists.']})
-
-        new_sensor = create_sensor(
-            body['identifier'],
-            body['name'],
-            body['climate_data']
-        )
-        sensors_table.insert(new_sensor)
-        return jsonify({'status': 'Sensor successfully created.'})
+            sensor = Sensor(name=name, id=sensor_id, user_id=user_id)
+            db.session.add(sensor)
+            db.session.commit()
+            return jsonify({'status': 'Sensor successfully created.'})
+        return jsonify({'status': 'Invalid body data.'})
     if request.method == "DELETE":
-        sensors_table.remove(where('identifier').exists())
+        sensors = Sensor.query.delete()
+        db.session.commit()
         return jsonify({'status': 'Sensors successfully deleted.'})
-    sensors_data = sensors_table.search(where('identifier').exists())
-    return jsonify(sensors_data)
+    sensors_list = Sensor.query.all()
+    if len(sensors_list):
+        sensor_dict_list = []
+        for sensor in sensors_list:
+            sensor_dict_list.append(sensor.to_dict())
+        return jsonify(sensor_dict_list)
+    return jsonify([])
+
 
 @app.route('/api/delete-all', methods=["GET"])
 def delete_all():
-    init_database()
     return jsonify({'status': 'success'})
 
 
@@ -144,8 +188,5 @@ def catch_all(path):
 
 if __name__ == '__main__':
     print('Starting server')
-    if not (db.tables()):
-        init_database()
-    else:
-        print('Existing database found')
-    app.run(debug=True, host='192.168.1.180')
+    db.create_all()
+    app.run(debug=True, host='192.168.1.156')
