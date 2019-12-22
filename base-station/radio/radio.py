@@ -6,6 +6,7 @@ import time
 node_id = 1
 network_id = 100
 connected_sensors = {}
+api_root = 'http://192.168.1.180:5000/api/sensors/'
 
 
 def create_sensor(id, last_date, start_time, interval_time):
@@ -66,16 +67,21 @@ def process_packet(packet):
         packet_type = control_dict['T']
         if packet_type == 'C':
             print('Type: Climate Data')
-            if(connected_sensors[sensor_id]):
+
+            # Update date of last node communication
+            if connected_sensors[sensor_id]:
                 connected_sensors[sensor_id].last_date = packet_date
             else:
                 print('Sensor isn\'t stored in connected_sensors')
 
+            # Create object for API usage
             climate_api_object = {
                 'date': str(packet.received),
                 'battery_voltage': control_dict['V'],
                 'climate_data': []
             }
+
+            # Process climate data
             climate_data_parts = main_data.split(',')
             for climate_part in climate_data_parts:
                 climate_parts = climate_part.split('=')
@@ -89,8 +95,10 @@ def process_packet(packet):
                     climate_api_object['climate_data'].append(climate_data_dict)
 
             print(climate_api_object)
+
+            # Send climate data to API
             try:
-                climate_post_url = 'http://192.168.1.180:5000/api/sensors/' + str(sensor_id) + '/climate-data'
+                climate_post_url = api_root + str(sensor_id) + '/climate-data'
                 response = requests.post(climate_post_url, json=climate_api_object)
                 print(response.json())
             except:
@@ -101,8 +109,11 @@ def process_packet(packet):
             start_time = 100
             interval_period = 500
 
+            # Create sensor object to track connected sensors
             sensor = create_sensor(sensor_id, packet_date, start_time, interval_period)
             connected_sensors[sensor_id] = sensor
+
+            # Send back time period
     else:
         print('Packet invalid')
 
@@ -111,8 +122,10 @@ with Radio(FREQ_433MHZ, node_id, network_id, isHighPower=True, verbose=False) as
     print("Starting loop...")
     while True:
 
+        # Process packets at each interval
         for packet in radio.get_packets():
             process_packet(packet)
 
+        # Periodically process packets
         delay = 0.1
         time.sleep(delay)
