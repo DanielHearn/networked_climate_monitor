@@ -5,14 +5,27 @@ import time
 
 node_id = 1
 network_id = 100
+connected_sensors = {}
+
+
+def create_sensor(id, last_date, start_time, interval_time):
+    sensor = {
+        "id": id,
+        "last_date": last_date,
+        "start_time": start_time,
+        "interval_time": interval_time
+    }
+    return sensor
+
 
 def ascii_to_string(ascii_array):
-  converted_string = ''
+    converted_string = ''
 
-  for x in ascii_array:
-    converted_string += chr(x)
+    for x in ascii_array:
+        converted_string += chr(x)
 
-  return converted_string
+    return converted_string
+
 
 def convert_type_to_string(type_char):
     types = {
@@ -23,14 +36,16 @@ def convert_type_to_string(type_char):
 
     return types[type_char]
 
+
 def process_packet(packet):
     print('-----------------------')
     packet_data = ascii_to_string(packet.data)
     sensor_id = packet.sender
+    packet_date = str(packet.received)
 
     print('Packet From: Node: ' + str(sensor_id))
     print('Signal: ' + str(packet.RSSI))
-    print('Date: ' + str(packet.received))
+    print('Date: ' + packet_date)
     print('Data: ' + packet_data)
 
     data_parts = packet_data.split('|')
@@ -48,8 +63,14 @@ def process_packet(packet):
                 control_dict[control_parts[0]] = control_parts[1]
 
         # Process main packet data
-        if control_dict['T'] == 'C':
+        packet_type = control_dict['T']
+        if packet_type == 'C':
             print('Type: Climate Data')
+            if(connected_sensors[sensor_id]):
+                connected_sensors[sensor_id].last_date = packet_date
+            else:
+                print('Sensor isn\'t stored in connected_sensors')
+
             climate_api_object = {
                 'date': str(packet.received),
                 'battery_voltage': control_dict['V'],
@@ -74,12 +95,20 @@ def process_packet(packet):
                 print(response.json())
             except:
                 print('Error sending data to API')
+        elif packet_type == 'I':
+            print('Type: Node Initialisation')
+            # Calculate time period
+            start_time = 100
+            interval_period = 500
+
+            sensor = create_sensor(sensor_id, packet_date, start_time, interval_period)
+            connected_sensors[sensor_id] = sensor
     else:
         print('Packet invalid')
 
 
 with Radio(FREQ_433MHZ, node_id, network_id, isHighPower=True, verbose=False) as radio:
-    print ("Starting loop...")
+    print("Starting loop...")
     while True:
 
         for packet in radio.get_packets():
