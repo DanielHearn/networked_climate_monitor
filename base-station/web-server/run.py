@@ -19,6 +19,8 @@ app.config['JWT_SECRET_KEY'] = '13071ce246c22add4f57eeb916f4d46d'
 app.config['JWT_BLACKLIST_ENABLED'] = True
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 
+api_key = 'xgLxTX7Nkem5qc9jllg2'
+
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
 
@@ -220,6 +222,7 @@ climate_data_post_parser = reqparse.RequestParser()
 climate_data_post_parser.add_argument('battery_voltage', help='This field cannot be blank', required=True)
 climate_data_post_parser.add_argument('date', help='This field cannot be blank', required=True)
 climate_data_post_parser.add_argument('climate_data', help='This field cannot be blank', required=True, type=list, location='json')
+climate_data_post_parser.add_argument('api_key', help='This field cannot be blank', required=True)
 
 climate_data_get_parser = reqparse.RequestParser()
 climate_data_get_parser.add_argument('quantity', help='This field cannot be blank', required=False)
@@ -228,36 +231,37 @@ climate_data_get_parser.add_argument('range_end', help='This field cannot be bla
 
 
 class ClimateData(Resource):
-    @jwt_required
     def post(self, sensor_id):
         request.get_json(force=True)
         data = climate_data_post_parser.parse_args()
-        sensor = SensorModel.query.filter_by(id=sensor_id).first()
-        if sensor:
-            if data['battery_voltage'] and data['date'] and data['climate_data']:
-                battery_voltage = data['battery_voltage']
-                date = dateutil.parser.parse(data['date'])
-                sensors_data = data['climate_data']
-                print(sensors_data)
+        if data['api_key'] == api_key:
+            sensor = SensorModel.query.filter_by(id=sensor_id).first()
+            if sensor:
+                if data['battery_voltage'] and data['date'] and data['climate_data']:
+                    battery_voltage = data['battery_voltage']
+                    date = dateutil.parser.parse(data['date'])
+                    sensors_data = data['climate_data']
+                    print(sensors_data)
 
-                climate_data = ClimateModel(sensor_id=sensor_id, battery_voltage=battery_voltage, date=date)
-                db.session.add(climate_data)
-                db.session.commit()
+                    climate_data = ClimateModel(sensor_id=sensor_id, battery_voltage=battery_voltage, date=date)
+                    db.session.add(climate_data)
+                    db.session.commit()
 
-                climate_id = climate_data.to_dict()['id']
+                    climate_id = climate_data.to_dict()['id']
 
-                for sensor_data in sensors_data:
-                    value = sensor_data['value']
-                    data_type = sensor_data['type']
+                    for sensor_data in sensors_data:
+                        value = sensor_data['value']
+                        data_type = sensor_data['type']
 
-                    unit = get_unit_from_type(data_type)
+                        unit = get_unit_from_type(data_type)
 
-                    sensor_obj = SensorDataModel(climate_id=climate_id, value=value, type=data_type, unit=unit)
-                    db.session.add(sensor_obj)
+                        sensor_obj = SensorDataModel(climate_id=climate_id, value=value, type=data_type, unit=unit)
+                        db.session.add(sensor_obj)
 
-                db.session.commit()
-                return jsonify({'status': 'Sensor data successfully created.'})
-        return jsonify({'status': 'Sensor doesn\'t exist'})
+                    db.session.commit()
+                    return jsonify({'status': 'Sensor data successfully created.'})
+            return jsonify({'status': 'Sensor doesn\'t exist'})
+        return jsonify({'status': 'Invalid API key'})
 
     @jwt_required
     def get(self, sensor_id):
@@ -390,4 +394,4 @@ def catch_all(path):
 
 if __name__ == '__main__':
     print('Starting server')
-    app.run(debug=True, host='192.168.1.156')
+    app.run(debug=True, host='192.168.1.180')

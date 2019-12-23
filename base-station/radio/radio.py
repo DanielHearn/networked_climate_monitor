@@ -10,7 +10,7 @@ node_id = 1
 network_id = 100
 connected_sensors = {}
 api_root = 'http://192.168.1.180:5000/api/sensors/'
-
+api_key = 'xgLxTX7Nkem5qc9jllg2'
 
 def create_sensor(id, last_date, start_time, interval_time):
     sensor = {
@@ -95,7 +95,8 @@ def process_packet(packet):
             climate_api_object = {
                 'date': str(packet.received),
                 'battery_voltage': control_dict['V'],
-                'climate_data': []
+                'climate_data': [],
+                'api_key': api_key
             }
 
             # Process climate data
