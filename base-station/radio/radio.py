@@ -40,6 +40,14 @@ def convert_type_to_string(type_char):
 
     return types[type_char]
 
+def process_packet_control(control):
+    control_dict = {}
+    control_data = control.split(',')
+    for control_part in control_data:
+        control_parts = control_part.split('=')
+        if len(control_parts) == 2:
+            control_dict[control_parts[0]] = control_parts[1]
+    return control_dict
 
 def process_packet(packet):
     print('-----------------------')
@@ -48,6 +56,7 @@ def process_packet(packet):
     packet_date = str(packet.received)
     packet_datetime = dateutil.parser.parse(packet_date)
 
+    # Display packet data
     print('Packet From: Node: ' + str(sensor_id))
     print('Signal: ' + str(packet.RSSI))
     print('Date: ' + packet_date)
@@ -55,17 +64,13 @@ def process_packet(packet):
 
     data_parts = packet_data.split('|')
 
+    # Process packet data if it is in the required format
     if len(data_parts) == 2:
         control = data_parts[0]
         main_data = data_parts[1].split('_')[0]
 
         # Process control
-        control_data = control.split(',')
-        control_dict = {}
-        for control_part in control_data:
-            control_parts = control_part.split('=')
-            if len(control_parts) == 2:
-                control_dict[control_parts[0]] = control_parts[1]
+        control_dict = process_packet_control(control)
 
         # Process main packet data
         packet_type = control_dict['T']
@@ -131,18 +136,22 @@ def process_packet(packet):
 
 
 def remove_inactive_sensors():
-    print('Remove inactive sensors')
+    print('Removing inactive sensors')
     global connected_sensors
     connected_sensors = filter_inactive_sensors(connected_sensors)
 
 
 def filter_inactive_sensors(sensors):
     now = datetime.datetime.now()
-    thirty_min_earlier = now - datetime.timedelta(seconds=30)
+    inactive_time = now - datetime.timedelta(minutes=10)
     temp_sensors = {}
+
+    # Filter only active sensors
     for sensor_id in connected_sensors:
         sensor = connected_sensors[sensor_id]
-        if sensor['last_date'] > thirty_min_earlier:
+
+        # Keep sensors that have communicated in the last 10 minutes
+        if sensor['last_date'] > inactive_time:
             temp_sensors[sensor_id] = sensor
         else:
             print('Removed sensor with id: ' + sensor_id)
@@ -151,9 +160,12 @@ def filter_inactive_sensors(sensors):
 
 def run():
     scheduler = BackgroundScheduler()
-    inactive_job = scheduler.add_job(remove_inactive_sensors, 'interval', seconds=10)
+
+    # Create job to remove inactive sensors every 10 minutes
+    inactive_job = scheduler.add_job(remove_inactive_sensors, 'interval', minutes=10)
     scheduler.start()
 
+    # Initialise the radio and start processing packets
     with Radio(FREQ_433MHZ, node_id, network_id, isHighPower=True, verbose=False) as radio:
         print("Starting loop...")
         while True:
@@ -166,6 +178,7 @@ def run():
             delay = 0.1
             time.sleep(delay)
 
+    # Shutdown any scheduler jobs
     inactive_job.remove()
     scheduler.shutdown()
 
