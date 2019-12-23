@@ -1,5 +1,5 @@
 import dateutil.parser
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 from flask_restful import Api, Resource, reqparse
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_serializer import SerializerMixin
@@ -207,9 +207,11 @@ class TokenRefresh(Resource):
 
 
 class AllUsers(Resource):
+    @jwt_required
     def get(self):
         return UserModel.return_all()
 
+    @jwt_required
     def delete(self):
         return UserModel.delete_all()
 
@@ -217,23 +219,26 @@ class AllUsers(Resource):
 climate_data_post_parser = reqparse.RequestParser()
 climate_data_post_parser.add_argument('battery_voltage', help='This field cannot be blank', required=True)
 climate_data_post_parser.add_argument('date', help='This field cannot be blank', required=True)
-climate_data_post_parser.add_argument('climate_data', help='This field cannot be blank', required=True)
+climate_data_post_parser.add_argument('climate_data', help='This field cannot be blank', required=True, type=list, location='json')
 
 climate_data_get_parser = reqparse.RequestParser()
 climate_data_get_parser.add_argument('quantity', help='This field cannot be blank', required=False)
 climate_data_get_parser.add_argument('range_start', help='This field cannot be blank', required=False)
 climate_data_get_parser.add_argument('range_end', help='This field cannot be blank', required=False)
 
+
 class ClimateData(Resource):
     @jwt_required
     def post(self, sensor_id):
+        request.get_json(force=True)
         data = climate_data_post_parser.parse_args()
         sensor = SensorModel.query.filter_by(id=sensor_id).first()
         if sensor:
             if data['battery_voltage'] and data['date'] and data['climate_data']:
                 battery_voltage = data['battery_voltage']
                 date = dateutil.parser.parse(data['date'])
-                sensor_data = data['climate_data']
+                sensors_data = data['climate_data']
+                print(sensors_data)
 
                 climate_data = ClimateModel(sensor_id=sensor_id, battery_voltage=battery_voltage, date=date)
                 db.session.add(climate_data)
@@ -241,9 +246,9 @@ class ClimateData(Resource):
 
                 climate_id = climate_data.to_dict()['id']
 
-                for sensor in sensor_data:
-                    value = sensor['value']
-                    data_type = sensor['type']
+                for sensor_data in sensors_data:
+                    value = sensor_data['value']
+                    data_type = sensor_data['type']
 
                     unit = get_unit_from_type(data_type)
 
@@ -326,6 +331,7 @@ sensor_parser.add_argument('name', help='This field cannot be blank', required=F
 sensor_parser.add_argument('sensor_id', help='This field cannot be blank', required=False)
 sensor_parser.add_argument('user_id', help='This field cannot be blank', required=False)
 
+
 class Sensors(Resource):
     @jwt_required
     def post(self):
@@ -384,4 +390,4 @@ def catch_all(path):
 
 if __name__ == '__main__':
     print('Starting server')
-    app.run(debug=True, host='192.168.1.180')
+    app.run(debug=True, host='192.168.1.156')
