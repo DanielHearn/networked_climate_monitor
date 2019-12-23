@@ -2,6 +2,9 @@ from RFM69 import Radio, FREQ_433MHZ
 import datetime
 import requests
 import time
+import threading
+import dateutil.parser
+from apscheduler.schedulers.background import BackgroundScheduler
 
 node_id = 1
 network_id = 100
@@ -43,6 +46,7 @@ def process_packet(packet):
     packet_data = ascii_to_string(packet.data)
     sensor_id = packet.sender
     packet_date = str(packet.received)
+    packet_datetime = dateutil.parser.parse(packet_date)
 
     print('Packet From: Node: ' + str(sensor_id))
     print('Signal: ' + str(packet.RSSI))
@@ -69,10 +73,18 @@ def process_packet(packet):
             print('Type: Climate Data')
 
             # Update date of last node communication
-            if connected_sensors[sensor_id]:
-                connected_sensors[sensor_id].last_date = packet_date
+            id_str = str(sensor_id)
+
+            if len(connected_sensors):
+                if connected_sensors[id_str]:
+                    connected_sensors[id_str]['last_date'] = packet_datetime
+                else:
+                    print('Sensor isn\'t stored in connected_sensors')
+                    sensor = create_sensor(id_str, packet_datetime, 0, 500)
+                    connected_sensors[id_str] = sensor
             else:
-                print('Sensor isn\'t stored in connected_sensors')
+                sensor = create_sensor(id_str, packet_datetime, 0, 500)
+                connected_sensors[id_str] = sensor
 
             # Create object for API usage
             climate_api_object = {
@@ -110,7 +122,7 @@ def process_packet(packet):
             interval_period = 500
 
             # Create sensor object to track connected sensors
-            sensor = create_sensor(sensor_id, packet_date, start_time, interval_period)
+            sensor = create_sensor(sensor_id, packet_datetime, start_time, interval_period)
             connected_sensors[sensor_id] = sensor
 
             # Send back time period
@@ -118,14 +130,44 @@ def process_packet(packet):
         print('Packet invalid')
 
 
-with Radio(FREQ_433MHZ, node_id, network_id, isHighPower=True, verbose=False) as radio:
-    print("Starting loop...")
-    while True:
+def remove_inactive_sensors():
+    print('Remove inactive sensors')
+    global connected_sensors
+    connected_sensors = filter_inactive_sensors(connected_sensors)
 
-        # Process packets at each interval
-        for packet in radio.get_packets():
-            process_packet(packet)
 
-        # Periodically process packets
-        delay = 0.1
-        time.sleep(delay)
+def filter_inactive_sensors(sensors):
+    now = datetime.datetime.now()
+    thirty_min_earlier = now - datetime.timedelta(seconds=30)
+    temp_sensors = {}
+    for sensor_id in connected_sensors:
+        sensor = connected_sensors[sensor_id]
+        if sensor['last_date'] > thirty_min_earlier:
+            temp_sensors[sensor_id] = sensor
+        else:
+            print('Removed sensor with id: ' + sensor_id)
+    return temp_sensors
+
+
+def run():
+    scheduler = BackgroundScheduler()
+    inactive_job = scheduler.add_job(remove_inactive_sensors, 'interval', seconds=10)
+    scheduler.start()
+
+    with Radio(FREQ_433MHZ, node_id, network_id, isHighPower=True, verbose=False) as radio:
+        print("Starting loop...")
+        while True:
+
+            # Process packets at each interval
+            for packet in radio.get_packets():
+                process_packet(packet)
+
+            # Periodically process packets
+            delay = 0.1
+            time.sleep(delay)
+
+    inactive_job.remove()
+    scheduler.shutdown()
+
+
+run()
