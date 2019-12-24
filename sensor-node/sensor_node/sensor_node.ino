@@ -30,6 +30,8 @@
 Adafruit_BME280 bme;
 RFM69 radio(RF69_SPI_CS, RF69_IRQ_PIN, false, RF69_IRQ_NUM);
 unsigned bme_status;
+boolean initialised = false;
+long send_interval = 10000;
 
 // Setup
 void setup() {
@@ -53,77 +55,120 @@ void setup() {
   #ifdef ENABLE_ATC
   //  radio.enableAutoPower(ATC_RSSI);
   #endif
+
+  delay(5000);
 }
 
 float getBatteryVoltage() {
   return analogRead(VBATPIN) * 2 * 3.3 / 1024;
 }
 
-// Main loop
-unsigned long previousMillis = 0;
-const long sendInterval = 10000;
-
 void loop() {
-    if (Serial) Serial.println("Sending");
-    char payload_data[] = "____________________________________________________________";
-
-    // Create control data
-    char battery_chars[5];   
-    dtostrf(getBatteryVoltage(), 4, 2, battery_chars);
-    payload_data[0] = 'V';
-    payload_data[1] = '=';
-    payload_data[2] = battery_chars[0];
-    payload_data[3] = battery_chars[1];
-    payload_data[4] = battery_chars[2];
-    payload_data[5] = battery_chars[3];
-    payload_data[6] = ',';
-    payload_data[7] = 'T';
-    payload_data[8] = '=';
-    payload_data[9] = 'C';
-    
-    // Create main data
-    payload_data[10] = '|';
-    if(bme_status) {
-      float temp = bme.readTemperature();
-      char temp_chars[5];   
-      dtostrf(temp, 5, 2, temp_chars);
-      char t1 = temp_chars[0];
-      payload_data[11] = 'T';
-      payload_data[12] = '=';
-      payload_data[13] = temp_chars[0];
-      payload_data[14] = temp_chars[1];
-      payload_data[15] = temp_chars[2];
-      payload_data[16] = temp_chars[3];
-      payload_data[17] = temp_chars[4];
-      payload_data[18] = ',';
+    if (initialised) {
+      Serial.println("Sending climate data");
+      char payload_data[] = "____________________________________________________________";
+  
+      // Create control data
+      char battery_chars[5];   
+      dtostrf(getBatteryVoltage(), 4, 2, battery_chars);
+      payload_data[0] = 'V';
+      payload_data[1] = '=';
+      payload_data[2] = battery_chars[0];
+      payload_data[3] = battery_chars[1];
+      payload_data[4] = battery_chars[2];
+      payload_data[5] = battery_chars[3];
+      payload_data[6] = ',';
+      payload_data[7] = 'T';
+      payload_data[8] = '=';
+      payload_data[9] = 'C';
       
-      float hum = bme.readHumidity();
-      char hum_chars[5];   
-      dtostrf(hum, 5, 2, hum_chars);
-      payload_data[19] = 'H';
-      payload_data[20] = '=';
-      payload_data[21] = hum_chars[0];
-      payload_data[22] = hum_chars[1];
-      payload_data[23] = hum_chars[2];
-      payload_data[24] = hum_chars[3];
-      payload_data[25] = hum_chars[4];
-    }
-
-    Serial.println(payload_data);
-
-    if (radio.sendWithRetry(1, payload_data, sizeof(payload_data), 3, 200)) {
-      if (Serial) Serial.println("ACK received");
+      // Create main data
+      payload_data[10] = '|';
+      if(bme_status) {
+        float temp = bme.readTemperature();
+        char temp_chars[5];   
+        dtostrf(temp, 5, 2, temp_chars);
+        char t1 = temp_chars[0];
+        payload_data[11] = 'T';
+        payload_data[12] = '=';
+        payload_data[13] = temp_chars[0];
+        payload_data[14] = temp_chars[1];
+        payload_data[15] = temp_chars[2];
+        payload_data[16] = temp_chars[3];
+        payload_data[17] = temp_chars[4];
+        payload_data[18] = ',';
+        
+        float hum = bme.readHumidity();
+        char hum_chars[5];   
+        dtostrf(hum, 5, 2, hum_chars);
+        payload_data[19] = 'H';
+        payload_data[20] = '=';
+        payload_data[21] = hum_chars[0];
+        payload_data[22] = hum_chars[1];
+        payload_data[23] = hum_chars[2];
+        payload_data[24] = hum_chars[3];
+        payload_data[25] = hum_chars[4];
+      }
+  
+      Serial.println(payload_data);
+  
+      if (radio.sendWithRetry(1, payload_data, sizeof(payload_data), 3, 200)) {
+        if (Serial) Serial.println("ACK received");
+      } else {
+        if (Serial) Serial.println("No ACK");
+      }
+  
+      //radio.sleep();
+      delay(send_interval);
+      
     } else {
-      if (Serial) Serial.println("No ACK");
-    }
+      Serial.println("Attempting initialisation");
+      char payload_data[] = "____________________________________________________________";
+      payload_data[0] = 'T';
+      payload_data[1] = '=';
+      payload_data[2] = 'I';
+      payload_data[3] = '|';
+      
+      Serial.println(payload_data);
 
-    //radio.sleep();
-    delay(sendInterval);
+      radio.send(1,  payload_data, sizeof(payload_data), false);
+
+      int i;
+      int retries = 3;
+      for (i = 1; i < retries; ++i){
+        if (radio.receiveDone()) {
+          Serial.println("Received time period packet");
+          char packet_data[] = "____________________________________________________________";
+          for (byte i = 0; i < radio.DATALEN; i++) {
+            char c = radio.DATA[i];
+            packet_data[i] = c;
+          }
+
+          String data = packet_data;
+          int split_index = data.indexOf('|');
+          String control_data = data.substring(0, split_index);
+          String main_data = data.substring(split_index+1);
+          Serial.println(control_data);
+          Serial.println(main_data);
+    
+          i = retries;
+          initialised = true;
+        }
+        if(initialised == false) {
+          delay(200);
+        }
+      }
+      if(initialised == false) {
+          delay(10000);
+      } else {
+        
+      }
+    }
 }
 
 // Reset the Radio
 void resetRadio() {
-  if (Serial) Serial.print("Resetting radio...");
+  Serial.print("Resetting radio...");
   pinMode(RF69_RESET, OUTPUT);
   digitalWrite(RF69_RESET, HIGH);
   delay(20);

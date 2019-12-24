@@ -12,6 +12,7 @@ connected_sensors = {}
 api_root = 'http://192.168.1.180:5000/api/sensors/'
 api_key = 'xgLxTX7Nkem5qc9jllg2'
 
+
 def create_sensor(id, last_date, start_time, interval_time):
     sensor = {
         "id": id,
@@ -40,6 +41,7 @@ def convert_type_to_string(type_char):
 
     return types[type_char]
 
+
 def process_packet_control(control):
     control_dict = {}
     control_data = control.split(',')
@@ -49,7 +51,8 @@ def process_packet_control(control):
             control_dict[control_parts[0]] = control_parts[1]
     return control_dict
 
-def process_packet(packet):
+
+def process_packet(packet, radio):
     print('-----------------------')
     packet_data = ascii_to_string(packet.data)
     sensor_id = packet.sender
@@ -81,7 +84,7 @@ def process_packet(packet):
             id_str = str(sensor_id)
 
             if len(connected_sensors):
-                if connected_sensors[id_str]:
+                if id_str in connected_sensors:
                     connected_sensors[id_str]['last_date'] = packet_datetime
                 else:
                     print('Sensor isn\'t stored in connected_sensors')
@@ -131,7 +134,11 @@ def process_packet(packet):
             sensor = create_sensor(sensor_id, packet_datetime, start_time, interval_period)
             connected_sensors[sensor_id] = sensor
 
+            payload_data = 'T=T|initial=' + start_time + ',interval=' + interval_period
+            print('Assigned start_time: ' + start_time + ', interval: ' + interval_period)
+
             # Send back time period
+            radio.send(sensor_id, payload_data)
     else:
         print('Packet invalid')
 
@@ -173,7 +180,7 @@ def run():
 
             # Process packets at each interval
             for packet in radio.get_packets():
-                process_packet(packet)
+                process_packet(packet, radio)
 
             # Periodically process packets
             delay = 0.1
