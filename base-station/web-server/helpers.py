@@ -7,6 +7,7 @@ def get_unit_from_type(type):
 
     return units[type]
 
+
 def create_settings():
     settings = {
         "temperature_unit": "c"

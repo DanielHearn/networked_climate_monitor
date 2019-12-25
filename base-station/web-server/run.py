@@ -131,33 +131,6 @@ account_parser = reqparse.RequestParser()
 account_parser.add_argument('email', help='This field cannot be blank', required=True)
 account_parser.add_argument('password', help='This field cannot be blank', required=True)
 
-
-class UserRegistration(Resource):
-    def post(self):
-        data = account_parser.parse_args()
-
-        if len(UserModel.query.all()):
-            return {'message': 'An account already exists'}
-
-        new_user = UserModel(
-            email=data['email'],
-            password=UserModel.generate_hash(data['password']),
-            settings=create_settings()
-        )
-
-        try:
-            new_user.save_to_db()
-            access_token = create_access_token(identity=data['email'])
-            refresh_token = create_refresh_token(identity=data['email'])
-            return {
-                'message': 'UserModel {} was created'.format(data['email']),
-                'access_token': access_token,
-                'refresh_token': refresh_token
-            }
-        except:
-            return {'message': 'Something went wrong'}, 500
-
-
 class UserLogin(Resource):
     def post(self):
         data = account_parser.parse_args()
@@ -211,6 +184,30 @@ class TokenRefresh(Resource):
 
 
 class AllUsers(Resource):
+    def post(self):
+        data = account_parser.parse_args()
+
+        if len(UserModel.query.all()):
+            return {'message': 'An account already exists'}
+
+        new_user = UserModel(
+            email=data['email'],
+            password=UserModel.generate_hash(data['password']),
+            settings=create_settings()
+        )
+
+        try:
+            new_user.save_to_db()
+            access_token = create_access_token(identity=data['email'])
+            refresh_token = create_refresh_token(identity=data['email'])
+            return {
+                'message': 'UserModel {} was created'.format(data['email']),
+                'access_token': access_token,
+                'refresh_token': refresh_token
+            }
+        except:
+            return {'message': 'Something went wrong'}, 500
+
     @jwt_required
     def get(self):
         return UserModel.return_all()
@@ -369,7 +366,6 @@ class Sensors(Resource):
 
 
 # Account Resources
-api.add_resource(UserRegistration, '/api/register')
 api.add_resource(UserLogin, '/api/login')
 api.add_resource(UserLogoutAccess, '/api/logout/access')
 api.add_resource(UserLogoutRefresh, '/api/logout/refresh')
