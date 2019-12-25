@@ -7,7 +7,7 @@ from passlib.hash import bcrypt
 from flask_jwt_extended import (JWTManager, create_access_token, create_refresh_token, jwt_required,
                                 jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 
-from helpers import get_unit_from_type
+from helpers import get_unit_from_type, create_settings
 
 app = Flask(__name__)
 api = Api(app)
@@ -41,6 +41,7 @@ class UserModel(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     password = db.Column(db.String(40), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    settings = db.Column(db.text, nullable=False)
 
     def __repr__(self):
         return '<UserModel %r>' % self.email
@@ -140,7 +141,8 @@ class UserRegistration(Resource):
 
         new_user = UserModel(
             email=data['email'],
-            password=UserModel.generate_hash(data['password'])
+            password=UserModel.generate_hash(data['password']),
+            settings=create_settings()
         )
 
         try:
@@ -278,17 +280,17 @@ class ClimateData(Resource):
             if (range_start and range_end is None) or (range_start is None and range_end):
                 return jsonify({'status': 'Invalid date range'})
             elif range_start and range_end:
-
                 date_start = dateutil.parser.parse(range_start)
                 date_end = dateutil.parser.parse(range_end)
-                print(date_start)
-                print(date_end)
+
+                # Get climate data between the two dates
                 climate_data = ClimateModel.query.order_by(ClimateModel.id.desc()).filter(
                     ClimateModel.sensor_id == sensor_id,
                     ClimateModel.date <= date_end,
 
                     ClimateModel.date >= date_start)
             else:
+                # Get the most recent climate data limited by the specified quantity
                 climate_data = ClimateModel.query.order_by(ClimateModel.id.desc()).filter_by(sensor_id=sensor_id).limit(
                     quantity)
 
