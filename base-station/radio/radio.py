@@ -9,7 +9,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 node_id = 1
 network_id = 100
 connected_sensors = {}
-api_root = 'http://192.168.1.180:5000/api/sensors/'
+api_root = 'http://192.168.1.180:5000/api/'
 api_key = 'xgLxTX7Nkem5qc9jllg2'
 
 
@@ -115,7 +115,7 @@ def process_packet(packet, radio):
 
             # Send climate data to API
             try:
-                climate_post_url = api_root + str(sensor_id) + '/climate-data'
+                climate_post_url = api_root + 'sensors/' + str(sensor_id) + '/climate-data'
                 response = requests.post(climate_post_url, json=climate_api_object)
                 print(response.json())
             except:
@@ -135,6 +135,19 @@ def process_packet(packet, radio):
 
             # Send back time period
             radio.send(sensor_id, payload_data)
+
+            # Attempt to create sensor
+            # Will fail if the sensor already exists
+            sensor_name = 'Sensor ' + str(sensor_id)
+            sensor_api_object = {
+                'name': sensor_name,
+                'user_id': 1,
+                'sensor_id': sensor_id
+            }
+
+            sensor_post_url = api_root + 'sensors/'
+            response = requests.post(sensor_post_url, json=sensor_api_object)
+            print(response.json())
     else:
         print('Packet invalid')
 

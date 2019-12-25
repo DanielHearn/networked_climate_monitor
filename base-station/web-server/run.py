@@ -344,6 +344,9 @@ class Sensors(Resource):
             sensor_id = data['sensor_id']
             user_id = data['user_id']
 
+            if SensorModel.query.filter_by(id=sensor_id).first():
+                return {'message': 'A sensor with that id already exists'}
+
             sensor = SensorModel(name=name, id=sensor_id, user_id=user_id)
             db.session.add(sensor)
             db.session.commit()
