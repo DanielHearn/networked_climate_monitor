@@ -83,14 +83,10 @@ def process_packet(packet, radio):
             # Update date of last node communication
             id_str = str(sensor_id)
 
-            if len(connected_sensors):
-                if id_str in connected_sensors:
-                    connected_sensors[id_str]['last_date'] = packet_datetime
-                else:
-                    print('Sensor isn\'t stored in connected_sensors')
-                    sensor = create_sensor(id_str, packet_datetime, 0, 500)
-                    connected_sensors[id_str] = sensor
+            if id_str in connected_sensors:
+                connected_sensors[id_str]['last_date'] = packet_datetime
             else:
+                print('Sensor isn\'t stored in connected_sensors')
                 sensor = create_sensor(id_str, packet_datetime, 0, 500)
                 connected_sensors[id_str] = sensor
 
