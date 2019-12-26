@@ -1,5 +1,5 @@
 from RFM69 import Radio, FREQ_433MHZ
-import datetime
+from datetime import timedelta, datetime
 import requests
 import time
 import threading
@@ -15,6 +15,9 @@ encrypt_key = 'pnOvzy105sF5g8Ot'
 connected_sensors = {}
 number_of_time_periods = 10
 time_periods = {}
+
+# Ten minute time periods
+node_interval = 600000
 
 
 def create_sensor(id, last_date, start_time, interval_time):
@@ -126,9 +129,44 @@ def process_packet(packet, radio):
                 print('Error sending data to API')
         elif packet_type == 'I':
             print('Type: Node Initialisation')
+
             # Calculate time period
-            start_time = 100
-            interval_period = 500
+            assigned_period = None
+            global time_periods
+
+            for period in time_periods:
+                sensor = time_periods[period]
+                if sensor == sensor_id:
+                    assigned_period = period
+                    break
+                elif sensor is None:
+                    assigned_period = period
+                    break
+
+            if assigned_period is None:
+                print('No available intervals')
+                return None
+            else:
+                time_periods.update({str(assigned_period): sensor_id})
+
+            print(time_periods)
+
+            now = datetime.now()
+            start_time = now + timedelta(minutes=10)
+            start_time = start_time - timedelta(seconds=start_time.second)
+            minutes = str(start_time.minute)
+            if len(minutes) == 1:
+                minutes = '0' + minutes
+
+            period = int(minutes[0] + str(int(assigned_period)-1))
+            start_time = start_time.replace(minute=period)
+
+            print('Assigned sensor with period: ' + assigned_period)
+            print('Sensor will start sending at: ' + str(start_time))
+            milliseconds_till_start = int((start_time - now).total_seconds() * 1000)
+
+            start_time = milliseconds_till_start
+            interval_period = node_interval
 
             # Create sensor object to track connected sensors
             sensor = create_sensor(sensor_id, packet_datetime, start_time, interval_period)
@@ -166,12 +204,12 @@ def remove_inactive_sensors():
 
 
 def filter_inactive_sensors(sensors):
-    now = datetime.datetime.now()
-    inactive_time = now - datetime.timedelta(minutes=10)
+    now = datetime.now()
+    inactive_time = now - timedelta(minutes=10)
     temp_sensors = {}
 
     # Filter only active sensors
-    for sensor_id in connected_sensors:
+    for sensor_id in sensors:
         sensor = connected_sensors[sensor_id]
 
         # Keep sensors that have communicated in the last 10 minutes
@@ -179,12 +217,18 @@ def filter_inactive_sensors(sensors):
             temp_sensors[sensor_id] = sensor
         else:
             print('Removed sensor with id: ' + sensor_id)
+
+            for period in time_periods:
+                period_sensor = time_periods[period]
+                if period_sensor == sensor_id:
+                    time_periods.update({str(period): None})
+
     return temp_sensors
 
 
 def init_time_periods():
-    for i in number_of_time_periods:
-        time_periods[i] = None
+    for i in range(1, number_of_time_periods):
+        time_periods[str(i)] = None
 
 
 def run():
@@ -206,7 +250,7 @@ def run():
                 process_packet(packet, radio)
 
             # Periodically process packets
-            delay = 0.1
+            delay = 0.05
             time.sleep(delay)
 
     # Shutdown any scheduler jobs

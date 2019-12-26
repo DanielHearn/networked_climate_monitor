@@ -125,6 +125,9 @@ void loop() {
       
     } else {
       Serial.println("Attempting initialisation");
+      int initial_delay = 0;
+
+      
       char payload_data[] = "____________________________________________________________";
       payload_data[0] = 'T';
       payload_data[1] = '=';
@@ -150,9 +153,36 @@ void loop() {
           int split_index = data.indexOf('|');
           String control_data = data.substring(0, split_index);
           String main_data = data.substring(split_index+1);
+
+          int packet_end_split_index = main_data.indexOf('_');
+          main_data = main_data.substring(0, packet_end_split_index);
           Serial.println(control_data);
           Serial.println(main_data);
-    
+
+          int str_len = main_data.length() + 1; 
+          char char_array[str_len];
+          main_data.toCharArray(char_array, str_len);
+          char *token = strtok(char_array, ","); 
+          
+          while (token != NULL) 
+          { 
+              String token_string = token;
+              int part_split_index = token_string.indexOf('=');
+
+              String key_string = token_string.substring(0, part_split_index);
+              String value_string = token_string.substring(part_split_index+1);
+              Serial.println(key_string);
+              Serial.println(value_string);
+
+              if (key_string == "initial") {
+                  initial_delay = value_string.toInt();
+              } else if (key_string == "interval") {
+                  send_interval = value_string.toInt();
+              }
+              
+              token = strtok(NULL, ","); 
+          }
+        
           i = retries;
           initialised = true;
         }
@@ -163,7 +193,9 @@ void loop() {
       if(initialised == false) {
           delay(10000);
       } else {
-        
+          Serial.println("Waiting before the first sensor reading");
+          Serial.println(initial_delay);
+          delay(initial_delay);
       }
     }
 }
