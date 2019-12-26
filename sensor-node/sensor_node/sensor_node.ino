@@ -54,7 +54,7 @@ void setup() {
   }
 
   #ifdef ENABLE_ATC
-  //  radio.enableAutoPower(ATC_RSSI);
+    radio.enableAutoPower(ATC_RSSI);
   #endif
   radio.encrypt(ENCRYPTKEY);
 

@@ -8,10 +8,13 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 node_id = 1
 network_id = 100
-connected_sensors = {}
 api_root = 'http://192.168.1.180:5000/api/'
 api_key = 'xgLxTX7Nkem5qc9jllg2'
 encrypt_key = 'pnOvzy105sF5g8Ot'
+
+connected_sensors = {}
+number_of_time_periods = 10
+time_periods = {}
 
 
 def create_sensor(id, last_date, start_time, interval_time):
@@ -179,7 +182,14 @@ def filter_inactive_sensors(sensors):
     return temp_sensors
 
 
+def init_time_periods():
+    for i in number_of_time_periods:
+        time_periods[i] = None
+
+
 def run():
+    init_time_periods()
+
     scheduler = BackgroundScheduler()
 
     # Create job to remove inactive sensors every 10 minutes
