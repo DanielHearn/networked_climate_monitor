@@ -11,6 +11,7 @@
 #define NETWORKID     100
 
 #define FREQUENCY      RF69_433MHZ
+#define ENCRYPTKEY     "pnOvzy105sF5g8Ot"
 
 // Serial board rate - just used to print debug messages
 #define SERIAL_BAUD   115200
@@ -55,6 +56,7 @@ void setup() {
   #ifdef ENABLE_ATC
   //  radio.enableAutoPower(ATC_RSSI);
   #endif
+  radio.encrypt(ENCRYPTKEY);
 
   delay(5000);
 }

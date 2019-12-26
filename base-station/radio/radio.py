@@ -11,6 +11,7 @@ network_id = 100
 connected_sensors = {}
 api_root = 'http://192.168.1.180:5000/api/'
 api_key = 'xgLxTX7Nkem5qc9jllg2'
+encrypt_key = 'pnOvzy105sF5g8Ot'
 
 
 def create_sensor(id, last_date, start_time, interval_time):
@@ -130,8 +131,8 @@ def process_packet(packet, radio):
             sensor = create_sensor(sensor_id, packet_datetime, start_time, interval_period)
             connected_sensors[sensor_id] = sensor
 
-            payload_data = 'T=T|initial=' + start_time + ',interval=' + interval_period
-            print('Assigned start_time: ' + start_time + ', interval: ' + interval_period)
+            payload_data = 'T=T|initial=' + str(start_time) + ',interval=' + str(interval_period)
+            print('Assigned start_time: ' + str(start_time) + ', interval: ' + str(interval_period))
 
             # Send back time period
             radio.send(sensor_id, payload_data)
@@ -145,9 +146,12 @@ def process_packet(packet, radio):
                 'sensor_id': sensor_id
             }
 
-            sensor_post_url = api_root + 'sensors/'
-            response = requests.post(sensor_post_url, json=sensor_api_object)
-            print(response.json())
+            try:
+                sensor_post_url = api_root + 'sensors'
+                response = requests.post(sensor_post_url, json=sensor_api_object)
+                print(response.json())
+            except:
+                print('Error sending data to API')
     else:
         print('Packet invalid')
 
@@ -183,7 +187,7 @@ def run():
     scheduler.start()
 
     # Initialise the radio and start processing packets
-    with Radio(FREQ_433MHZ, node_id, network_id, isHighPower=True, verbose=False) as radio:
+    with Radio(FREQ_433MHZ, node_id, network_id, isHighPower=True, verbose=False, encryptionKey=encrypt_key) as radio:
         print("Starting loop...")
         while True:
 
