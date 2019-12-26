@@ -2,24 +2,23 @@ from RFM69 import Radio, FREQ_433MHZ
 from datetime import timedelta, datetime
 import requests
 import time
-import threading
 import dateutil.parser
 from apscheduler.schedulers.background import BackgroundScheduler
 
+# Config variables
 node_id = 1
 network_id = 100
 api_root = 'http://192.168.1.180:5000/api/'
 api_key = 'xgLxTX7Nkem5qc9jllg2'
 encrypt_key = 'pnOvzy105sF5g8Ot'
-
-connected_sensors = {}
 number_of_time_periods = 10
-time_periods = {}
-
-# Ten minute time periods
 node_interval = 600000
 
+# State variables
+connected_sensors = {}
+time_periods = {}
 
+# Creates a sensor object
 def create_sensor(id, last_date, start_time, interval_time):
     sensor = {
         "id": id,
@@ -29,7 +28,7 @@ def create_sensor(id, last_date, start_time, interval_time):
     }
     return sensor
 
-
+# Converts an ascii string to the equivalent unicode string
 def ascii_to_string(ascii_array):
     converted_string = ''
 
@@ -39,6 +38,7 @@ def ascii_to_string(ascii_array):
     return converted_string
 
 
+# Converts sensor type character to the equivalent string
 def convert_type_to_string(type_char):
     types = {
         'H': 'Humidity',
@@ -48,7 +48,7 @@ def convert_type_to_string(type_char):
 
     return types[type_char]
 
-
+# Process packet control data
 def process_packet_control(control):
     control_dict = {}
     control_data = control.split(',')
@@ -61,6 +61,8 @@ def process_packet_control(control):
 
 def process_packet(packet, radio):
     print('-----------------------')
+
+    # Get packet data
     packet_data = ascii_to_string(packet.data)
     sensor_id = packet.sender
     packet_date = str(packet.received)
@@ -110,10 +112,10 @@ def process_packet(packet, radio):
             for climate_part in climate_data_parts:
                 climate_parts = climate_part.split('=')
                 if len(climate_parts) == 2:
-                    type = convert_type_to_string(climate_parts[0])
+                    sensor_type = convert_type_to_string(climate_parts[0])
                     value = climate_parts[1]
                     climate_data_dict = {
-                        'type': type,
+                        'type': sensor_type,
                         'value': value
                     }
                     climate_api_object['climate_data'].append(climate_data_dict)
@@ -158,7 +160,7 @@ def process_packet(packet, radio):
             if len(minutes) == 1:
                 minutes = '0' + minutes
 
-            period = int(minutes[0] + str(int(assigned_period)-1))
+            period = int(minutes[0] + str(int(assigned_period) - 1))
             start_time = start_time.replace(minute=period)
 
             print('Assigned sensor with period: ' + assigned_period)
@@ -196,13 +198,13 @@ def process_packet(packet, radio):
     else:
         print('Packet invalid')
 
-
+# Removes inactive sensors
 def remove_inactive_sensors():
     print('Removing inactive sensors')
     global connected_sensors
     connected_sensors = filter_inactive_sensors(connected_sensors)
 
-
+# Removes sensors that have not send data in the last 10 minutes
 def filter_inactive_sensors(sensors):
     now = datetime.now()
     inactive_time = now - timedelta(minutes=10)
@@ -225,21 +227,13 @@ def filter_inactive_sensors(sensors):
 
     return temp_sensors
 
-
+# Initialise the time periods
 def init_time_periods():
     for i in range(1, number_of_time_periods):
         time_periods[str(i)] = None
 
-
-def run():
-    init_time_periods()
-
-    scheduler = BackgroundScheduler()
-
-    # Create job to remove inactive sensors every 10 minutes
-    inactive_job = scheduler.add_job(remove_inactive_sensors, 'interval', minutes=10)
-    scheduler.start()
-
+# Initialise radio and process radio packets
+def run_radio():
     # Initialise the radio and start processing packets
     with Radio(FREQ_433MHZ, node_id, network_id, isHighPower=True, verbose=False, encryptionKey=encrypt_key) as radio:
         print("Starting loop...")
@@ -253,9 +247,22 @@ def run():
             delay = 0.05
             time.sleep(delay)
 
+# Initialise program and start radio loop
+def run():
+    init_time_periods()
+
+    scheduler = BackgroundScheduler()
+
+    # Create job to remove inactive sensors every 10 minutes
+    inactive_job = scheduler.add_job(remove_inactive_sensors, 'interval', minutes=10)
+    scheduler.start()
+
+    run_radio()
+
     # Shutdown any scheduler jobs
     inactive_job.remove()
     scheduler.shutdown()
 
 
+# Start program
 run()

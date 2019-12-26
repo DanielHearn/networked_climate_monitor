@@ -9,9 +9,11 @@ from flask_jwt_extended import (JWTManager, create_access_token, create_refresh_
 
 from helpers import get_unit_from_type, create_settings
 
+# Load Flask
 app = Flask(__name__)
 api = Api(app)
 
+# Initialise configuration variables
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'a060dc4d401ffdb1b91bf5db8430f88d'
@@ -24,7 +26,7 @@ api_key = 'xgLxTX7Nkem5qc9jllg2'
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
 
-
+# Create the database if it doesn't already exist
 @app.before_first_request
 def create_tables():
     db.create_all()
