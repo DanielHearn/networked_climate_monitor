@@ -7,29 +7,34 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 
+// Define radio configuration
 #define NODEID        2
 #define NETWORKID     100
-
 #define FREQUENCY      RF69_433MHZ
 #define ENCRYPTKEY     "pnOvzy105sF5g8Ot"
 
 // Serial board rate - just used to print debug messages
 #define SERIAL_BAUD   115200
 
+// Define radio pins
 #define RF69_RESET    4
 #define RF69_SPI_CS   8
 #define RF69_IRQ_PIN  7
 #define RF69_IRQ_NUM  4
 
+// Define sensor pins
 #define BME_SCK 13
 #define BME_MISO 12
 #define BME_MOSI 11
 #define BME_CS 10
 
+// Define battery pin
 #define VBATPIN A9
 
 Adafruit_BME280 bme;
 RFM69 radio(RF69_SPI_CS, RF69_IRQ_PIN, false, RF69_IRQ_NUM);
+
+// Define global variables
 unsigned bme_status;
 boolean initialised = false;
 long send_interval = 10000;
@@ -41,26 +46,29 @@ void setup() {
   
   // Reset the radio
   resetRadio();
+  
   // Initialize the radio
   radio.initialize(FREQUENCY, NODEID, NETWORKID);
   radio.promiscuous(false);
   
-  radio.setHighPower(); //must include this only for RFM69HW/HCW!
-    
+  radio.setHighPower();
+
+  // Load BME280 sensor
   bme_status = bme.begin();  
   if (!bme_status) {
       Serial.println("Could not find a valid BME280 sensor, check wiring, address, sensor ID!");
       while (1);
   }
 
+  // Change radio power to preserve battery if the radio has good signal with the base station
   #ifdef ENABLE_ATC
     radio.enableAutoPower(ATC_RSSI);
   #endif
-  radio.encrypt(ENCRYPTKEY);
 
-  delay(5000);
+  radio.encrypt(ENCRYPTKEY);
 }
 
+// Read battery level and convert it to voltage level
 float getBatteryVoltage() {
   return analogRead(VBATPIN) * 2 * 3.3 / 1024;
 }
@@ -156,8 +164,6 @@ void loop() {
 
           int packet_end_split_index = main_data.indexOf('_');
           main_data = main_data.substring(0, packet_end_split_index);
-          Serial.println(control_data);
-          Serial.println(main_data);
 
           int str_len = main_data.length() + 1; 
           char char_array[str_len];
@@ -171,8 +177,6 @@ void loop() {
 
               String key_string = token_string.substring(0, part_split_index);
               String value_string = token_string.substring(part_split_index+1);
-              Serial.println(key_string);
-              Serial.println(value_string);
 
               if (key_string == "initial") {
                   initial_delay = value_string.toInt();
@@ -191,6 +195,7 @@ void loop() {
         }
       }
       if(initialised == false) {
+          Serial.println("Waiting before attempting initialisation again");
           delay(10000);
       } else {
           Serial.println("Waiting before the first sensor reading");
@@ -202,10 +207,11 @@ void loop() {
 
 // Reset the Radio
 void resetRadio() {
-  Serial.print("Resetting radio...");
+  Serial.print("Resetting radio");
   pinMode(RF69_RESET, OUTPUT);
   digitalWrite(RF69_RESET, HIGH);
   delay(20);
   digitalWrite(RF69_RESET, LOW);
   delay(500);
+  Serial.print("Radio reset");
 }
