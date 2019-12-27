@@ -8,7 +8,7 @@
 #include <Adafruit_BME280.h>
 
 // Define radio configuration
-#define NODEID        2
+#define NODEID        1
 #define NETWORKID     100
 #define FREQUENCY      RF69_433MHZ
 #define ENCRYPTKEY     "pnOvzy105sF5g8Ot"
@@ -66,6 +66,8 @@ void setup() {
   #endif
 
   radio.encrypt(ENCRYPTKEY);
+
+  delay(5000);
 }
 
 // Read battery level and convert it to voltage level
@@ -95,10 +97,12 @@ void loop() {
       // Create main data
       payload_data[10] = '|';
       if(bme_status) {
+        // Get temperature and place in char array with 2 decimal points
         float temp = bme.readTemperature();
-        char temp_chars[5];   
+        char temp_chars[5];
         dtostrf(temp, 5, 2, temp_chars);
-        char t1 = temp_chars[0];
+
+        // Put temperature data into payload
         payload_data[11] = 'T';
         payload_data[12] = '=';
         payload_data[13] = temp_chars[0];
@@ -107,10 +111,13 @@ void loop() {
         payload_data[16] = temp_chars[3];
         payload_data[17] = temp_chars[4];
         payload_data[18] = ',';
-        
+ 
+        // Get humidity and place in char array with 2 decimal points
         float hum = bme.readHumidity();
         char hum_chars[5];   
         dtostrf(hum, 5, 2, hum_chars);
+
+        // Put humidity into payload
         payload_data[19] = 'H';
         payload_data[20] = '=';
         payload_data[21] = hum_chars[0];
@@ -121,11 +128,12 @@ void loop() {
       }
   
       Serial.println(payload_data);
-  
+
+      // Send climate data to base station with retries if no ack is receies
       if (radio.sendWithRetry(1, payload_data, sizeof(payload_data), 3, 200)) {
-        if (Serial) Serial.println("ACK received");
+        if (Serial) Serial.println("Succefully send with ACK");
       } else {
-        if (Serial) Serial.println("No ACK");
+        if (Serial) Serial.println("Unsucessfull send with no ACK");
       }
   
       //radio.sleep();
@@ -133,7 +141,7 @@ void loop() {
       
     } else {
       Serial.println("Attempting initialisation");
-      int initial_delay = 0;
+      long initial_delay = 0;
 
       
       char payload_data[] = "____________________________________________________________";
@@ -177,7 +185,7 @@ void loop() {
 
               String key_string = token_string.substring(0, part_split_index);
               String value_string = token_string.substring(part_split_index+1);
-
+  
               if (key_string == "initial") {
                   initial_delay = value_string.toInt();
               } else if (key_string == "interval") {
@@ -191,7 +199,7 @@ void loop() {
           initialised = true;
         }
         if(initialised == false) {
-          delay(200);
+          delay(250);
         }
       }
       if(initialised == false) {

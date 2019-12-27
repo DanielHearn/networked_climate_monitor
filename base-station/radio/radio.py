@@ -18,6 +18,7 @@ node_interval = 600000
 connected_sensors = {}
 time_periods = {}
 
+
 # Creates a sensor object
 def create_sensor(id, last_date, start_time, interval_time):
     sensor = {
@@ -27,6 +28,7 @@ def create_sensor(id, last_date, start_time, interval_time):
         "interval_time": interval_time
     }
     return sensor
+
 
 # Converts an ascii string to the equivalent unicode string
 def ascii_to_string(ascii_array):
@@ -47,6 +49,7 @@ def convert_type_to_string(type_char):
     }
 
     return types[type_char]
+
 
 # Process packet control data
 def process_packet_control(control):
@@ -198,11 +201,13 @@ def process_packet(packet, radio):
     else:
         print('Packet invalid')
 
+
 # Removes inactive sensors
 def remove_inactive_sensors():
     print('Removing inactive sensors')
     global connected_sensors
     connected_sensors = filter_inactive_sensors(connected_sensors)
+
 
 # Removes sensors that have not send data in the last 10 minutes
 def filter_inactive_sensors(sensors):
@@ -227,10 +232,12 @@ def filter_inactive_sensors(sensors):
 
     return temp_sensors
 
+
 # Initialise the time periods
 def init_time_periods():
     for i in range(1, number_of_time_periods):
         time_periods[str(i)] = None
+
 
 # Initialise radio and process radio packets
 def run_radio():
@@ -246,6 +253,7 @@ def run_radio():
             # Periodically process packets
             delay = 0.05
             time.sleep(delay)
+
 
 # Initialise program and start radio loop
 def run():

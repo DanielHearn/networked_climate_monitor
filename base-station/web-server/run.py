@@ -332,28 +332,29 @@ class Sensor(Resource):
 
 
 sensor_parser = reqparse.RequestParser()
+sensor_parser.add_argument('api_key', help='This field cannot be blank', required=False)
 sensor_parser.add_argument('name', help='This field cannot be blank', required=False)
 sensor_parser.add_argument('sensor_id', help='This field cannot be blank', required=False)
 sensor_parser.add_argument('user_id', help='This field cannot be blank', required=False)
 
 
 class Sensors(Resource):
-    @jwt_required
     def post(self):
         data = sensor_parser.parse_args()
-        if data['name'] and data['sensor_id'] and data['user_id']:
-            name = data['name']
-            sensor_id = data['sensor_id']
-            user_id = data['user_id']
+        if data['api_key'] == api_key:
+            if data['name'] and data['sensor_id'] and data['user_id']:
+                name = data['name']
+                sensor_id = data['sensor_id']
+                user_id = data['user_id']
 
-            if SensorModel.query.filter_by(id=sensor_id).first():
-                return {'message': 'A sensor with that id already exists'}
+                if SensorModel.query.filter_by(id=sensor_id).first():
+                    return {'message': 'A sensor with that id already exists'}
 
-            sensor = SensorModel(name=name, id=sensor_id, user_id=user_id)
-            db.session.add(sensor)
-            db.session.commit()
-            return jsonify({'status': 'Sensor successfully created.'})
-        return jsonify({'status': 'Invalid body data.'})
+                sensor = SensorModel(name=name, id=sensor_id, user_id=user_id)
+                db.session.add(sensor)
+                db.session.commit()
+                return jsonify({'status': 'Sensor successfully created.'})
+            return jsonify({'status': 'Invalid body data.'})
 
     @jwt_required
     def get(self):
