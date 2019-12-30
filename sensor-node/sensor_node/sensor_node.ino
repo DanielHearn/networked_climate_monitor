@@ -8,7 +8,7 @@
 #include <Adafruit_BME280.h>
 
 // Define radio configuration
-#define NODEID        1
+#define NODEID        2
 #define NETWORKID     100
 #define FREQUENCY      RF69_433MHZ
 #define ENCRYPTKEY     "pnOvzy105sF5g8Ot"
@@ -37,7 +37,10 @@ RFM69 radio(RF69_SPI_CS, RF69_IRQ_PIN, false, RF69_IRQ_NUM);
 // Define global variables
 unsigned bme_status;
 boolean initialised = false;
-long send_interval = 10000;
+long send_interval = 60000;
+long initialisation_interval = 60000;
+long loop_drift = 0;
+int drift = 1500;
 
 // Setup
 void setup() {
@@ -76,9 +79,11 @@ float getBatteryVoltage() {
 }
 
 void loop() {
+    loop_drift = 0;
     if (initialised) {
       Serial.println("Sending climate data");
       char payload_data[] = "____________________________________________________________";
+      boolean valid_data = false;
   
       // Create control data
       char battery_chars[5];   
@@ -97,52 +102,135 @@ void loop() {
       // Create main data
       payload_data[10] = '|';
       if(bme_status) {
-        // Get temperature and place in char array with 2 decimal points
-        float temp = bme.readTemperature();
-        char temp_chars[5];
-        dtostrf(temp, 5, 2, temp_chars);
+        boolean valid_temp = false;
+        float temp = 0;
+        int t_i;
+        int t_retries = 3;
 
-        // Put temperature data into payload
-        payload_data[11] = 'T';
-        payload_data[12] = '=';
-        payload_data[13] = temp_chars[0];
-        payload_data[14] = temp_chars[1];
-        payload_data[15] = temp_chars[2];
-        payload_data[16] = temp_chars[3];
-        payload_data[17] = temp_chars[4];
-        payload_data[18] = ',';
- 
-        // Get humidity and place in char array with 2 decimal points
-        float hum = bme.readHumidity();
-        char hum_chars[5];   
-        dtostrf(hum, 5, 2, hum_chars);
+        // Attempt to get valid temperature with 3 attempts
+        for (t_i = 1; t_i < t_retries; ++t_i) {
+           temp = bme.readTemperature();
+           if (temp >= -40 && temp <= 85) {
+            valid_temp = true;
+           }
+           loop_drift += 100;
+           delay(100);
+        }
+        if (valid_temp) {
+          // Place humidity into char array with 2 decimal points
+          char temp_chars[5];
+          dtostrf(temp, 5, 2, temp_chars);
+  
+          // Put temperature data into payload
+          payload_data[11] = 'T';
+          payload_data[12] = '=';
+          payload_data[13] = temp_chars[0];
+          payload_data[14] = temp_chars[1];
+          payload_data[15] = temp_chars[2];
+          payload_data[16] = temp_chars[3];
+          payload_data[17] = temp_chars[4];
+          payload_data[18] = ',';
+          valid_data = true;
+        }
+        
+        boolean valid_hum = false;
+        float hum = 0;
+        int h_i;
+        int h_retries = 3;
 
-        // Put humidity into payload
-        payload_data[19] = 'H';
-        payload_data[20] = '=';
-        payload_data[21] = hum_chars[0];
-        payload_data[22] = hum_chars[1];
-        payload_data[23] = hum_chars[2];
-        payload_data[24] = hum_chars[3];
-        payload_data[25] = hum_chars[4];
+        // Attempt to get valid humditity with 3 attempts
+        for (h_i = 1; h_i < h_retries; ++h_i) {
+           hum = bme.readHumidity();
+           if (hum >= 0 && hum <= 100) {
+            valid_hum = true;
+           }
+           loop_drift += 100;
+           delay(100);
+        }
+        if (valid_hum) {
+          // Place humidity into char array with 2 decimal points
+          char hum_chars[5];   
+          dtostrf(hum, 5, 2, hum_chars);
+  
+          // Put humidity into payload
+          payload_data[19] = 'H';
+          payload_data[20] = '=';
+          payload_data[21] = hum_chars[0];
+          payload_data[22] = hum_chars[1];
+          payload_data[23] = hum_chars[2];
+          payload_data[24] = hum_chars[3];
+          payload_data[25] = hum_chars[4];
+          valid_data = true;
+        }
       }
   
       Serial.println(payload_data);
 
-      // Send climate data to base station with retries if no ack is receies
-      if (radio.sendWithRetry(1, payload_data, sizeof(payload_data), 3, 200)) {
-        if (Serial) Serial.println("Succefully send with ACK");
+      if (valid_data) {
+         // Send climate data to base station with retries if no ack is receies
+         if (radio.sendWithRetry(1, payload_data, sizeof(payload_data), 3, 200)) {
+          if (Serial) Serial.println("Succefully send with ACK");
+  
+          // Check if re-initialisation request recieved
+          int i;
+          int retries = 3;
+          for (i = 1; i < retries; ++i){
+            Serial.println("Checking for re-init packet");
+            if (radio.receiveDone()) {
+              Serial.println("Received re-init packet");
+              char packet_data[] = "____________________________________________________________";
+              for (byte i = 0; i < radio.DATALEN; i++) {
+                char c = radio.DATA[i];
+                packet_data[i] = c;
+              }
+    
+              String data = packet_data;
+              int split_index = data.indexOf('|');
+              String control_data = data.substring(0, split_index);
+    
+              int str_len = control_data.length() + 1; 
+              char char_array[str_len];
+              control_data.toCharArray(char_array, str_len);
+              char *token = strtok(char_array, ","); 
+              
+              while (token != NULL) 
+              { 
+                  String token_string = token;
+                  int part_split_index = token_string.indexOf('=');
+    
+                  String key_string = token_string.substring(0, part_split_index);
+                  String value_string = token_string.substring(part_split_index+1);
+      
+                  if (key_string == "T" && value_string == "RI") {
+                      Serial.println("Re-initialisation request");
+                      initialised = false;
+                  }
+                  
+                  token = strtok(NULL, ","); 
+              }
+            
+              i = retries;
+            }
+            if(initialised) {
+              Serial.println("Waiting to check for initialisation again");
+              loop_drift += 250;
+              delay(250);
+            }
+          }
+       
+        } else {
+          if (Serial) Serial.println("Unsucessfull send with no ACK");
+        }
       } else {
-        if (Serial) Serial.println("Unsucessfull send with no ACK");
+        Serial.println("Invalid data from sensor");
       }
   
       //radio.sleep();
-      delay(send_interval);
+      delay(send_interval - drift - loop_drift);
       
     } else {
       Serial.println("Attempting initialisation");
       long initial_delay = 0;
-
       
       char payload_data[] = "____________________________________________________________";
       payload_data[0] = 'T';
@@ -199,16 +287,17 @@ void loop() {
           initialised = true;
         }
         if(initialised == false) {
+          loop_drift += 250;
           delay(250);
         }
       }
       if(initialised == false) {
           Serial.println("Waiting before attempting initialisation again");
-          delay(10000);
+          delay(initialisation_interval - drift);
       } else {
           Serial.println("Waiting before the first sensor reading");
-          Serial.println(initial_delay);
-          delay(initial_delay);
+          Serial.println(initial_delay - drift - loop_drift);
+          delay(initial_delay - drift - loop_drift);
       }
     }
 }
