@@ -1,9 +1,11 @@
 import dateutil.parser
+from datetime import timedelta
 from flask import Flask, render_template, jsonify, request
-from flask_restful import Api, Resource, reqparse
+from flask_restful import Api, Resource
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_serializer import SerializerMixin
 from passlib.hash import bcrypt
+from marshmallow import Schema, fields, ValidationError, validate
 from flask_jwt_extended import (JWTManager, create_access_token, create_refresh_token, jwt_required,
                                 jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 
@@ -26,6 +28,7 @@ api_key = 'xgLxTX7Nkem5qc9jllg2'
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
 
+
 # Create the database if it doesn't already exist
 @app.before_first_request
 def create_tables():
@@ -37,6 +40,29 @@ def check_if_token_in_blacklist(decrypted_token):
     jti = decrypted_token['jti']
     return RevokedTokenModel.is_jti_blacklisted(jti)
 
+@jwt.expired_token_loader
+def expired_token_callback(expired_token):
+    token_type = expired_token['type']
+    return jsonify({
+        'status': 'Error',
+        'errors': ['The {} token has expired'.format(token_type)]
+    }), 401
+
+@jwt.revoked_token_loader
+def revoked_token_loader_callback():
+    return jsonify({
+        'status': 'Error',
+        'errors': ['The token is invalid as it has been revoked']
+    }), 401
+
+@jwt.unauthorized_loader
+def unauthorized_loader_callback(msg):
+    return jsonify({
+        'status': 'Error',
+        'errors': [msg]
+    }), 401
+
+## MODELS
 
 class UserModel(db.Model, SerializerMixin):
     __tablename__ = 'user'
@@ -129,28 +155,71 @@ class SensorDataModel(db.Model, SerializerMixin):
         return '<Sensor Data %r>' % self.id
 
 
-account_parser = reqparse.RequestParser()
-account_parser.add_argument('email', help='This field cannot be blank', required=True)
-account_parser.add_argument('password', help='This field cannot be blank', required=True)
+## SCHEMAS
+
+class UserSchema(Schema):
+    email = fields.Email(required=True, validate=validate.Length(min=0, max=120))
+    password = fields.Str(required=True, validate=validate.Length(min=8, max=40))
+    settings = fields.Str(dump_only=True, required=True)
+
+
+class SensorSchema(Schema):
+    name = fields.Str(required=True, validate=validate.Length(min=0, max=40))
+    sensor_id = fields.Integer(required=True)
+    user_id = fields.Integer(required=True)
+
+
+class ClimateDataSchema(Schema):
+    battery_voltage = fields.Float(required=True)
+    date = fields.DateTime(required=True)
+    climate_data = fields.List(fields.Dict(
+        value=fields.Integer(required=True),
+        type=fields.Str(required=True, validate=validate.Length(min=0, max=100)),
+        unit=fields.Str(required=True, validate=validate.Length(min=0, max=20))
+    ))
+
+
+climate_data_schema = ClimateDataSchema()
+sensor_schema = SensorSchema()
+user_schema = UserSchema()
+
 
 class UserLogin(Resource):
+    # Get access token and refresh token if a valid email and password are received
     def post(self):
-        data = account_parser.parse_args()
+        json_data = request.get_json()
+        if not json_data:
+            return {"message": "No input data provided"}, 400
+
+        # Validate and deserialize input
+        try:
+            data = user_schema.load(json_data)
+        except ValidationError as err:
+            return err.messages, 422
+
         current_user = UserModel.find_by_email(data['email'])
 
         if not current_user:
             return {'message': 'UserModel {} doesn\'t exist'.format(data['email'])}
 
         if UserModel.verify_hash(data['password'], current_user.password):
-            access_token = create_access_token(identity=data['email'])
-            refresh_token = create_refresh_token(identity=data['email'])
-            return {
-                'message': 'Logged in as {}'.format(current_user.email),
-                'access_token': access_token,
-                'refresh_token': refresh_token
-            }
+            try:
+                expires = timedelta(days=365)
+                access_token = create_access_token(identity=data['email'], expires_delta=expires)
+                refresh_token = create_refresh_token(identity=data['email'])
+                return {
+                    'status': 'Successful login',
+                    'access_token': access_token,
+                    'refresh_token': refresh_token
+                }
+            except:
+                return {'status': 'Error', 'errors': [
+                    'Error in generating tokens'
+                ]}, 500
         else:
-            return {'message': 'Wrong credentials'}
+            return {'status': 'Error', 'errors': [
+                'Email or password is incorrect'
+            ]}, 401
 
 
 class UserLogoutAccess(Resource):
@@ -160,9 +229,11 @@ class UserLogoutAccess(Resource):
         try:
             revoked_token = RevokedTokenModel(jti=jti)
             revoked_token.add()
-            return {'message': 'Access token has been revoked'}
+            return {'status': 'Access token has been revoked'}
         except:
-            return {'message': 'Something went wrong'}, 500
+            return {'status': 'Error', 'errors': [
+                'Error in revoking access token'
+            ]}, 500
 
 
 class UserLogoutRefresh(Resource):
@@ -172,22 +243,38 @@ class UserLogoutRefresh(Resource):
         try:
             revoked_token = RevokedTokenModel(jti=jti)
             revoked_token.add()
-            return {'message': 'Refresh token has been revoked'}
+            return {'status': 'Refresh token has been revoked'}
         except:
-            return {'message': 'Something went wrong'}, 500
+            return {'status': 'Error', 'errors': [
+                'Error in revoking refresh token'
+            ]}, 500
 
 
 class TokenRefresh(Resource):
+    # Return a new access token if a valid refresh token is received
     @jwt_refresh_token_required
     def post(self):
         current_user = get_jwt_identity()
-        access_token = create_access_token(identity=current_user)
-        return {'access_token': access_token}
+        try:
+            access_token = create_access_token(identity=current_user)
+            return {'access_token': access_token}
+        except:
+            return {'status': 'Error', 'errors': [
+                'Error in refreshing access token'
+            ]}, 500
 
 
 class AllUsers(Resource):
     def post(self):
-        data = account_parser.parse_args()
+        json_data = request.get_json()
+        if not json_data:
+            return {"message": "No input data provided"}, 400
+
+        # Validate and deserialize input
+        try:
+            data = user_schema.load(json_data)
+        except ValidationError as err:
+            return err.messages, 422
 
         if len(UserModel.query.all()):
             return {'message': 'An account already exists'}
@@ -200,7 +287,8 @@ class AllUsers(Resource):
 
         try:
             new_user.save_to_db()
-            access_token = create_access_token(identity=data['email'])
+            expires = timedelta(days=365)
+            access_token = create_access_token(identity=data['email'], expires_delta=expires)
             refresh_token = create_refresh_token(identity=data['email'])
             return {
                 'message': 'UserModel {} was created'.format(data['email']),
@@ -210,32 +298,32 @@ class AllUsers(Resource):
         except:
             return {'message': 'Something went wrong'}, 500
 
-    @jwt_required
+    # @jwt_required
     def get(self):
         return UserModel.return_all()
 
-    @jwt_required
+    # @jwt_required
     def delete(self):
         return UserModel.delete_all()
 
 
-climate_data_post_parser = reqparse.RequestParser()
-climate_data_post_parser.add_argument('battery_voltage', help='This field cannot be blank', required=True)
-climate_data_post_parser.add_argument('date', help='This field cannot be blank', required=True)
-climate_data_post_parser.add_argument('climate_data', help='This field cannot be blank', required=True, type=list, location='json')
-climate_data_post_parser.add_argument('api_key', help='This field cannot be blank', required=True)
-
-climate_data_get_parser = reqparse.RequestParser()
-climate_data_get_parser.add_argument('quantity', help='This field cannot be blank', required=False)
-climate_data_get_parser.add_argument('range_start', help='This field cannot be blank', required=False)
-climate_data_get_parser.add_argument('range_end', help='This field cannot be blank', required=False)
-
-
 class ClimateData(Resource):
+    # Create new climate data if a valid api key is input
     def post(self, sensor_id):
-        request.get_json(force=True)
-        data = climate_data_post_parser.parse_args()
-        if data['api_key'] == api_key:
+        json_data = request.get_json(force=True)
+        input_api_key = request.args.get('api_key')
+
+        if not json_data:
+            return {"message": "No input data provided"}, 400
+
+        # Validate and deserialize input
+        try:
+            data = climate_data_schema.load(json_data)
+        except ValidationError as err:
+            return err.messages, 422
+
+        if input_api_key == api_key:
+
             sensor = SensorModel.query.filter_by(id=sensor_id).first()
             if sensor:
                 if data['battery_voltage'] and data['date'] and data['climate_data']:
@@ -260,22 +348,25 @@ class ClimateData(Resource):
                         db.session.add(sensor_obj)
 
                     db.session.commit()
-                    return jsonify({'status': 'Sensor data successfully created.'})
-            return jsonify({'status': 'Sensor doesn\'t exist'})
-        return jsonify({'status': 'Invalid API key'})
+                    return {'status': 'Sensor data successfully created.'}, 200
+            return {'status': 'Sensor doesn\'t exist'}, 500
+        return {'status': 'Invalid API key'}, 500
 
-    @jwt_required
+    # @jwt_required
     def get(self, sensor_id):
-        data = climate_data_get_parser.parse_args()
+        input_quantity = request.args.get('quantity')
+        input_range_start = request.args.get('range_start')
+        input_range_end = request.args.get('range_end')
+
         sensor = SensorModel.query.filter_by(id=sensor_id).first()
         if sensor:
             quantity = 20
-            input_quantity = data['quantity']
+            input_quantity = input_quantity
             if input_quantity:
                 quantity = input_quantity
 
-            range_start = data['range_start']
-            range_end = data['range_end']
+            range_start = input_range_start
+            range_end = input_range_end
             if (range_start and range_end is None) or (range_start is None and range_end):
                 return jsonify({'status': 'Invalid date range'})
             elif range_start and range_end:
@@ -303,73 +394,84 @@ class ClimateData(Resource):
                     sensor_dict = sensor.to_dict()
                     sensor_dict_list.append(sensor_dict)
                 climate_dict['climate_data'] = sensor_dict_list
-
                 climate_dict_list.append(climate_dict)
-            return jsonify(climate_dict_list)
-        return jsonify({'status': 'Sensor doesn\'t exist'})
 
-    @jwt_required
+            return {'climate_data': climate_dict_list}, 200
+        return {'status': 'Sensor doesn\'t exist'}, 500
+
+    # @jwt_required
     def delete(self, sensor_id):
         return jsonify({'status': 'Sensor climate data successfully deleted.'})
 
 
 class Sensor(Resource):
-    @jwt_required
+    # @jwt_required
     def delete(self, sensor_id):
         sensor = SensorModel.query.filter_by(id=sensor_id).first()
         if sensor:
             db.session.delete(sensor)
             db.session.commit()
-            return jsonify({'status': 'Sensor successfully deleted.'})
-        return jsonify({'status': 'Sensor doesn\'t exist'})
+            return {'status': 'Sensor successfully deleted.'}, 200
+        return {'status': 'Sensor doesn\'t exist'}, 500
 
-    @jwt_required
+    # @jwt_required
     def get(self, sensor_id):
         sensor = SensorModel.query.filter_by(id=sensor_id).first()
         if sensor:
             return jsonify(sensor.to_dict())
-        return jsonify({'status': 'Sensor doesn\'t exist'})
-
-
-sensor_parser = reqparse.RequestParser()
-sensor_parser.add_argument('api_key', help='This field cannot be blank', required=False)
-sensor_parser.add_argument('name', help='This field cannot be blank', required=False)
-sensor_parser.add_argument('sensor_id', help='This field cannot be blank', required=False)
-sensor_parser.add_argument('user_id', help='This field cannot be blank', required=False)
+        return {'status': 'Sensor doesn\'t exist'}, 500
 
 
 class Sensors(Resource):
+    # Create new sensor if a valid api_key is input
     def post(self):
-        data = sensor_parser.parse_args()
-        if data['api_key'] == api_key:
-            if data['name'] and data['sensor_id'] and data['user_id']:
-                name = data['name']
-                sensor_id = data['sensor_id']
-                user_id = data['user_id']
+        json_data = request.get_json(force=True)
+        input_api_key = request.args.get('api_key')
 
-                if SensorModel.query.filter_by(id=sensor_id).first():
-                    return {'message': 'A sensor with that id already exists'}
+        if not json_data:
+            return {"message": "No input data provided"}, 400
 
-                sensor = SensorModel(name=name, id=sensor_id, user_id=user_id)
-                db.session.add(sensor)
-                db.session.commit()
-                return jsonify({'status': 'Sensor successfully created.'})
-            return jsonify({'status': 'Invalid body data.'})
+        # Validate and deserialize input
+        try:
+            data = sensor_schema.load(json_data)
+        except ValidationError as err:
+            return err.messages, 422
 
-    @jwt_required
+        if input_api_key == api_key:
+            name = data['name']
+            sensor_id = data['sensor_id']
+            user_id = data['user_id']
+
+            # Check if that sensor already exists
+            if SensorModel.query.filter_by(id=sensor_id).first():
+                return {'message': 'A sensor with that id already exists'}, 500
+
+            sensor = SensorModel(name=name, id=sensor_id, user_id=user_id)
+            db.session.add(sensor)
+            db.session.commit()
+            return {'status': 'Sensor successfully created.'}
+        return {'status': 'Invalid api key.'}, 500
+
+    # Get all sensors in an array
+    # @jwt_required
     def get(self):
         sensors_list = SensorModel.query.all()
         sensor_dict_list = []
+
+        # Convert all sensors into dicts
         for sensor in sensors_list:
             sensor_dict_list.append(sensor.to_dict())
         return jsonify(sensor_dict_list)
 
+    # Delete all sensors
     @jwt_required
     def delete(self):
-        sensors = SensorModel.query.delete()
+        SensorModel.query.delete()
         db.session.commit()
         return jsonify({'status': 'Sensors successfully deleted.'})
 
+
+## RESOURCES
 
 # Account Resources
 api.add_resource(UserLogin, '/api/login')
@@ -384,10 +486,12 @@ api.add_resource(Sensors, '/api/sensors')
 api.add_resource(ClimateData, '/api/sensors/<int:sensor_id>/climate-data')
 
 
+## ROUTES
+
 @app.route('/api', defaults={'path': ''})
 @app.route('/api/<path:path>')
 def api_catch_all(path):
-    return jsonify({'status': 'error', 'errors': ['Endpoint doesn\'t exist']})
+    return jsonify({'status': 'error', 'errors': ['Endpoint doesn\'t exist']}), 500
 
 
 @app.route('/', defaults={'path': ''})
@@ -398,4 +502,4 @@ def catch_all(path):
 
 if __name__ == '__main__':
     print('Starting server')
-    app.run(debug=True, host='192.168.1.180')
+    app.run(debug=True, host='192.168.1.156')
