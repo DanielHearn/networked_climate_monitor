@@ -40,6 +40,7 @@ def check_if_token_in_blacklist(decrypted_token):
     jti = decrypted_token['jti']
     return RevokedTokenModel.is_jti_blacklisted(jti)
 
+
 @jwt.expired_token_loader
 def expired_token_callback(expired_token):
     token_type = expired_token['type']
@@ -48,6 +49,7 @@ def expired_token_callback(expired_token):
         'errors': ['The {} token has expired'.format(token_type)]
     }), 401
 
+
 @jwt.revoked_token_loader
 def revoked_token_loader_callback():
     return jsonify({
@@ -55,12 +57,14 @@ def revoked_token_loader_callback():
         'errors': ['The token is invalid as it has been revoked']
     }), 401
 
+
 @jwt.unauthorized_loader
 def unauthorized_loader_callback(msg):
     return jsonify({
         'status': 'Error',
         'errors': [msg]
     }), 401
+
 
 ## MODELS
 
@@ -282,27 +286,30 @@ class AllUsers(Resource):
         new_user = UserModel(
             email=data['email'],
             password=UserModel.generate_hash(data['password']),
-            settings=create_settings()
+            settings=str(create_settings())
         )
 
         try:
-            new_user.save_to_db()
-            expires = timedelta(days=365)
-            access_token = create_access_token(identity=data['email'], expires_delta=expires)
+            print(1)
+            db.session.add(new_user)
+            print(2)
+            db.session.commit()
+            print(3)
+            access_token = create_access_token(identity=data['email'])
             refresh_token = create_refresh_token(identity=data['email'])
             return {
-                'message': 'UserModel {} was created'.format(data['email']),
-                'access_token': access_token,
-                'refresh_token': refresh_token
-            }
+                       'status': 'UserModel {} was successfully created'.format(data['email']),
+                       'access_token': access_token,
+                       'refresh_token': refresh_token
+                   }, 200
         except:
-            return {'message': 'Something went wrong'}, 500
+            return {'status': 'Error', 'errors': ['Account creation failed']}, 500
 
-    # @jwt_required
+    @jwt_required
     def get(self):
         return UserModel.return_all()
 
-    # @jwt_required
+    @jwt_required
     def delete(self):
         return UserModel.delete_all()
 
@@ -352,7 +359,7 @@ class ClimateData(Resource):
             return {'status': 'Sensor doesn\'t exist'}, 500
         return {'status': 'Invalid API key'}, 500
 
-    # @jwt_required
+    @jwt_required
     def get(self, sensor_id):
         input_quantity = request.args.get('quantity')
         input_range_start = request.args.get('range_start')
@@ -399,13 +406,13 @@ class ClimateData(Resource):
             return {'climate_data': climate_dict_list}, 200
         return {'status': 'Sensor doesn\'t exist'}, 500
 
-    # @jwt_required
+    @jwt_required
     def delete(self, sensor_id):
         return jsonify({'status': 'Sensor climate data successfully deleted.'})
 
 
 class Sensor(Resource):
-    # @jwt_required
+    @jwt_required
     def delete(self, sensor_id):
         sensor = SensorModel.query.filter_by(id=sensor_id).first()
         if sensor:
@@ -414,7 +421,7 @@ class Sensor(Resource):
             return {'status': 'Sensor successfully deleted.'}, 200
         return {'status': 'Sensor doesn\'t exist'}, 500
 
-    # @jwt_required
+    @jwt_required
     def get(self, sensor_id):
         sensor = SensorModel.query.filter_by(id=sensor_id).first()
         if sensor:
@@ -429,13 +436,13 @@ class Sensors(Resource):
         input_api_key = request.args.get('api_key')
 
         if not json_data:
-            return {"message": "No input data provided"}, 400
+            return {'status': 'Error', 'errors': "No body json data provided"}, 422
 
         # Validate and deserialize input
         try:
             data = sensor_schema.load(json_data)
         except ValidationError as err:
-            return err.messages, 422
+            return {'status': 'Error', 'errors': err.messages}, 422
 
         if input_api_key == api_key:
             name = data['name']
@@ -444,31 +451,41 @@ class Sensors(Resource):
 
             # Check if that sensor already exists
             if SensorModel.query.filter_by(id=sensor_id).first():
-                return {'message': 'A sensor with that id already exists'}, 500
+                return {'status': 'Error', 'errors': ['A sensor with that id already exists']}, 500
 
-            sensor = SensorModel(name=name, id=sensor_id, user_id=user_id)
-            db.session.add(sensor)
-            db.session.commit()
-            return {'status': 'Sensor successfully created.'}
-        return {'status': 'Invalid api key.'}, 500
+            try:
+                sensor = SensorModel(name=name, id=sensor_id, user_id=user_id)
+                db.session.add(sensor)
+                db.session.commit()
+                return {'status': 'Sensor successfully created.'}
+            except:
+                return {'status': 'Error', 'errors': ['Error while adding sensor to database']}, 500
+        else:
+            return {'status': 'Error', 'errors': ['Invalid api key']}, 401
 
     # Get all sensors in an array
-    # @jwt_required
+    @jwt_required
     def get(self):
-        sensors_list = SensorModel.query.all()
-        sensor_dict_list = []
+        try:
+            sensors_list = SensorModel.query.all()
+            sensor_dict_list = []
 
-        # Convert all sensors into dicts
-        for sensor in sensors_list:
-            sensor_dict_list.append(sensor.to_dict())
-        return jsonify(sensor_dict_list)
+            # Convert all sensors into dicts
+            for sensor in sensors_list:
+                sensor_dict_list.append(sensor.to_dict())
+            return {'status': 'Successfully retrieved all sensors', 'sensors': sensor_dict_list}, 200
+        except:
+            return {'status': 'Error', 'errors': ['Error while retrieving sensors from database']}, 500
 
     # Delete all sensors
     @jwt_required
     def delete(self):
-        SensorModel.query.delete()
-        db.session.commit()
-        return jsonify({'status': 'Sensors successfully deleted.'})
+        try:
+            SensorModel.query.delete()
+            db.session.commit()
+            return {'status': 'Sensors successfully deleted.'}, 200
+        except:
+            return {'status': 'Error', 'errors': ['Error while deleting all sensors from database']}, 500
 
 
 ## RESOURCES
