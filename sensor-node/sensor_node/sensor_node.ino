@@ -173,12 +173,15 @@ void loop() {
       if (valid_data) {
          // Send climate data to base station with retries if no ack is receies
          if (radio.sendWithRetry(1, payload_data, sizeof(payload_data), 3, 200)) {
-          if (Serial) Serial.println("Succefully send with ACK");
-  
+          Serial.println("Succefully send with ACK");
+
+          loop_drift += 500;
+          delay(500);
+          
           // Check if re-initialisation request recieved
           int i;
           int retries = 3;
-          for (i = 1; i < retries; ++i){
+          for (i = 0; i < retries; ++i){
             Serial.println("Checking for re-init packet");
             if (radio.receiveDone()) {
               Serial.println("Received re-init packet");
@@ -248,7 +251,7 @@ void loop() {
 
       int i;
       int retries = 3;
-      for (i = 1; i < retries; ++i){
+      for (i = 0; i < retries; ++i){
         if (radio.receiveDone()) {
           Serial.println("Received time period packet");
           char packet_data[] = "____________________________________________________________";
