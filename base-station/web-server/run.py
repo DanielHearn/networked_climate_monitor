@@ -5,11 +5,12 @@ from flask_restful import Api, Resource
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_serializer import SerializerMixin
 from passlib.hash import bcrypt
-from marshmallow import Schema, fields, ValidationError, validate
+from marshmallow import ValidationError, validate
 from flask_jwt_extended import (JWTManager, create_access_token, create_refresh_token, jwt_required,
                                 jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 
 from helpers import get_unit_from_type, create_settings
+from schema import UserSchema, SensorSchema, ClimateDataSchema
 
 # Load Flask
 app = Flask(__name__)
@@ -41,6 +42,7 @@ def check_if_token_in_blacklist(decrypted_token):
     return RevokedTokenModel.is_jti_blacklisted(jti)
 
 
+# Specify custom error message for expired tokens
 @jwt.expired_token_loader
 def expired_token_callback(expired_token):
     token_type = expired_token['type']
@@ -50,6 +52,7 @@ def expired_token_callback(expired_token):
     }), 401
 
 
+# Specify custom error message for revoked tokens
 @jwt.revoked_token_loader
 def revoked_token_loader_callback():
     return jsonify({
@@ -58,6 +61,7 @@ def revoked_token_loader_callback():
     }), 401
 
 
+# Specify custom error message for missing authorisation headers
 @jwt.unauthorized_loader
 def unauthorized_loader_callback(msg):
     return jsonify({
@@ -66,7 +70,7 @@ def unauthorized_loader_callback(msg):
     }), 401
 
 
-## MODELS
+# MODELS
 
 class UserModel(db.Model, SerializerMixin):
     __tablename__ = 'user'
@@ -78,7 +82,7 @@ class UserModel(db.Model, SerializerMixin):
     def __repr__(self):
         return '<UserModel %r>' % self.email
 
-    def save_to_db(self):
+    def save(self):
         db.session.add(self)
         db.session.commit()
 
@@ -97,7 +101,7 @@ class UserModel(db.Model, SerializerMixin):
             db.session.commit()
             return {'message': '{} row(s) deleted'.format(num_rows_deleted)}
         except:
-            return {'message': 'Something went wrong'}
+            return {'message': 'Error during row deletion'}
 
     @staticmethod
     def generate_hash(password):
@@ -113,7 +117,7 @@ class RevokedTokenModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     jti = db.Column(db.String(120))
 
-    def add(self):
+    def save(self):
         db.session.add(self)
         db.session.commit()
 
@@ -133,6 +137,23 @@ class SensorModel(db.Model, SerializerMixin):
     def __repr__(self):
         return '<SensorModel %r>' % self.name
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    @classmethod
+    def delete_all(cls):
+        try:
+            num_rows_deleted = db.session.query(cls).delete()
+            db.session.commit()
+            return {'message': '{} row(s) deleted'.format(num_rows_deleted)}
+        except:
+            return {'message': 'Error during row deletion'}
+
 
 class ClimateModel(db.Model, SerializerMixin):
     __tablename__ = 'climate'
@@ -144,6 +165,23 @@ class ClimateModel(db.Model, SerializerMixin):
 
     def __repr__(self):
         return '<Climate %r>' % self.id
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    @classmethod
+    def delete_all(cls):
+        try:
+            num_rows_deleted = db.session.query(cls).delete()
+            db.session.commit()
+            return {'message': '{} row(s) deleted'.format(num_rows_deleted)}
+        except:
+            return {'message': 'Error during row deletion'}
 
 
 class SensorDataModel(db.Model, SerializerMixin):
@@ -158,29 +196,22 @@ class SensorDataModel(db.Model, SerializerMixin):
     def __repr__(self):
         return '<Sensor Data %r>' % self.id
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
 
-## SCHEMAS
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
 
-class UserSchema(Schema):
-    email = fields.Email(required=True, validate=validate.Length(min=0, max=120))
-    password = fields.Str(required=True, validate=validate.Length(min=8, max=40))
-    settings = fields.Str(dump_only=True, required=True)
-
-
-class SensorSchema(Schema):
-    name = fields.Str(required=True, validate=validate.Length(min=0, max=40))
-    sensor_id = fields.Integer(required=True)
-    user_id = fields.Integer(required=True)
-
-
-class ClimateDataSchema(Schema):
-    battery_voltage = fields.Float(required=True)
-    date = fields.DateTime(required=True)
-    climate_data = fields.List(fields.Dict(
-        value=fields.Integer(required=True),
-        type=fields.Str(required=True, validate=validate.Length(min=0, max=100)),
-        unit=fields.Str(required=True, validate=validate.Length(min=0, max=20))
-    ))
+    @classmethod
+    def delete_all(cls):
+        try:
+            num_rows_deleted = db.session.query(cls).delete()
+            db.session.commit()
+            return {'message': '{} row(s) deleted'.format(num_rows_deleted)}
+        except:
+            return {'message': 'Error during row deletion'}
 
 
 climate_data_schema = ClimateDataSchema()
@@ -232,7 +263,7 @@ class UserLogoutAccess(Resource):
         jti = get_raw_jwt()['jti']
         try:
             revoked_token = RevokedTokenModel(jti=jti)
-            revoked_token.add()
+            revoked_token.save_to_db()
             return {'status': 'Access token has been revoked'}
         except:
             return {'status': 'Error', 'errors': [
@@ -246,7 +277,7 @@ class UserLogoutRefresh(Resource):
         jti = get_raw_jwt()['jti']
         try:
             revoked_token = RevokedTokenModel(jti=jti)
-            revoked_token.add()
+            revoked_token.save_to_db()
             return {'status': 'Refresh token has been revoked'}
         except:
             return {'status': 'Error', 'errors': [
@@ -268,7 +299,7 @@ class TokenRefresh(Resource):
             ]}, 500
 
 
-class AllUsers(Resource):
+class Users(Resource):
     def post(self):
         json_data = request.get_json()
         if not json_data:
@@ -290,11 +321,7 @@ class AllUsers(Resource):
         )
 
         try:
-            print(1)
-            db.session.add(new_user)
-            print(2)
-            db.session.commit()
-            print(3)
+            new_user.save_to_db()
             access_token = create_access_token(identity=data['email'])
             refresh_token = create_refresh_token(identity=data['email'])
             return {
@@ -306,11 +333,11 @@ class AllUsers(Resource):
             return {'status': 'Error', 'errors': ['Account creation failed']}, 500
 
     @jwt_required
-    def get(self):
+    def get_all(self):
         return UserModel.return_all()
 
     @jwt_required
-    def delete(self):
+    def delete_all(self):
         return UserModel.delete_all()
 
 
@@ -340,8 +367,7 @@ class ClimateData(Resource):
                     print(sensors_data)
 
                     climate_data = ClimateModel(sensor_id=sensor_id, battery_voltage=battery_voltage, date=date)
-                    db.session.add(climate_data)
-                    db.session.commit()
+                    climate_data.save_to_db()
 
                     climate_id = climate_data.to_dict()['id']
 
@@ -416,8 +442,7 @@ class Sensor(Resource):
     def delete(self, sensor_id):
         sensor = SensorModel.query.filter_by(id=sensor_id).first()
         if sensor:
-            db.session.delete(sensor)
-            db.session.commit()
+            sensor.save_to_db()
             return {'status': 'Sensor successfully deleted.'}, 200
         return {'status': 'Sensor doesn\'t exist'}, 500
 
@@ -438,7 +463,7 @@ class Sensors(Resource):
         if not json_data:
             return {'status': 'Error', 'errors': "No body json data provided"}, 422
 
-        # Validate and deserialize input
+        # Validate and deserialize json data for sensor
         try:
             data = sensor_schema.load(json_data)
         except ValidationError as err:
@@ -455,8 +480,7 @@ class Sensors(Resource):
 
             try:
                 sensor = SensorModel(name=name, id=sensor_id, user_id=user_id)
-                db.session.add(sensor)
-                db.session.commit()
+                sensor.save_to_db()
                 return {'status': 'Sensor successfully created.'}
             except:
                 return {'status': 'Error', 'errors': ['Error while adding sensor to database']}, 500
@@ -473,7 +497,7 @@ class Sensors(Resource):
             # Convert all sensors into dicts
             for sensor in sensors_list:
                 sensor_dict_list.append(sensor.to_dict())
-            return {'status': 'Successfully retrieved all sensors', 'sensors': sensor_dict_list}, 200
+            return {'status': 'Sensors successfully retrieved', 'sensors': sensor_dict_list}, 200
         except:
             return {'status': 'Error', 'errors': ['Error while retrieving sensors from database']}, 500
 
@@ -481,8 +505,7 @@ class Sensors(Resource):
     @jwt_required
     def delete(self):
         try:
-            SensorModel.query.delete()
-            db.session.commit()
+            SensorModel.delete_all()
             return {'status': 'Sensors successfully deleted.'}, 200
         except:
             return {'status': 'Error', 'errors': ['Error while deleting all sensors from database']}, 500
@@ -495,7 +518,7 @@ api.add_resource(UserLogin, '/api/login')
 api.add_resource(UserLogoutAccess, '/api/logout/access')
 api.add_resource(UserLogoutRefresh, '/api/logout/refresh')
 api.add_resource(TokenRefresh, '/api/token/refresh')
-api.add_resource(AllUsers, '/api/account')
+api.add_resource(Users, '/api/account')
 
 # Sensor Resources
 api.add_resource(Sensor, '/api/sensors/<int:sensor_id>')
