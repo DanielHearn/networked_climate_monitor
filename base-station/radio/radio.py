@@ -133,8 +133,12 @@ def process_packet(packet, radio):
 
                 # Request initialisation
                 payload_data = 'T=RI|'
-                radio.send(sensor_id, payload_data)
-                print("Sent re-initialisation request")
+                print("Sending re-initialisation request")
+                if radio.send(sensor_id, payload_data, 3, 200, True):
+                    print('Received ack')
+                else:
+                    print('No ack')
+
         elif packet_type == 'I':
             print('Type: Node Initialisation')
 
