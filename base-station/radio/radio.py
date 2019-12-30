@@ -94,44 +94,46 @@ def process_packet(packet, radio):
 
             # Update date of last node communication
             id_str = str(sensor_id)
-
             if id_str in connected_sensors:
                 connected_sensors[id_str]['last_date'] = packet_datetime
+
+                # Create object for API usage
+                climate_api_object = {
+                    'date': str(packet.received),
+                    'battery_voltage': control_dict['V'],
+                    'climate_data': [],
+                    'api_key': api_key
+                }
+
+                # Process climate data
+                climate_data_parts = main_data.split(',')
+                for climate_part in climate_data_parts:
+                    climate_parts = climate_part.split('=')
+                    if len(climate_parts) == 2:
+                        sensor_type = convert_type_to_string(climate_parts[0])
+                        value = climate_parts[1]
+                        climate_data_dict = {
+                            'type': sensor_type,
+                            'value': value
+                        }
+                        climate_api_object['climate_data'].append(climate_data_dict)
+
+                print(climate_api_object)
+
+                # Send climate data to API
+                try:
+                    climate_post_url = api_root + 'sensors/' + str(sensor_id) + '/climate-data'
+                    response = requests.post(climate_post_url, json=climate_api_object)
+                    print(response.json())
+                except:
+                    print('Error sending data to API')
             else:
                 print('Sensor isn\'t stored in connected_sensors')
-                sensor = create_sensor(id_str, packet_datetime, 0, 500)
-                connected_sensors[id_str] = sensor
 
-            # Create object for API usage
-            climate_api_object = {
-                'date': str(packet.received),
-                'battery_voltage': control_dict['V'],
-                'climate_data': [],
-                'api_key': api_key
-            }
-
-            # Process climate data
-            climate_data_parts = main_data.split(',')
-            for climate_part in climate_data_parts:
-                climate_parts = climate_part.split('=')
-                if len(climate_parts) == 2:
-                    sensor_type = convert_type_to_string(climate_parts[0])
-                    value = climate_parts[1]
-                    climate_data_dict = {
-                        'type': sensor_type,
-                        'value': value
-                    }
-                    climate_api_object['climate_data'].append(climate_data_dict)
-
-            print(climate_api_object)
-
-            # Send climate data to API
-            try:
-                climate_post_url = api_root + 'sensors/' + str(sensor_id) + '/climate-data'
-                response = requests.post(climate_post_url, json=climate_api_object)
-                print(response.json())
-            except:
-                print('Error sending data to API')
+                # Request initialisation
+                payload_data = 'T=RI|'
+                radio.send(sensor_id, payload_data)
+                print("Sent re-initialisation request")
         elif packet_type == 'I':
             print('Type: Node Initialisation')
 
@@ -154,11 +156,10 @@ def process_packet(packet, radio):
             else:
                 time_periods.update({str(assigned_period): sensor_id})
 
-            print(time_periods)
-
             now = datetime.now()
             start_time = now + timedelta(minutes=10)
             start_time = start_time - timedelta(seconds=start_time.second)
+            start_time = start_time - timedelta(microseconds=start_time.microsecond)
             minutes = str(start_time.minute)
             if len(minutes) == 1:
                 minutes = '0' + minutes
@@ -174,8 +175,9 @@ def process_packet(packet, radio):
             interval_period = node_interval
 
             # Create sensor object to track connected sensors
-            sensor = create_sensor(sensor_id, packet_datetime, start_time, interval_period)
-            connected_sensors[sensor_id] = sensor
+            id_str = str(sensor_id)
+            sensor = create_sensor(id_str, packet_datetime, start_time, interval_period)
+            connected_sensors[id_str] = sensor
 
             payload_data = 'T=T|initial=' + str(start_time) + ',interval=' + str(interval_period)
             print('Assigned start_time: ' + str(start_time) + ', interval: ' + str(interval_period))
@@ -189,7 +191,8 @@ def process_packet(packet, radio):
             sensor_api_object = {
                 'name': sensor_name,
                 'user_id': 1,
-                'sensor_id': sensor_id
+                'sensor_id': sensor_id,
+                'api_key': api_key
             }
 
             try:
