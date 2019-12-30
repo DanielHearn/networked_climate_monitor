@@ -8,7 +8,7 @@
 #include <Adafruit_BME280.h>
 
 // Define radio configuration
-#define NODEID        2
+#define NODEID        1
 #define NETWORKID     100
 #define FREQUENCY      RF69_433MHZ
 #define ENCRYPTKEY     "pnOvzy105sF5g8Ot"
@@ -40,7 +40,7 @@ boolean initialised = false;
 long send_interval = 60000;
 long initialisation_interval = 60000;
 long loop_drift = 0;
-int drift = 1500;
+int drift = 1.8000;
 
 // Setup
 void setup() {
@@ -112,9 +112,11 @@ void loop() {
            temp = bme.readTemperature();
            if (temp >= -40 && temp <= 85) {
             valid_temp = true;
+            t_i = t_retries;
+           } else {
+             loop_drift += 100;
+             delay(100);
            }
-           loop_drift += 100;
-           delay(100);
         }
         if (valid_temp) {
           // Place humidity into char array with 2 decimal points
@@ -143,9 +145,11 @@ void loop() {
            hum = bme.readHumidity();
            if (hum >= 0 && hum <= 100) {
             valid_hum = true;
+            h_i = h_retries;
+           } else {
+             loop_drift += 100;
+             delay(100);
            }
-           loop_drift += 100;
-           delay(100);
         }
         if (valid_hum) {
           // Place humidity into char array with 2 decimal points
@@ -219,7 +223,7 @@ void loop() {
           }
        
         } else {
-          if (Serial) Serial.println("Unsucessfull send with no ACK");
+          Serial.println("Unsucessfull send with no ACK");
         }
       } else {
         Serial.println("Invalid data from sensor");
@@ -293,7 +297,7 @@ void loop() {
       }
       if(initialised == false) {
           Serial.println("Waiting before attempting initialisation again");
-          delay(initialisation_interval - drift);
+          delay(initialisation_interval - drift - loop_drift);
       } else {
           Serial.println("Waiting before the first sensor reading");
           Serial.println(initial_delay - drift - loop_drift);
