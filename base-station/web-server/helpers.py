@@ -1,11 +1,10 @@
-def get_unit_from_type(type):
+def get_unit_from_type(unit_type):
     units = {
         'Humidity': '%',
         'Temperature': 'c',
         'Pressure': 'hPa'
     }
-
-    return units[type]
+    return units[unit_type]
 
 
 def create_settings():
