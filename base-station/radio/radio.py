@@ -1,3 +1,4 @@
+# Imports
 from RFM69 import Radio, FREQ_433MHZ
 from datetime import timedelta, datetime
 import requests
@@ -154,21 +155,23 @@ def process_packet(packet, radio):
                 print('No available intervals')
                 return None
             else:
+                # Assign time period
                 time_periods.update({str(assigned_period): sensor_id})
 
+            # Calculate next time period for the node to start sending data at
             now = datetime.now()
             start_time = now + timedelta(minutes=10)
-            start_time = start_time - timedelta(seconds=start_time.second)
-            start_time = start_time - timedelta(microseconds=start_time.microsecond)
+            start_time -= timedelta(seconds=start_time.second)  - timedelta(microseconds=start_time.microsecond)
             minutes = str(start_time.minute)
             if len(minutes) == 1:
                 minutes = '0' + minutes
-
             period = int(minutes[0] + str(int(assigned_period) - 1))
             start_time = start_time.replace(minute=period)
 
             print('Assigned sensor with period: ' + assigned_period)
             print('Sensor will start sending at: ' + str(start_time))
+
+            # Calculate milliseconds to the start of the time period
             milliseconds_till_start = int((start_time - now).total_seconds() * 1000)
 
             start_time = milliseconds_till_start
@@ -185,8 +188,7 @@ def process_packet(packet, radio):
             # Send back time period
             radio.send(sensor_id, payload_data)
 
-            # Attempt to create sensor
-            # Will fail if the sensor already exists
+            # Assemble sensor object
             sensor_name = 'Sensor ' + str(sensor_id)
             sensor_api_object = {
                 'name': sensor_name,
@@ -195,6 +197,8 @@ def process_packet(packet, radio):
                 'api_key': api_key
             }
 
+            # Attempt to create sensor
+            # Will fail if the sensor already exists
             try:
                 sensor_post_url = api_root + 'sensors'
                 response = requests.post(sensor_post_url, json=sensor_api_object)
@@ -228,6 +232,7 @@ def filter_inactive_sensors(sensors):
         else:
             print('Removed sensor with id: ' + sensor_id)
 
+            # Remove sensor from assigned time period
             for period in time_periods:
                 period_sensor = time_periods[period]
                 if period_sensor == sensor_id:
@@ -246,7 +251,7 @@ def init_time_periods():
 def run_radio():
     # Initialise the radio and start processing packets
     with Radio(FREQ_433MHZ, node_id, network_id, isHighPower=True, verbose=False, encryptionKey=encrypt_key) as radio:
-        print("Starting loop...")
+        print("Starting radio loop")
         while True:
 
             # Process packets at each interval
