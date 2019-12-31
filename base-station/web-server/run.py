@@ -442,7 +442,7 @@ class Sensor(Resource):
     def delete(self, sensor_id):
         sensor = SensorModel.query.filter_by(id=sensor_id).first()
         if sensor:
-            sensor.save()
+            sensor.delete()
             return {'status': 'Sensor successfully deleted.'}, 200
         return {'status': 'Sensor doesn\'t exist'}, 500
 
