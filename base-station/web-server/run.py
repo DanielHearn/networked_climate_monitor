@@ -263,7 +263,7 @@ class UserLogoutAccess(Resource):
         jti = get_raw_jwt()['jti']
         try:
             revoked_token = RevokedTokenModel(jti=jti)
-            revoked_token.save_to_db()
+            revoked_token.save()
             return {'status': 'Access token has been revoked'}
         except:
             return {'status': 'Error', 'errors': [
@@ -277,7 +277,7 @@ class UserLogoutRefresh(Resource):
         jti = get_raw_jwt()['jti']
         try:
             revoked_token = RevokedTokenModel(jti=jti)
-            revoked_token.save_to_db()
+            revoked_token.save()
             return {'status': 'Refresh token has been revoked'}
         except:
             return {'status': 'Error', 'errors': [
@@ -321,7 +321,7 @@ class Users(Resource):
         )
 
         try:
-            new_user.save_to_db()
+            new_user.save()
             access_token = create_access_token(identity=data['email'])
             refresh_token = create_refresh_token(identity=data['email'])
             return {
@@ -367,7 +367,7 @@ class ClimateData(Resource):
                     print(sensors_data)
 
                     climate_data = ClimateModel(sensor_id=sensor_id, battery_voltage=battery_voltage, date=date)
-                    climate_data.save_to_db()
+                    climate_data.save()
 
                     climate_id = climate_data.to_dict()['id']
 
@@ -442,7 +442,7 @@ class Sensor(Resource):
     def delete(self, sensor_id):
         sensor = SensorModel.query.filter_by(id=sensor_id).first()
         if sensor:
-            sensor.save_to_db()
+            sensor.save()
             return {'status': 'Sensor successfully deleted.'}, 200
         return {'status': 'Sensor doesn\'t exist'}, 500
 
@@ -480,7 +480,7 @@ class Sensors(Resource):
 
             try:
                 sensor = SensorModel(name=name, id=sensor_id, user_id=user_id)
-                sensor.save_to_db()
+                sensor.save()
                 return {'status': 'Sensor successfully created.'}
             except:
                 return {'status': 'Error', 'errors': ['Error while adding sensor to database']}, 500
