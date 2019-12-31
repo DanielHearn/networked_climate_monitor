@@ -91,8 +91,8 @@ class UserModel(db.Model, SerializerMixin):
         return cls.query.filter_by(email=email).first()
 
     @classmethod
-    def return_all(cls):
-        return {'users': list(map(lambda x: x.to_dict(), UserModel.query.all()))}
+    def return_first(cls):
+        return UserModel.query.first()
 
     @classmethod
     def delete_all(cls):
@@ -303,16 +303,16 @@ class Users(Resource):
     def post(self):
         json_data = request.get_json()
         if not json_data:
-            return {"message": "No input data provided"}, 400
+            return {'status': 'Error', 'errors': ['No input data provided']}, 400
 
         # Validate and deserialize input
         try:
             data = user_schema.load(json_data)
         except ValidationError as err:
-            return err.messages, 422
+            return {'status': 'Error', 'errors': err.messages}, 422
 
         if len(UserModel.query.all()):
-            return {'message': 'An account already exists'}
+            return {'status': 'Error', 'errors': ['An account already exists']}, 500
 
         new_user = UserModel(
             email=data['email'],
@@ -325,7 +325,7 @@ class Users(Resource):
             access_token = create_access_token(identity=data['email'])
             refresh_token = create_refresh_token(identity=data['email'])
             return {
-                       'status': 'UserModel {} was successfully created'.format(data['email']),
+                       'status': 'Account was successfully created',
                        'access_token': access_token,
                        'refresh_token': refresh_token
                    }, 200
@@ -333,8 +333,29 @@ class Users(Resource):
             return {'status': 'Error', 'errors': ['Account creation failed']}, 500
 
     @jwt_required
+    def patch(self):
+        user = UserModel.return_first()
+        if not user:
+            return {'status': 'Error', 'errors': ['The account has not been created']}, 500
+
+        json_data = request.get_json()
+        if 'email' in json_data:
+            user.email = json_data['email']
+        if 'password' in json_data:
+            user.password = UserModel.generate_hash(json_data['password'])
+        if 'settings' in json_data:
+            user.settings = json_data['settings']
+
+        db.session.commit()
+
+        return {'status': 'Account successfully updated'}, 200
+
+    @jwt_required
     def get(self):
-        return UserModel.return_all()
+        user = UserModel.return_first()
+        if not user:
+            return {'status': 'Error', 'errors': ['The account has not been created']}, 500
+        return {'status': 'Account successfully retrieved', 'account': user.to_dict()}, 200
 
 
 class ClimateData(Resource):
@@ -350,7 +371,7 @@ class ClimateData(Resource):
         try:
             data = climate_data_schema.load(json_data)
         except ValidationError as err:
-            return err.messages, 422
+            return {'status': 'Error', 'errors': err.messages}, 422
 
         if input_api_key == api_key:
 
@@ -430,24 +451,41 @@ class ClimateData(Resource):
 
     @jwt_required
     def delete(self, sensor_id):
-        return jsonify({'status': 'Sensor climate data successfully deleted.'})
+        return jsonify({'status': 'Sensor climate data successfully deleted'})
 
 
 class Sensor(Resource):
+    # Update sensor for the specified sensor id
+    @jwt_required
+    def patch(self, sensor_id):
+        sensor = SensorModel.query.filter_by(id=sensor_id).first()
+        if sensor:
+            json_data = request.get_json()
+            if 'name' in json_data:
+                sensor.name = json_data['name']
+            if 'sensor_id' in json_data:
+                sensor.id = json_data['sensor_id']
+
+            db.session.commit()
+            return {'status': 'Sensor successfully updated'}, 200
+        return {'status': 'Error', 'errors': ['Sensor doesn\'t exist']}, 500
+
+    # Delete sensor for the specified sensor id
     @jwt_required
     def delete(self, sensor_id):
         sensor = SensorModel.query.filter_by(id=sensor_id).first()
         if sensor:
             sensor.delete()
-            return {'status': 'Sensor successfully deleted.'}, 200
-        return {'status': 'Sensor doesn\'t exist'}, 500
+            return {'status': 'Sensor successfully deleted'}, 200
+        return {'status': 'Error', 'errors': ['Sensor doesn\'t exist']}, 500
 
+    # Get sensor data for the specified sensor id
     @jwt_required
     def get(self, sensor_id):
         sensor = SensorModel.query.filter_by(id=sensor_id).first()
         if sensor:
-            return jsonify(sensor.to_dict())
-        return {'status': 'Sensor doesn\'t exist'}, 500
+            return {'status': 'Sensor successfully retrieved', 'sensor': sensor.to_dict()}, 200
+        return {'status': 'Error', 'errors': ['Sensor doesn\'t exist']}, 500
 
 
 class Sensors(Resource):

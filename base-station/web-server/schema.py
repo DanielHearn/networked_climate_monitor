@@ -7,7 +7,6 @@ class UserSchema(Schema):
     password = fields.Str(required=True, validate=validate.Length(min=8, max=40))
     settings = fields.Str(dump_only=True, required=True)
 
-
 class SensorSchema(Schema):
     name = fields.Str(required=True, validate=validate.Length(min=0, max=40))
     sensor_id = fields.Integer(required=True)
