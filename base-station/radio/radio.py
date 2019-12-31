@@ -102,7 +102,9 @@ def process_packet(packet, radio):
                 climate_api_object = {
                     'date': str(packet.received),
                     'battery_voltage': control_dict['V'],
-                    'climate_data': [],
+                    'climate_data': []
+                }
+                params = {
                     'api_key': api_key
                 }
 
@@ -124,7 +126,7 @@ def process_packet(packet, radio):
                 # Send climate data to API
                 try:
                     climate_post_url = api_root + 'sensors/' + str(sensor_id) + '/climate-data'
-                    response = requests.post(climate_post_url, json=climate_api_object)
+                    response = requests.post(climate_post_url, json=climate_api_object, params=params)
                     print(response.json())
                 except:
                     print('Error sending data to API')
@@ -165,7 +167,7 @@ def process_packet(packet, radio):
             # Calculate next time period for the node to start sending data at
             now = datetime.now()
             start_time = now + timedelta(minutes=10)
-            start_time -= timedelta(seconds=start_time.second)  - timedelta(microseconds=start_time.microsecond)
+            start_time -= timedelta(seconds=start_time.second) - timedelta(microseconds=start_time.microsecond)
             minutes = str(start_time.minute)
             if len(minutes) == 1:
                 minutes = '0' + minutes
@@ -197,7 +199,9 @@ def process_packet(packet, radio):
             sensor_api_object = {
                 'name': sensor_name,
                 'user_id': 1,
-                'sensor_id': sensor_id,
+                'sensor_id': sensor_id
+            }
+            params = {
                 'api_key': api_key
             }
 
@@ -205,7 +209,7 @@ def process_packet(packet, radio):
             # Will fail if the sensor already exists
             try:
                 sensor_post_url = api_root + 'sensors'
-                response = requests.post(sensor_post_url, json=sensor_api_object)
+                response = requests.post(sensor_post_url, json=sensor_api_object, params=params)
                 print(response.json())
             except:
                 print('Error sending data to API')
