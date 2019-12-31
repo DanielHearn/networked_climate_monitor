@@ -41,7 +41,7 @@ boolean initialised = false;
 long send_interval = 60000;
 long initialisation_interval = 60000;
 long loop_drift = 0;
-int drift = 1.8000;
+int drift = 760;
 
 // Setup
 void setup() {
