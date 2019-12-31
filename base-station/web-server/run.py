@@ -333,12 +333,8 @@ class Users(Resource):
             return {'status': 'Error', 'errors': ['Account creation failed']}, 500
 
     @jwt_required
-    def get_all(self):
+    def get(self):
         return UserModel.return_all()
-
-    @jwt_required
-    def delete_all(self):
-        return UserModel.delete_all()
 
 
 class ClimateData(Resource):
