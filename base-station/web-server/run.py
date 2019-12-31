@@ -344,7 +344,7 @@ class Users(Resource):
 class ClimateData(Resource):
     # Create new climate data if a valid api key is input
     def post(self, sensor_id):
-        json_data = request.get_json(force=True)
+        json_data = request.get_json()
         input_api_key = request.args.get('api_key')
 
         if not json_data:
@@ -362,7 +362,7 @@ class ClimateData(Resource):
             if sensor:
                 if data['battery_voltage'] and data['date'] and data['climate_data']:
                     battery_voltage = data['battery_voltage']
-                    date = dateutil.parser.parse(data['date'])
+                    date = data['date']
                     sensors_data = data['climate_data']
                     print(sensors_data)
 
@@ -542,4 +542,4 @@ def catch_all(path):
 
 if __name__ == '__main__':
     print('Starting server')
-    app.run(debug=True, host='192.168.1.156')
+    app.run(debug=True, host='192.168.1.180')
