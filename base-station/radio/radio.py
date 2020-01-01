@@ -136,7 +136,8 @@ def process_packet(packet, radio):
                 # Request initialisation
                 payload_data = 'T=RI|'
                 print("Sending re-initialisation request")
-                if radio.send(sensor_id, payload_data, 3, 200, True):
+                print(payload_data)
+                if radio.send(sensor_id, payload_data, attempts=3, wait=400, require_ack=True):
                     print('Received ack')
                 else:
                     print('No ack')
