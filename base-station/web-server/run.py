@@ -94,15 +94,6 @@ class UserModel(db.Model, SerializerMixin):
     def return_first(cls):
         return UserModel.query.first()
 
-    @classmethod
-    def delete_all(cls):
-        try:
-            num_rows_deleted = db.session.query(cls).delete()
-            db.session.commit()
-            return {'message': '{} row(s) deleted'.format(num_rows_deleted)}
-        except:
-            return {'message': 'Error during row deletion'}
-
     @staticmethod
     def generate_hash(password):
         return bcrypt.hash(password)
@@ -174,15 +165,6 @@ class ClimateModel(db.Model, SerializerMixin):
         db.session.delete(self)
         db.session.commit()
 
-    @classmethod
-    def delete_all(cls):
-        try:
-            num_rows_deleted = db.session.query(cls).delete()
-            db.session.commit()
-            return {'message': '{} row(s) deleted'.format(num_rows_deleted)}
-        except:
-            return {'message': 'Error during row deletion'}
-
 
 class SensorDataModel(db.Model, SerializerMixin):
     __tablename__ = 'sensordata'
@@ -203,15 +185,6 @@ class SensorDataModel(db.Model, SerializerMixin):
     def delete(self):
         db.session.delete(self)
         db.session.commit()
-
-    @classmethod
-    def delete_all(cls):
-        try:
-            num_rows_deleted = db.session.query(cls).delete()
-            db.session.commit()
-            return {'message': '{} row(s) deleted'.format(num_rows_deleted)}
-        except:
-            return {'message': 'Error during row deletion'}
 
 
 climate_data_schema = ClimateDataSchema()
@@ -419,7 +392,8 @@ class ClimateData(Resource):
             if input_quantity:
                 int_quantity = int(input_quantity)
                 if int_quantity > default_quantity or int_quantity < 0:
-                    return {'status': 'Error', 'errors': ['Quantity must be below or equal to 50 and greater than 0']}, 400
+                    return {'status': 'Error',
+                            'errors': ['Quantity must be below or equal to 50 and greater than 0']}, 400
 
             range_start = input_range_start
             range_end = input_range_end
@@ -481,6 +455,7 @@ class ClimateData(Resource):
 
             return {'status': ['Sensor climate data successfully deleted']}, 200
         return {'status': 'Error', 'errors': ['Sensor doesn\'t exist']}, 500
+
 
 class Sensor(Resource):
     # Update sensor for the specified sensor id
@@ -593,7 +568,7 @@ api.add_resource(ClimateData, '/api/sensors/<int:sensor_id>/climate-data')
 @app.route('/api', defaults={'path': ''})
 @app.route('/api/<path:path>')
 def api_catch_all(path):
-    return jsonify({'status': 'error', 'errors': ['Endpoint doesn\'t exist']}), 500
+    return {'status': 'Error', 'errors': ['Endpoint doesn\'t exist']}, 500
 
 
 @app.route('/', defaults={'path': ''})
