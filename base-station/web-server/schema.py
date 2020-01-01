@@ -20,4 +20,4 @@ class ClimateDataSchema(Schema):
         value=fields.Integer(required=True),
         type=fields.Str(required=True, validate=validate.Length(min=0, max=100)),
         unit=fields.Str(required=True, validate=validate.Length(min=0, max=20))
-    ))
+    ), required=True)

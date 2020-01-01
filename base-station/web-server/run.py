@@ -365,7 +365,7 @@ class ClimateData(Resource):
         input_api_key = request.args.get('api_key')
 
         if not json_data:
-            return {"message": "No input data provided"}, 400
+            return {'status': 'Error', 'errors': ['No input data provided']}, 400
 
         # Validate and deserialize input
         try:
@@ -375,32 +375,32 @@ class ClimateData(Resource):
 
         if input_api_key == api_key:
 
+            # Find sensor
             sensor = SensorModel.query.filter_by(id=sensor_id).first()
             if sensor:
-                if data['battery_voltage'] and data['date'] and data['climate_data']:
-                    battery_voltage = data['battery_voltage']
-                    date = data['date']
-                    sensors_data = data['climate_data']
-                    print(sensors_data)
+                battery_voltage = data['battery_voltage']
+                date = data['date']
+                sensors_data = data['climate_data']
 
-                    climate_data = ClimateModel(sensor_id=sensor_id, battery_voltage=battery_voltage, date=date)
-                    climate_data.save()
+                climate_data = ClimateModel(sensor_id=sensor_id, battery_voltage=battery_voltage, date=date)
+                climate_data.save()
 
-                    climate_id = climate_data.to_dict()['id']
+                climate_id = climate_data.to_dict()['id']
 
-                    for sensor_data in sensors_data:
-                        value = sensor_data['value']
-                        data_type = sensor_data['type']
+                # Create sensor data for each type of sensor
+                for sensor_data in sensors_data:
+                    value = sensor_data['value']
+                    data_type = sensor_data['type']
 
-                        unit = get_unit_from_type(data_type)
+                    unit = get_unit_from_type(data_type)
 
-                        sensor_obj = SensorDataModel(climate_id=climate_id, value=value, type=data_type, unit=unit)
-                        db.session.add(sensor_obj)
+                    sensor_obj = SensorDataModel(climate_id=climate_id, value=value, type=data_type, unit=unit)
+                    db.session.add(sensor_obj)
 
-                    db.session.commit()
-                    return {'status': 'Sensor data successfully created.'}, 200
-            return {'status': 'Sensor doesn\'t exist'}, 500
-        return {'status': 'Invalid API key'}, 500
+                db.session.commit()
+                return {'status': 'Sensor data successfully created.'}, 200
+            return {'status': 'Error', 'errors': ['Sensor doesn\'t exist']}, 500
+        return {'status': 'Error', 'errors': ['Invalid API key']}, 401
 
     @jwt_required
     def get(self, sensor_id):
@@ -408,22 +408,33 @@ class ClimateData(Resource):
         input_range_start = request.args.get('range_start')
         input_range_end = request.args.get('range_end')
 
+        # Check if sensor exists
         sensor = SensorModel.query.filter_by(id=sensor_id).first()
         if sensor:
-            quantity = 20
-            input_quantity = input_quantity
+            # Use a quantity to limit the number of climate objects returned
+            default_quantity = 50
+            quantity = default_quantity
+
+            # Validate quantity if input
             if input_quantity:
-                quantity = input_quantity
+                int_quantity = int(input_quantity)
+                if int_quantity > default_quantity or int_quantity < 0:
+                    return {'status': 'Error', 'errors': ['Quantity must be below or equal to 50 and greater than 0']}, 400
 
             range_start = input_range_start
             range_end = input_range_end
-            if (range_start and range_end is None) or (range_start is None and range_end):
-                return jsonify({'status': 'Invalid date range'})
-            elif range_start and range_end:
-                date_start = dateutil.parser.parse(range_start)
-                date_end = dateutil.parser.parse(range_end)
 
-                # Get climate data between the two dates
+            # Check if range is valid
+            if (range_start and range_end is None) or (range_start is None and range_end):
+                return {'status': 'Error', 'errors': ['Invalid date range']}, 400
+            elif (range_start and range_end) and (range_start < range_end):
+                try:
+                    date_start = dateutil.parser.parse(range_start)
+                    date_end = dateutil.parser.parse(range_end)
+                except:
+                    return {'status': 'Error', 'errors': ['Invalid date range']}, 400
+
+                # Get climate data between the two dates with descending date order
                 climate_data = ClimateModel.query.order_by(ClimateModel.id.desc()).filter(
                     ClimateModel.sensor_id == sensor_id,
                     ClimateModel.date <= date_end,
@@ -434,6 +445,7 @@ class ClimateData(Resource):
                 climate_data = ClimateModel.query.order_by(ClimateModel.id.desc()).filter_by(sensor_id=sensor_id).limit(
                     quantity)
 
+            # Retrieve sensor data for each climate data
             climate_dict_list = []
             for climate in climate_data:
                 climate_dict = climate.to_dict()
@@ -446,13 +458,29 @@ class ClimateData(Resource):
                 climate_dict['climate_data'] = sensor_dict_list
                 climate_dict_list.append(climate_dict)
 
-            return {'climate_data': climate_dict_list}, 200
-        return {'status': 'Sensor doesn\'t exist'}, 500
+            return {'status': 'Climate data succesfully retrieved', 'climate_data': climate_dict_list}, 200
+        return {'status': 'Error', 'errors': ['Sensor doesn\'t exist']}, 500
 
     @jwt_required
     def delete(self, sensor_id):
-        return jsonify({'status': 'Sensor climate data successfully deleted'})
+        # Check if sensor exists
+        sensor = SensorModel.query.filter_by(id=sensor_id).first()
+        if sensor:
+            climate_data = ClimateModel.query.filter_by(sensor_id=sensor_id)
 
+            # Delete all climate data
+            for climate in climate_data:
+                climate_dict = climate.to_dict()
+                climate_id = climate_dict['id']
+
+                # Delete all sensor data for the climate data
+                sensor_data = SensorDataModel.query.filter_by(climate_id=climate_id)
+                for sensor in sensor_data:
+                    sensor.delete()
+                climate.delete()
+
+            return {'status': ['Sensor climate data successfully deleted']}, 200
+        return {'status': 'Error', 'errors': ['Sensor doesn\'t exist']}, 500
 
 class Sensor(Resource):
     # Update sensor for the specified sensor id
