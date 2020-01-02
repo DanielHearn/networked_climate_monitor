@@ -41,7 +41,7 @@ boolean initialised = false;
 long send_interval = 60000;
 long initialisation_interval = 60000;
 long loop_drift = 0;
-int drift = 760;
+int drift = 900;
 
 // Setup
 void setup() {
@@ -81,7 +81,7 @@ void loop() {
   loop_drift = 0;
   if (initialised) {
     // Wake radio
-    //radio.receiveDone();
+    radio.receiveDone();
 
     Serial.println("Sending climate data");
     char payload_data[] = "____________________________________________________________";
@@ -186,9 +186,8 @@ void loop() {
         for (i = 0; i < retries; ++i) {
           Serial.println("Checking for re-init packet");
           if (radio.receiveDone()) {
-            Serial.println("Received re-init packet");
-        
-            Serial.println(radio.DATALEN);
+            Serial.println("Packet received");
+      
             char packet_data[] = "____________________________________________________________";
             for (byte i = 0; i < radio.DATALEN; i++) {
               char c = radio.DATA[i];
@@ -196,10 +195,8 @@ void loop() {
             }
 
             String data = packet_data;
-            Serial.println(data);
             int split_index = data.indexOf('|');
             String control_data = data.substring(0, split_index);
-            Serial.println(control_data);
             int str_len = control_data.length() + 1;
             char char_array[str_len];
             control_data.toCharArray(char_array, str_len);
@@ -214,7 +211,7 @@ void loop() {
               String value_string = token_string.substring(part_split_index + 1);
 
               if (key_string == "T" && value_string == "RI") {
-                Serial.println("Re-initialisation request");
+                Serial.println("Re-initialisation request received");
                 initialised = false;
                 
                 i = retries;
@@ -229,7 +226,6 @@ void loop() {
             }
           }
           if (initialised) {
-            Serial.println("Waiting to check for re-initialisation again");
             loop_drift += 1000;
             delay(1000);
           }
@@ -243,11 +239,9 @@ void loop() {
     }
 
     if(initialised) {
-      //radio.sleep();
+      radio.sleep();
       delay(send_interval - drift - loop_drift);      
     }
-
-
   } else {
     // Wake radio
     radio.receiveDone();
@@ -320,7 +314,7 @@ void loop() {
       }
     }
 
-    //radio.sleep();
+    radio.sleep();
 
     if (initialised == false) {
       Serial.println("Waiting before attempting initialisation again");
@@ -328,7 +322,7 @@ void loop() {
     } else {
       Serial.println("Waiting before the first sensor reading");
       Serial.println(initial_delay - drift - loop_drift);
-      delay(initial_delay - (drift/2) - loop_drift);
+      delay(initial_delay - loop_drift);
     }
   }
 }
