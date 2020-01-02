@@ -278,7 +278,7 @@ def run():
     scheduler = BackgroundScheduler()
 
     # Create job to remove inactive sensors every 10 minutes
-    inactive_job = scheduler.add_job(remove_inactive_sensors, 'interval', minutes=10)
+    inactive_job = scheduler.add_job(remove_inactive_sensors, 'interval', minutes=25)
     scheduler.start()
 
     run_radio()
