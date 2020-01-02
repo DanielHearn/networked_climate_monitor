@@ -168,12 +168,11 @@ def process_packet(packet, radio):
             # Calculate next time period for the node to start sending data at
             now = datetime.now()
             start_time = now + timedelta(minutes=10)
-            start_time -= timedelta(seconds=start_time.second) - timedelta(microseconds=start_time.microsecond)
             minutes = str(start_time.minute)
             if len(minutes) == 1:
                 minutes = '0' + minutes
             period = int(minutes[0] + str(int(assigned_period) - 1))
-            start_time = start_time.replace(minute=period)
+            start_time = start_time.replace(minute=period, second=0, microsecond=0)
 
             print('Assigned sensor with period: ' + assigned_period)
             print('Sensor will start sending at: ' + str(start_time))
