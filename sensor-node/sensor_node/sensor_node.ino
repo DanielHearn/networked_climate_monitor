@@ -41,7 +41,7 @@ boolean initialised = false;
 long send_interval = 60000;
 long initialisation_interval = 60000;
 long loop_drift = 0;
-int drift = 900;
+int drift = 850;
 
 // Setup
 void setup() {
@@ -70,6 +70,8 @@ void setup() {
   #endif
 
   radio.encrypt(ENCRYPTKEY);
+
+  delay(20000);
 }
 
 // Read battery level and convert it to voltage level
@@ -100,9 +102,11 @@ void loop() {
     payload_data[7] = 'T';
     payload_data[8] = '=';
     payload_data[9] = 'C';
-
-    // Create main data
     payload_data[10] = '|';
+
+    int data_index = 11;
+
+    // Create climate data
     if (bme_status) {
       boolean valid_temp = false;
       float temp = 0;
@@ -126,14 +130,15 @@ void loop() {
         dtostrf(temp, 5, 2, temp_chars);
 
         // Put temperature data into payload
-        payload_data[11] = 'T';
-        payload_data[12] = '=';
-        payload_data[13] = temp_chars[0];
-        payload_data[14] = temp_chars[1];
-        payload_data[15] = temp_chars[2];
-        payload_data[16] = temp_chars[3];
-        payload_data[17] = temp_chars[4];
-        payload_data[18] = ',';
+        payload_data[data_index] = 'T';
+        payload_data[data_index+1] = '=';
+        payload_data[data_index+2] = temp_chars[0];
+        payload_data[data_index+3] = temp_chars[1];
+        payload_data[data_index+4] = temp_chars[2];
+        payload_data[data_index+5] = temp_chars[3];
+        payload_data[data_index+6] = temp_chars[4];
+        payload_data[data_index+7] = ',';
+        data_index += 8;
         valid_data = true;
       }
 
@@ -159,13 +164,14 @@ void loop() {
         dtostrf(hum, 5, 2, hum_chars);
 
         // Put humidity into payload
-        payload_data[19] = 'H';
-        payload_data[20] = '=';
-        payload_data[21] = hum_chars[0];
-        payload_data[22] = hum_chars[1];
-        payload_data[23] = hum_chars[2];
-        payload_data[24] = hum_chars[3];
-        payload_data[25] = hum_chars[4];
+        payload_data[data_index] = 'H';
+        payload_data[data_index+1] = '=';
+        payload_data[data_index+2] = hum_chars[0];
+        payload_data[data_index+3] = hum_chars[1];
+        payload_data[data_index+4] = hum_chars[2];
+        payload_data[data_index+5] = hum_chars[3];
+        payload_data[data_index+6] = hum_chars[4];
+        data_index += 7;
         valid_data = true;
       }
     }
@@ -240,7 +246,9 @@ void loop() {
 
     if(initialised) {
       radio.sleep();
-      delay(send_interval - drift - loop_drift);      
+      long sleep_ms = send_interval - drift - loop_drift;
+      micro_sleep(sleep_ms);
+      //delay(send_interval - drift - loop_drift);      
     }
   } else {
     // Wake radio
@@ -310,7 +318,7 @@ void loop() {
       }
       if (initialised == false) {
         loop_drift += 250;
-        delay(100);
+        delay(250);
       }
     }
 
@@ -318,12 +326,28 @@ void loop() {
 
     if (initialised == false) {
       Serial.println("Waiting before attempting initialisation again");
-      delay(initialisation_interval - drift - loop_drift);
+      //delay(initialisation_interval - drift - loop_drift);
+      long sleep_ms = initialisation_interval - drift - loop_drift;
+      micro_sleep(sleep_ms);
     } else {
       Serial.println("Waiting before the first sensor reading");
-      Serial.println(initial_delay - drift - loop_drift);
-      delay(initial_delay - loop_drift);
+      Serial.println(initial_delay  - loop_drift);
+      //delay(initial_delay - loop_drift);
+      long sleep_ms = initial_delay - loop_drift;
+      micro_sleep(sleep_ms);
     }
+  }
+}
+
+// Sleeps microcontroller for the closest 8 seconds to the input milliseconds
+void micro_sleep(long sleep_ms) {
+  int micro_sleep_ms = 8000;
+  // Calculate closest multiple of 8 seconds to the input milliseconds
+  int sleep_loops = round(sleep_ms / micro_sleep_ms);
+
+  // Sleep for the required time
+  for (int i = 0; i < sleep_loops; i++) {
+    int sleep_in_ms = Watchdog.sleep(micro_sleep_ms);
   }
 }
 
