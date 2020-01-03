@@ -10,8 +10,8 @@ from flask_jwt_extended import (JWTManager, create_access_token, create_refresh_
                                 jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from helpers import get_unit_from_type, create_settings
-from schema import UserSchema, SensorSchema, ClimateDataSchema
+from helpers import get_unit_from_type, create_settings, generate_reset_key
+from schema import UserSchema, SensorSchema, ClimateDataSchema, ChangePasswordSchema
 
 # Load Flask
 app = Flask(__name__)
@@ -79,6 +79,7 @@ class UserModel(db.Model, SerializerMixin):
     password = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     settings = db.Column(db.Text, nullable=False)
+    reset_token = db.Column(db.String(40), nullable=False)
 
     def __repr__(self):
         return '<UserModel %r>' % self.email
@@ -191,6 +192,7 @@ class SensorDataModel(db.Model, SerializerMixin):
 climate_data_schema = ClimateDataSchema()
 sensor_schema = SensorSchema()
 user_schema = UserSchema()
+change_password_schema = ChangePasswordSchema()
 
 
 class UserLogin(Resource):
@@ -198,7 +200,7 @@ class UserLogin(Resource):
     def post(self):
         json_data = request.get_json()
         if not json_data:
-            return {"message": "No input data provided"}, 400
+            return {'message': 'No input data provided'}, 400
 
         # Validate and deserialize input
         try:
@@ -288,10 +290,13 @@ class Users(Resource):
         if len(UserModel.query.all()):
             return {'status': 'Error', 'errors': ['An account already exists']}, 500
 
+        reset_token = generate_reset_key()
+
         new_user = UserModel(
             email=data['email'],
             password=UserModel.generate_hash(data['password']),
-            settings=str(create_settings())
+            settings=str(create_settings()),
+            reset_token=reset_token
         )
 
         try:
@@ -301,7 +306,8 @@ class Users(Resource):
             return {
                        'status': 'Account was successfully created',
                        'access_token': access_token,
-                       'refresh_token': refresh_token
+                       'refresh_token': refresh_token,
+                       'reset_key': reset_token
                    }, 200
         except:
             return {'status': 'Error', 'errors': ['Account creation failed']}, 500
@@ -499,7 +505,7 @@ class Sensors(Resource):
         input_api_key = request.args.get('api_key')
 
         if not json_data:
-            return {'status': 'Error', 'errors': "No body json data provided"}, 422
+            return {'status': 'Error', 'errors': ['No body json data provided']}, 422
 
         # Validate and deserialize json data for sensor
         try:
@@ -549,6 +555,34 @@ class Sensors(Resource):
             return {'status': 'Error', 'errors': ['Error while deleting all sensors from database']}, 500
 
 
+class ChangePassword(Resource):
+    def post(self):
+        json_data = request.get_json(force=True)
+
+        if not json_data:
+            return {'status': 'Error', 'errors': ['No body json data provided']}, 422
+
+        # Validate and deserialize json data for sensor
+        try:
+            data = change_password_schema.load(json_data)
+        except ValidationError as err:
+            return {'status': 'Error', 'errors': err.messages}, 422
+
+        user = UserModel.return_first()
+        if not user:
+            return {'status': 'Error', 'errors': ['An account doesn\'t exist']}, 500
+
+        if user.reset_token == data['reset_token']:
+            user.password = UserModel.generate_hash(data['password'])
+            new_reset_token = generate_reset_key()
+            user.reset_token = new_reset_token
+
+            db.session.commit()
+
+            return {'status': 'Successfully reset password', 'new_reset_token': new_reset_token}, 200
+        return {'status': 'Error', 'errors': ['Invalid password reset token']}, 401
+
+
 ## RESOURCES
 
 # Account Resources
@@ -557,6 +591,7 @@ api.add_resource(UserLogoutAccess, '/api/logout/access')
 api.add_resource(UserLogoutRefresh, '/api/logout/refresh')
 api.add_resource(TokenRefresh, '/api/token/refresh')
 api.add_resource(Users, '/api/account')
+api.add_resource(ChangePassword, '/api/accounts/actions/change-password')
 
 # Sensor Resources
 api.add_resource(Sensor, '/api/sensors/<int:sensor_id>')
@@ -575,7 +610,7 @@ def api_catch_all(path):
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def catch_all(path):
-    return render_template("index.html")
+    return render_template('index.html')
 
 
 ## FUNCTIONS
