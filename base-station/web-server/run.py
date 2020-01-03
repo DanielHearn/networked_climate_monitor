@@ -580,6 +580,7 @@ def catch_all(path):
 
 ## FUNCTIONS
 
+# Deletes old climate data from the database to save storage space
 def remove_old_climate_data():
     print('Removing climate data older than 6 months')
     now = datetime.now()
@@ -588,12 +589,11 @@ def remove_old_climate_data():
     sensors = SensorModel.query.all()
     for sensor in sensors:
         sensor_id = sensor.id
-        print(sensor_id)
         climate_data = ClimateModel.query.filter(ClimateModel.sensor_id == sensor_id,
                                                     ClimateModel.date <= old_time)
         # Delete all climate data
         for climate in climate_data:
-            print('Delete old climate data at: ' + str(climate.date))
+            print('Deleting old climate data at: ' + str(climate.date))
             climate_dict = climate.to_dict()
             climate_id = climate_dict['id']
 
