@@ -1,5 +1,5 @@
 import dateutil.parser
-from datetime import timedelta
+from datetime import timedelta, datetime
 from flask import Flask, render_template, jsonify, request
 from flask_restful import Api, Resource
 from flask_sqlalchemy import SQLAlchemy
@@ -8,6 +8,7 @@ from passlib.hash import bcrypt
 from marshmallow import ValidationError, validate
 from flask_jwt_extended import (JWTManager, create_access_token, create_refresh_token, jwt_required,
                                 jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
+from apscheduler.schedulers.background import BackgroundScheduler
 
 from helpers import get_unit_from_type, create_settings
 from schema import UserSchema, SensorSchema, ClimateDataSchema
@@ -577,6 +578,47 @@ def catch_all(path):
     return render_template("index.html")
 
 
-if __name__ == '__main__':
+## FUNCTIONS
+
+def remove_old_climate_data():
+    print('Removing climate data older than 6 months')
+    now = datetime.now()
+    old_time = now - timedelta(weeks=24)
+
+    sensors = SensorModel.query.all()
+    for sensor in sensors:
+        sensor_id = sensor.id
+        print(sensor_id)
+        climate_data = ClimateModel.query.filter(ClimateModel.sensor_id == sensor_id,
+                                                    ClimateModel.date <= old_time)
+        # Delete all climate data
+        for climate in climate_data:
+            print('Delete old climate data at: ' + str(climate.date))
+            climate_dict = climate.to_dict()
+            climate_id = climate_dict['id']
+
+            # Delete all sensor data for the climate data
+            sensor_data = SensorDataModel.query.filter_by(climate_id=climate_id)
+            for sensor_d in sensor_data:
+                sensor_d.delete()
+            climate.delete()
+
+
+def init():
+    scheduler = BackgroundScheduler()
+
+
+    # Create job to remove old climate data every 24 hours
+    old_climate_job = scheduler.add_job(remove_old_climate_data, 'interval', hours=24)
+    scheduler.start()
+
     print('Starting server')
     app.run(debug=True, host='192.168.1.180')
+
+    # Shutdown any scheduler jobs
+    old_climate_job.remove()
+    scheduler.shutdown()
+
+
+if __name__ == '__main__':
+    init()
