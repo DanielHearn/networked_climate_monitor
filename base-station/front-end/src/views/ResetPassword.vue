@@ -1,11 +1,11 @@
 <template>
   <div class="home">
-    <p>Home</p>
+    <p>Reset Password</p>
   </div>
 </template>
 
 <script>
 export default {
-  name: "home"
+  name: "resetpassword",
 };
 </script>
