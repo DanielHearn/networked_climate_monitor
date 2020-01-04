@@ -1,0 +1,21 @@
+@import "./../../scss/variables.scss";
+
+.side-panel {
+  width: 22em;
+  padding: 1em;
+  background: $dark;
+  color: $white;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  flex: 1 auto;
+  flex-direction: column;
+  .side-panel-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    .sub-heading:first-child {
+      margin-top: 0;
+    }
+  }
+}

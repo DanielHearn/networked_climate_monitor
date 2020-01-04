@@ -9,6 +9,7 @@ from marshmallow import ValidationError, validate
 from flask_jwt_extended import (JWTManager, create_access_token, create_refresh_token, jwt_required,
                                 jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 from apscheduler.schedulers.background import BackgroundScheduler
+from flask_cors import CORS
 
 from helpers import get_unit_from_type, create_settings, generate_reset_key
 from schema import UserSchema, SensorSchema, ClimateDataSchema, ChangePasswordSchema
@@ -16,6 +17,7 @@ from schema import UserSchema, SensorSchema, ClimateDataSchema, ChangePasswordSc
 # Load Flask
 app = Flask(__name__)
 api = Api(app)
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Initialise configuration variables
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -47,28 +49,28 @@ def check_if_token_in_blacklist(decrypted_token):
 @jwt.expired_token_loader
 def expired_token_callback(expired_token):
     token_type = expired_token['type']
-    return jsonify({
+    return {
         'status': 'Error',
         'errors': ['The {} token has expired'.format(token_type)]
-    }), 401
+    }, 401
 
 
 # Specify custom error message for revoked tokens
 @jwt.revoked_token_loader
 def revoked_token_loader_callback():
-    return jsonify({
+    return {
         'status': 'Error',
         'errors': ['The token is invalid as it has been revoked']
-    }), 401
+    }, 401
 
 
 # Specify custom error message for missing authorisation headers
 @jwt.unauthorized_loader
 def unauthorized_loader_callback(msg):
-    return jsonify({
+    return {
         'status': 'Error',
         'errors': [msg]
-    }), 401
+    }, 401
 
 
 # MODELS

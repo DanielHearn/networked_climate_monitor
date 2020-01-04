@@ -1,0 +1,44 @@
+@import './scss/variables.scss';
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+#app {
+  font-family: "Rubik", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+}
+
+#nav {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  height: 3em;
+  background: grey;
+  color: $white;
+  .nav__side {
+    padding: 0 0.2em;
+  }
+  .nav__links {
+    justify-content: space-between;
+    align-items: center;
+    display: flex;
+    a {
+      padding: 0 0.35em;
+      justify-content: center;
+      align-items: center;
+      display: flex;
+    }
+  }
+  a {
+    color: $white;
+    text-decoration: none;
+    font-weight: $medium-weight;
+    &.router-link-exact-active {
+      color: $accent;
+    }
+  }
+}
