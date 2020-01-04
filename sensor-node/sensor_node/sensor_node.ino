@@ -6,7 +6,7 @@
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
-#include <Adafruit_SleepyDog.h>
+#include <LowPower.h>
 
 // Define radio configuration
 #define NODEID        1
@@ -41,7 +41,7 @@ boolean initialised = false;
 long send_interval = 60000;
 long initialisation_interval = 60000;
 long loop_drift = 0;
-int drift = 850;
+int drift = 1000;
 
 // Setup
 void setup() {
@@ -226,8 +226,7 @@ void loop() {
               token = strtok(NULL, ",");
             }
             
-            if (radio.ACKRequested())
-            {
+            if (radio.ACKRequested()) {
               radio.sendACK();
             }
           }
@@ -246,9 +245,8 @@ void loop() {
 
     if(initialised) {
       radio.sleep();
-      long sleep_ms = send_interval - drift - loop_drift;
-      micro_sleep(sleep_ms);
-      //delay(send_interval - drift - loop_drift);      
+      long sleep_ms = send_interval - loop_drift;
+      micro_sleep(sleep_ms - 14000);    
     }
   } else {
     // Wake radio
@@ -326,30 +324,56 @@ void loop() {
 
     if (initialised == false) {
       Serial.println("Waiting before attempting initialisation again");
-      //delay(initialisation_interval - drift - loop_drift);
-      long sleep_ms = initialisation_interval - drift - loop_drift;
+      long sleep_ms = initialisation_interval - loop_drift;
       micro_sleep(sleep_ms);
     } else {
       Serial.println("Waiting before the first sensor reading");
-      Serial.println(initial_delay  - loop_drift);
-      //delay(initial_delay - loop_drift);
       long sleep_ms = initial_delay - loop_drift;
-      micro_sleep(sleep_ms);
+      micro_sleep(sleep_ms - 10000);
     }
   }
 }
 
-// Sleeps microcontroller for the closest 8 seconds to the input milliseconds
-void micro_sleep(long sleep_ms) {
-  int micro_sleep_ms = 8000;
-  // Calculate closest multiple of 8 seconds to the input milliseconds
-  int sleep_loops = round(sleep_ms / micro_sleep_ms);
 
-  // Sleep for the required time
-  for (int i = 0; i < sleep_loops; i++) {
-    int sleep_in_ms = Watchdog.sleep(micro_sleep_ms);
-  }
+// Sleeps microcontroller
+void micro_sleep(long sleep_ms) {
+ do {
+    if (sleep_ms > 8000) {
+      LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
+      sleep_ms-=8000;
+    } else if (sleep_ms > 4000) {
+      LowPower.powerDown(SLEEP_4S, ADC_OFF, BOD_OFF);
+      sleep_ms-=4000;
+    } else if (sleep_ms > 2000) {
+      LowPower.powerDown(SLEEP_2S, ADC_OFF, BOD_OFF);
+      sleep_ms-=2000;
+    } else if (sleep_ms > 1000) {
+      LowPower.powerDown(SLEEP_1S, ADC_OFF, BOD_OFF);
+      sleep_ms-=1000;
+    } else if (sleep_ms > 512) {
+      LowPower.powerDown(SLEEP_500MS, ADC_OFF, BOD_OFF);
+      sleep_ms-=512;
+    } else if (sleep_ms > 256) {
+      LowPower.powerDown(SLEEP_250MS, ADC_OFF, BOD_OFF);
+      sleep_ms-=256;
+    } else if (sleep_ms > 128) {
+      LowPower.powerDown(SLEEP_120MS, ADC_OFF, BOD_OFF);
+      sleep_ms-=128;
+    } else if (sleep_ms > 64) {
+      LowPower.powerDown(SLEEP_60MS, ADC_OFF, BOD_OFF);
+      sleep_ms-=64;
+    } else if (sleep_ms > 32) {
+      LowPower.powerDown(SLEEP_30MS, ADC_OFF, BOD_OFF);
+      sleep_ms-=32;
+    } else if (sleep_ms > 16){
+      LowPower.powerDown(SLEEP_15MS, ADC_OFF, BOD_OFF);
+      sleep_ms-=16;
+    } else {
+      sleep_ms=0;
+    }
+  } while(sleep_ms);
 }
+
 
 // Reset the Radio
 void resetRadio() {
