@@ -245,7 +245,7 @@ void sendClimateData() {
 
   if(initialised) {
     radio.sleep();
-    long sleep_ms = send_interval - loop_drift - 16500;
+    long sleep_ms = send_interval - loop_drift - 17000;
     micro_sleep(sleep_ms);    
   }
 }
@@ -330,7 +330,7 @@ void initialise() {
     micro_sleep(sleep_ms);
   } else {
     Serial.println("Waiting before the first sensor reading");
-    long sleep_ms = initial_delay - loop_drift - 4000;
+    long sleep_ms = initial_delay - loop_drift - 8000;
     micro_sleep(sleep_ms);
   }
 }
