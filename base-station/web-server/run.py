@@ -208,7 +208,7 @@ class UserLogin(Resource):
         try:
             data = user_schema.load(json_data)
         except ValidationError as err:
-            return err.messages, 422
+            return {'status': 'Error', 'errors': err.messages}, 422
 
         current_user = UserModel.find_by_email(data['email'])
 
