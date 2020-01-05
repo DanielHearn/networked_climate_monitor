@@ -213,7 +213,9 @@ class UserLogin(Resource):
         current_user = UserModel.find_by_email(data['email'])
 
         if not current_user:
-            return {'message': 'UserModel {} doesn\'t exist'.format(data['email'])}
+            return {'status': 'Error', 'errors': [
+                'User doesn\'t exist'
+            ]}, 500
 
         if UserModel.verify_hash(data['password'], current_user.password):
             try:
