@@ -8,6 +8,7 @@
 #include <LowPower.h>
 
 // Define radio configuration
+// Node ID must be greater than or equal to 2
 #define NODEID        2
 #define NETWORKID     100
 #define FREQUENCY      RF69_433MHZ
