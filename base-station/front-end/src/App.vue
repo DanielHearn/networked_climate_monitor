@@ -28,7 +28,17 @@ export default {
   name: "app",
   methods: {
     logout: function() {
+      const user = this.$store.state.user
+      user.logged_in = false
+      user.access_token = ''
+      user.refresh_token = ''
+      user.email = ''
+      user.user_id = 0
+      this.$store.commit('setUser', user)
+
       console.log('Logout')
+      this.$toasted.show('Logged out')
+      this.$router.push('login')
     }
   }
 };

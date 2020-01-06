@@ -78,6 +78,7 @@ export default {
             user.user_id = 1
             this.$store.commit('setUser', user)
             console.log('Logged in')
+            this.$toasted.show('Logged in')
           }
 
         })
