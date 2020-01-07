@@ -8,8 +8,8 @@
         <router-link to="/">Home</router-link>
         <router-link to="/login">Login</router-link>
         <router-link to="/register">Register</router-link>
-        <router-link to="/dashboard">Dashboard</router-link>
-        <router-link to="/settings">Settings</router-link>
+        <router-link to="/dashboard" v-if="$store.state.user.logged_in">Dashboard</router-link>
+        <router-link to="/settings" v-if="$store.state.user.logged_in">Settings</router-link>
       </div>
       <div class="nav__side">
         <button v-if="$store.state.user.logged_in" @click="logout">Logout</button>
@@ -24,11 +24,18 @@
 </style>
 
 <script>
+import {HTTP} from './static/http-common'
+import {getStoredAccessToken, getStoredRefreshToken, setStoredAccessToken, setStoredRefreshToken} from './store/storage.js'
+//import {processErrors} from './static/helpers'
+
 export default {
   name: "app",
   methods: {
     logout: function() {
       const user = this.$store.state.user
+      const accessToken = user.access_token
+      const refreshToken = user.refresh_token
+
       user.logged_in = false
       user.access_token = ''
       user.refresh_token = ''
@@ -36,10 +43,71 @@ export default {
       user.user_id = 0
       this.$store.commit('setUser', user)
 
-      console.log('Logout')
+      setStoredAccessToken('')
+      setStoredRefreshToken('')
+
       this.$toasted.show('Logged out')
-      this.$router.push('login')
+
+      if (this.$route.name !== 'home') {
+        this.$router.push('/')
+      }
+      console.log(accessToken)
+      HTTP.post(`logout/access`, {}, {
+        headers: {'Authorization': 'Bearer ' + accessToken},
+      })
+      .then(response => {
+        const data = response.data
+        if (data.status) {
+          console.log(data.status)
+        }
+      })
+      .catch(e => {
+        console.log(e.response)
+      })
+
+      HTTP.post(`logout/refresh`, {}, {
+        headers: {'Authorization': 'Bearer ' + refreshToken},
+      })
+      .then(response => {
+        const data = response.data
+        if (data.status) {
+          console.log(data.status)
+        }
+      })
+      .catch(e => {
+        console.log(e.response)
+      })
     }
+  },
+  created: function() {
+    const accessToken = getStoredAccessToken()
+    const refreshToken = getStoredRefreshToken()
+
+    if (accessToken) {
+      HTTP.get(`account`, {
+        headers: {'Authorization': 'Bearer ' + accessToken},
+      })
+      .then(response => {
+        const data = response.data
+        if (data.status && data.account) {
+          const user = this.$store.state.user
+          user.logged_in = true
+          user.access_token = accessToken
+          user.refresh_token = refreshToken
+          user.email = data.account.email
+          user.user_id = data.account.id
+          user.settings = JSON.parse(data.account.settings.replace(/'/g, '"'))
+
+          this.$store.commit('setUser', user)
+
+          this.$toasted.show('Logged in')
+        }
+      })
+      .catch(e => {
+        console.log(e.response)
+      })
+    }
+
   }
 };
 </script>

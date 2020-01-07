@@ -23,33 +23,39 @@ export default {
       sensors: []
     }
   },
+  methods: {
+    loadDashboard: function() {
+      const accessToken = this.$store.state.user.access_token
+      if (accessToken) {
+        HTTP.get(`sensors`, {
+          headers: {'Authorization': 'Bearer ' + accessToken},
+        })
+        .then(response => {
+          console.log(response)
+          const data = response.data
+          if (data.sensors) {
+            this.sensors = data.sensors
+          }
+        })
+        .catch(e => {
+          if (e.response && e.response.data) {
+            this.$router.push('/login')
+          }
+        })
+      } else {
+        this.$router.push('/login')
+      }
+    }
+  },
   created: function() {
     console.log('Load dashboard')
 
     if (this.$store.state.user.logged_in) {
-      HTTP.get(`/sensors`, {
-        headers: {'Authorization': 'Bearer ' + this.$store.state.user.access_token},
-      })
-      .then(response => {
-        console.log(response)
-        const data = response.data
-        if (data.sensors) {
-          this.sensors = data.sensors
-        }
-      })
-      .catch(e => {
-        if (e.response && e.response.data) {
-          const errors = e.response.data
-          for (let errorField in errors) {
-            const field = errorField
-            const fieldErrors = errors[errorField]
-            for (let error of fieldErrors) {
-              const errorText = `${field}: ${error}`
-              this.errors.push(errorText)
-            }
-          }
-        }
-      })
+      this.loadDashboard()
+    } else{
+      setTimeout(() => {
+        this.loadDashboard()
+      }, 150)
     }
   }
 };

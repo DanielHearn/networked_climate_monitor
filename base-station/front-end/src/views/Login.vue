@@ -27,6 +27,7 @@
 <script>
 import {HTTP} from './../static/http-common';
 import {processErrors} from './../static/helpers';
+import {setStoredAccessToken, setStoredRefreshToken} from './../store/storage.js'
 
 export default {
   name: "login",
@@ -62,7 +63,7 @@ export default {
       }
 
       if (valid) {
-        HTTP.post(`/login`, {
+        HTTP.post(`login`, {
           email: email,
           password: password
         })
@@ -76,6 +77,26 @@ export default {
             user.refresh_token = data.refresh_token
             user.email = email
             user.user_id = 1
+
+            setStoredAccessToken(data.access_token)
+            setStoredRefreshToken(data.refresh_token)
+
+            HTTP.get(`account`, {
+              headers: {'Authorization': 'Bearer ' + data.access_token},
+            })
+            .then(response => {
+              const data = response.data
+              if (data.status && data.account) {
+                const user = this.$store.state.user
+                user.settings = JSON.parse(data.account.settings.replace(/'/g, '"'))
+
+                this.$store.commit('setUser', user)
+              }
+            })
+            .catch(e => {
+              console.log(e)
+            })
+
             this.$store.commit('setUser', user)
             console.log('Logged in')
             this.$toasted.show('Logged in')

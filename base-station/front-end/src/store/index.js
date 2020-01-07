@@ -1,6 +1,8 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
+import {setStoredAccessToken, setStoredRefreshToken} from './storage.js'
+
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -25,6 +27,8 @@ export default new Vuex.Store({
     },
     setUser(state, value) {
       state.user = value
+      setStoredAccessToken(value.access_token)
+      setStoredRefreshToken(value.refresh_token)
     }
   },
   actions: {},
