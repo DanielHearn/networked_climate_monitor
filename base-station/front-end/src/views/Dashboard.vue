@@ -9,7 +9,7 @@
           <p>{{sensor.name}}</p>
           <div v-if="sensor.climate_data && sensor.climate_data.length">
             <p>Date received: {{sensor.climate_data[0].date}}</p>
-            <p>Battery voltage: {{sensor.climate_data[0].battery_voltage}}</p>
+            <p>Battery voltage: {{getBatteryStatusFromVoltage(sensor.climate_data[0].battery_voltage)}}</p>
             <ul>
               <li v-for="(data, index) in sensor.climate_data[0].climate_data" :key="index">
                 <p>{{data.type}}: {{data.value}}{{data.unit}}</p>
@@ -29,6 +29,7 @@
 
 <script>
 import {HTTP} from './../static/http-common';
+import {getBatteryStatusFromVoltage} from './../static/helpers'
 
 export default {
   name: "dashboard",
@@ -46,6 +47,7 @@ export default {
     }
   },
   methods: {
+    getBatteryStatusFromVoltage: getBatteryStatusFromVoltage,
     deleteSensor: function(sensorID, sensorName) {
       const accessToken = this.$store.state.user.access_token
       HTTP.delete(`sensors/${sensorID}`, {

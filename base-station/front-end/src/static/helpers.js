@@ -19,3 +19,13 @@ export const processErrors = (errors) => {
   }
   return outputErrors
 }
+
+export const getBatteryStatusFromVoltage = (voltage) => {
+  let status = 'Bad'
+  if (voltage >= 4.1) {
+    status = 'Good'
+  } else if (voltage >= 3.8) {
+    status = 'Ok'
+  }
+  return status
+}
