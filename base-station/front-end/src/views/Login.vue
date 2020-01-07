@@ -98,8 +98,9 @@ export default {
             })
 
             this.$store.commit('setUser', user)
-            console.log('Logged in')
             this.$toasted.show('Logged in')
+
+            this.$router.push('/dashboard')
           }
 
         })
