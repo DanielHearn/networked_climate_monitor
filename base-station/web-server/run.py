@@ -405,6 +405,8 @@ class ClimateData(Resource):
                 if int_quantity > default_quantity or int_quantity < 0:
                     return {'status': 'Error',
                             'errors': ['Quantity must be below or equal to 50 and greater than 0']}, 400
+                else:
+                    quantity = int_quantity
 
             range_start = input_range_start
             range_end = input_range_end
