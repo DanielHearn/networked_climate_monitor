@@ -246,7 +246,7 @@ void sendClimateData() {
 
   if(initialised) {
     radio.sleep();
-    long sleep_ms = send_interval - loop_drift - 17000;
+    long sleep_ms = send_interval - loop_drift - 16500;
     micro_sleep(sleep_ms);    
   }
 }
