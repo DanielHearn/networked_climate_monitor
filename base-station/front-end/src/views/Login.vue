@@ -8,8 +8,10 @@
         method="post"
       >
         <input type="text" name="email" v-model="email" placeholder="Email">
+        <router-link to="/reset-password">Reset Password</router-link>
         <input type="text" name="password" v-model="password" placeholder="Password">
         <button type="submit" value="Submit">Login</button>
+        <router-link to="/register">Not registered? Click here to register</router-link>
       </form>
     </div>
     <div>
@@ -20,7 +22,6 @@
         </li>
       </ul>
     </div>
-    <router-link to="/reset-password">Reset Password</router-link>
   </div>
 </template>
 
