@@ -1,6 +1,11 @@
 <template>
   <div class="main-panel">
-    <slot></slot>
+    <div class="main-panel-header">
+      <slot name="header"></slot>
+    </div>
+    <div class="main-panel-content">
+      <slot name="content"></slot>
+    </div>
   </div>
 </template>
 

@@ -1,17 +1,10 @@
 <template>
-  <div class="side-panel" :class="{ mobile: mobile, active: open }">
-    <div v-if="mobile" class="mobile-header">
-      <p class="sub-heading">{{ title }}</p>
-      <button @click="toggleOpen">
-        <i v-if="open" class="material-icons">keyboard_arrow_up</i>
-        <i v-else class="material-icons">keyboard_arrow_down</i>
-      </button>
+  <div class="side-panel">
+    <div class="side-panel-header">
+      <slot name="header"></slot>
     </div>
-    <div
-      class="side-panel-content"
-      :class="{ hidden: !open && this.$store.state.mobile }"
-    >
-      <slot></slot>
+    <div class="side-panel-content">
+      <slot name="content"></slot>
     </div>
   </div>
 </template>
