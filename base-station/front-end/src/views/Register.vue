@@ -1,37 +1,55 @@
 <template>
-  <div>
-    <p>Register</p>
-    <div>
-      <form
-        id="register"
-        @submit="checkRegister"
-        method="post"
-      >
-        <input type="text" name="email" v-model="email" placeholder="Email">
-        <input type="text" name="password" v-model="password" placeholder="Password">
-        <input type="text" name="confirmPassword" v-model="confirmPassword" placeholder="Confirm password">
-        <button type="submit" value="Submit">Register</button>
-      </form>
-    </div>
-    <div>
-      <ul v-if="errors.length">
-        <p>Errors:</p>
-        <li v-for="(error, index) in errors" :key="index">
-          <p>{{error}}</p>
-        </li>
-      </ul>
-    </div>
-    <router-link to="/login">Already registered? Click here to login</router-link>
-  </div>
+  <main-panel>
+    <template slot="content">
+      <div style="display: flex; align-items: center; flex-direction: column;">
+        <h1 class="title">Climate Monitor</h1>
+        <h2 class="heading">Account Registration</h2>
+        <div class="content-column">
+          <p class="text">Enter an email and password to register the account.</p>
+          <form
+            id="register"
+            class="form"
+            @submit="checkRegister"
+            method="post"
+          >
+            <div class="input-box">
+              <p class="text">Email</p>
+              <input type="text" name="email" v-model="email" placeholder="Email" tabindex="0">
+            </div>
+            <div class="input-box">
+              <p class="text">Password</p>
+              <input type="text" name="password" v-model="password" placeholder="Password"  tabindex="0">
+            </div>
+            <div class="input-box">
+              <p class="text">Confirm Password</p>
+              <input type="text" name="confirmPassword" v-model="confirmPassword" placeholder="Confirm password"  tabindex="0">
+            </div>
+            <ul v-if="errors.length" class="error-box">
+              <p>Errors:</p>
+              <li v-for="(error, index) in errors" :key="index">
+                <p>{{error}}</p>
+              </li>
+            </ul>
+            <button type="submit" value="Submit" class="button button--primary" tabindex="0">Register</button>
+          </form>
+          <router-link to="/login" class="link">Already registered? Click here to login</router-link>
+        </div>
+      </div>
+    </template>
+  </main-panel>
 </template>
 
 <script>
+import MainPanel from './../components/MainPanel/MainPanel.vue'
 import {HTTP} from './../static/http-common';
 import {processErrors} from './../static/helpers';
 import {setStoredAccessToken, setStoredRefreshToken} from './../store/storage.js'
 
 export default {
   name: "register",
+  components: {
+    MainPanel
+  },
   data: function() {
     return {
       email: '',
@@ -115,6 +133,8 @@ export default {
         .catch(e => {
           if (e.response && e.response.data && e.response.data.errors) {
             this.errors = processErrors(e.response.data.errors)
+          } else {
+            this.errors.push(e)
           }
         })
       }

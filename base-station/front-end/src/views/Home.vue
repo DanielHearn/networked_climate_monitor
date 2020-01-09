@@ -1,10 +1,15 @@
 <template>
   <main-panel>
-    <div>
-      <h2>Introduction</h2>
-      <p>The networked climate monitor project provides access to the recent and historical climate data for the sensors.</p>
-      <p>To access the climate data an account will need to be registered</p>
-    </div>
+    <template slot="content">
+      <div>
+        <h2>Introduction</h2>
+        <p>The networked climate monitor project provides access to the recent and historical climate data for the sensors.</p>
+        <p>To access the climate data an account will need to be registered</p>
+      </div>
+      <div>
+        <p>Source code on <a href="https://github.com/DanielHearn/networked_climate_monitor" class="link">Github</a>.</p>
+      </div>
+    </template>
   </main-panel>
 </template>
 

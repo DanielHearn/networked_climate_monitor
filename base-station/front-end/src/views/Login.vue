@@ -1,37 +1,52 @@
 <template>
-  <div class="home">
-    <p>Login</p>
-    <div>
-      <form
-        id="login"
-        @submit="checkLogin"
-        method="post"
-      >
-        <input type="text" name="email" v-model="email" placeholder="Email">
-        <router-link to="/reset-password">Reset Password</router-link>
-        <input type="text" name="password" v-model="password" placeholder="Password">
-        <button type="submit" value="Submit">Login</button>
-        <router-link to="/register">Not registered? Click here to register</router-link>
-      </form>
-    </div>
-    <div>
-      <ul v-if="errors.length">
-        <p>Errors:</p>
-        <li v-for="(error, index) in errors" :key="index">
-          <p>{{error}}</p>
-        </li>
-      </ul>
-    </div>
-  </div>
+  <main-panel>
+    <template slot="content">
+      <div style="display: flex; align-items: center; flex-direction: column;">
+        <h1 class="title">Climate Monitor</h1>
+        <h2 class="heading">Login</h2>
+        <div class="content-column">
+          <p class="text">Enter an email and password to login.</p>
+          <form
+            id="login"
+            class="form"
+            @submit="checkLogin"
+            method="post"
+          >
+            <div class="input-box">
+              <p class="text">Email</p>
+              <input type="text" name="email" v-model="email" placeholder="Email"  tabindex="0">
+            </div>
+            <div class="input-box">
+              <p class="text">Password</p>
+              <input type="text" name="password" v-model="password" placeholder="Password" tabindex="0">
+            </div>
+            <router-link to="/reset-password" class="link" tabindex="-1">Forgotten your password? Click here</router-link>
+            <ul v-if="errors.length" class="error-box">
+              <p>Errors:</p>
+              <li v-for="(error, index) in errors" :key="index">
+                <p>{{error}}</p>
+              </li>
+            </ul>
+            <button type="submit" value="Submit" class="button button--primary" tabindex="0">Login</button>
+            <router-link to="/register" class="link">Not registered? Click here to register</router-link>
+          </form>
+        </div>
+      </div>
+    </template>
+  </main-panel>
 </template>
 
 <script>
+import MainPanel from './../components/MainPanel/MainPanel.vue'
 import {HTTP} from './../static/http-common';
 import {processErrors} from './../static/helpers';
 import {setStoredAccessToken, setStoredRefreshToken} from './../store/storage.js'
 
 export default {
   name: "login",
+  components: {
+    MainPanel
+  },
   data: function() {
     return {
       email: '',
@@ -108,6 +123,8 @@ export default {
         .catch(e => {
           if (e.response && e.response.data && e.response.data.errors) {
             this.errors = processErrors(e.response.data.errors)
+          } else {
+            this.errors.push(e)
           }
         })
       }
