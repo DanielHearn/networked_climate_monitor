@@ -6,7 +6,7 @@ body {
 }
 
 #app {
-  font-family: "Poppins", Helvetica, Arial, sans-serif;
+  font-family: $font-family;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
@@ -79,9 +79,25 @@ body {
   }
 }
 
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  .list-item {
+    background: $white;
+    padding: 0.5em;
+    color: $darkest;
+    margin: 0.2em 0;
+    &.active {
+      background: $grey-dark;
+    }
+  }
+}
+
 .button {
   padding: 0.6em 1em;
   cursor: pointer;
+  font-family: $font-family;
   font-weight: $medium-weight;
   font-size: $s-size;
   -webkit-appearance: none;
@@ -92,7 +108,8 @@ body {
   }
   &--secondary {
     border: 2px solid $darkest;
-    color: $white;
+    background: transparent;
+    color: $darkest;
   }
 }
 

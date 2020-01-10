@@ -2,12 +2,12 @@
   <div class="content">
     <side-panel>
       <template slot="header">
-        <p class="text">Sensors</p>
-        <button @click="refreshSensors">Refresh Sensors</button>
+        <p class="heading">Sensors</p>
+        <button @click="refreshSensors" class="button button--primary">Refresh Sensors</button>
       </template>
       <template slot="content">
-        <ul>
-          <li v-for="sensor in sensors" :key="sensor.id">
+        <ul class="list">
+          <li v-for="sensor in sensors" :key="sensor.id" class="list-item" v-bind:class="{ active: sensor.id === activeSensorID }">
             <p class="text">{{sensor.id}}: {{sensor.name}}</p>
             <div v-if="sensor.recent_climate_data">
               <ul>
@@ -23,49 +23,51 @@
             <div v-else>
               <p class="text">No climate data for sensor</p>
             </div>
-            <button @click="deleteSensor(sensor.id, sensor.name)">Delete Sensor</button>
-            <button @click="deleteClimate(sensor.id, sensor.name)">Delete Climate Data</button>
-            <button @click="setActiveSensor(sensor.id)">View Climate</button>
+            <button @click="deleteSensor(sensor.id, sensor.name)" class="button button--secondary">Delete Sensor</button>
+            <button @click="deleteClimate(sensor.id, sensor.name)" class="button button--secondary">Delete Climate Data</button>
+            <button @click="setActiveSensor(sensor.id)" class="button button--primary">View Climate</button>
           </li>
         </ul>
       </template>
     </side-panel>
-    <main-panel v-if="activeSensorID === -1"> 
-      <template slot="header">
-        <p class="text">Climate Data</p>
-      </template>
-      <template slot="content">
-        <p class="text">No sensor selected</p>
-      </template>
-    </main-panel>
-    <main-panel v-else>
-      <template slot="header">
-        <p class="text">{{sensors[activeSensorID].name}} Climate Data</p>
-        <button >Refresh ClimateData</button>
-      </template>
-      <template slot="content">
-        <div v-if="sensors[activeSensorID]">
-          <div v-if="sensors[activeSensorID].recent_climate_data">
-            <h3 class="heading">Recent Sensor Data</h3>
-            <p class="text">Date received: {{sensors[activeSensorID].recent_climate_data.date}}</p>
-            <ul>
-              <li v-for="(data, index) in sensors[activeSensorID].recent_climate_data.climate_data" :key="index">
-                <p>{{data.type}}: {{data.value}}{{data.unit}}</p>
-              </li>
-            </ul>
+    <template v-if="!$store.state.mobile">
+      <main-panel v-if="activeSensorIndex === -1"> 
+        <template slot="header">
+          <p class="heading">Climate Data</p>
+        </template>
+        <template slot="content">
+          <p class="text">No sensor selected</p>
+        </template>
+      </main-panel>
+      <main-panel v-else>
+        <template slot="header">
+          <p class="heading">{{sensors[activeSensorIndex].name}} Climate Data</p>
+          <button class="button button--primary">Refresh Climate Data</button>
+        </template>
+        <template slot="content">
+          <div v-if="sensors[activeSensorIndex]">
+            <div v-if="sensors[activeSensorIndex].recent_climate_data">
+              <h3 class="heading">Recent Sensor Data</h3>
+              <p class="text">Date received: {{sensors[activeSensorIndex].recent_climate_data.date}}</p>
+              <ul>
+                <li v-for="(data, index) in sensors[activeSensorIndex].recent_climate_data.climate_data" :key="index">
+                  <p>{{data.type}}: {{data.value}}{{data.unit}}</p>
+                </li>
+              </ul>
 
-            <h3 class="heading">Historical Sensor Data</h3>
-              <v-date-picker
-              v-model="timePeriod"
-              mode="range"
-              />
+              <h3 class="heading">Historical Sensor Data</h3>
+                <v-date-picker
+                v-model="timePeriod"
+                mode="range"
+                />
+            </div>
+            <div v-else>
+              <p class="text">Sensor has no climate data.</p>
+            </div>
           </div>
-          <div v-else>
-            <p class="text">Sensor has no climate data.</p>
-          </div>
-        </div>
-      </template>
-    </main-panel>
+        </template>
+      </main-panel>
+    </template>
   </div>
 </template>
 
@@ -88,6 +90,7 @@ export default {
       errors: [],
       sensors: [],
       activeSensorID: -1,
+      activeSensorIndex: -1,
       timePeriod: {
         start: Date.now(),
         end: Date.now()
@@ -106,7 +109,8 @@ export default {
           }
         })
         if (lowestSensorID !== -1 && lowestIndex !== -1) {
-          this.activeSensorID = lowestIndex
+          this.activeSensorID = lowestSensorID
+          this.activeSensorIndex = lowestIndex
         }
 
       }
@@ -116,7 +120,8 @@ export default {
     getBatteryStatusFromVoltage: getBatteryStatusFromVoltage,
     setActiveSensor: function(sensorID) {
       const activeSensor = this.sensors.filter(sensor => sensor.id === sensorID)[0]
-      this.activeSensorID = this.sensors.indexOf(activeSensor)
+      this.activeSensorID = activeSensor.id
+      this.activeSensorIndex = this.sensors.indexOf(activeSensor)
     },
     deleteSensor: function(sensorID, sensorName) {
       const accessToken = this.$store.state.user.access_token
@@ -193,9 +198,15 @@ export default {
 
     if (this.$store.state.user.logged_in) {
       this.loadDashboard()
+      setInterval(() => {
+        this.loadDashboard()
+      }, 60000)
     } else{
       setTimeout(() => {
         this.loadDashboard()
+        setInterval(() => {
+          this.loadDashboard()
+        }, 60000)
       }, 150)
     }
   }

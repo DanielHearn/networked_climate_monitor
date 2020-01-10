@@ -1,7 +1,7 @@
 @import "./../../scss/variables.scss";
 
 .side-panel {
-  width: 22em;
+  width: 30em;
   background: $dark;
   color: $white;
   z-index: 1;
@@ -10,11 +10,14 @@
   flex: 1 auto;
   flex-direction: column;
   .side-panel-header {
-    padding: 1em;
+    padding: 0.5em;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
   }
   .side-panel-content {
     overflow-y: scroll;
-    padding: 1em;
     display: flex;
     flex-direction: column;
     height: 100%;
