@@ -2,19 +2,26 @@
   <div class="content">
     <side-panel>
       <template slot="header">
-        <p>Sensors</p>
+        <p class="text">Sensors</p>
         <button @click="refreshSensors">Refresh Sensors</button>
       </template>
       <template slot="content">
         <ul>
           <li v-for="sensor in sensors" :key="sensor.id">
-            <p>{{sensor.id}}: {{sensor.name}}</p>
-            <div v-if="sensor.climate_data && sensor.climate_data.length">
-              <p>Date received: {{sensor.climate_data[0].date}}</p>
-              <p>Battery voltage: {{getBatteryStatusFromVoltage(sensor.climate_data[0].battery_voltage)}}</p>
+            <p class="text">{{sensor.id}}: {{sensor.name}}</p>
+            <div v-if="sensor.recent_climate_data">
+              <ul>
+                <li v-for="(data, index) in sensor.recent_climate_data.climate_data" :key="index">
+                  <template v-if="data.type === 'Temperature' || data.type === 'Humidity'">  
+                    <p class="text">{{data.type}}: {{data.value}}{{data.unit}}</p>
+                  </template>
+                </li>
+              </ul>
+              <p class="text">Date received: {{sensor.recent_climate_data.date}}</p>
+              <p class="text">Battery voltage: {{getBatteryStatusFromVoltage(sensor.recent_climate_data.battery_voltage)}}</p>
             </div>
             <div v-else>
-              <p>No climate data for sensor</p>
+              <p class="text">No climate data for sensor</p>
             </div>
             <button @click="deleteSensor(sensor.id, sensor.name)">Delete Sensor</button>
             <button @click="deleteClimate(sensor.id, sensor.name)">Delete Climate Data</button>
@@ -25,29 +32,38 @@
     </side-panel>
     <main-panel v-if="activeSensorID === -1"> 
       <template slot="header">
-        <p>Climate Data</p>
+        <p class="text">Climate Data</p>
       </template>
       <template slot="content">
-        <p>No sensor selected</p>
+        <p class="text">No sensor selected</p>
       </template>
     </main-panel>
     <main-panel v-else>
       <template slot="header">
-        <p>Climate Data</p>
+        <p class="text">Climate Data</p>
         <button >Refresh ClimateData</button>
       </template>
       <template slot="content">
-        <div v-if="sensors[activeSensorID] && sensors[activeSensorID].climate_data && sensors[activeSensorID].climate_data">
-          <ul>
-            <li v-for="(data, index) in sensors[activeSensorID].climate_data[0].climate_data" :key="index">
-              <p>{{data.type}}: {{data.value}}{{data.unit}}</p>
-            </li>
-          </ul>
+        <div v-if="sensors[activeSensorID]">
+          <div v-if="sensors[activeSensorID].recent_climate_data">
+            <h3 class="heading">Recent Garden Sensor Data</h3>
+            <p class="text">Date received: {{sensors[activeSensorID].recent_climate_data.date}}</p>
+            <ul>
+              <li v-for="(data, index) in sensors[activeSensorID].recent_climate_data.climate_data" :key="index">
+                <p>{{data.type}}: {{data.value}}{{data.unit}}</p>
+              </li>
+            </ul>
+
+            <h3 class="heading">Recent Garden Sensor Data</h3>
+              <v-date-picker
+              v-model="timePeriod"
+              mode="range"
+              />
+          </div>
+          <div v-else>
+            <p class="text">Sensor has no climate data.</p>
+          </div>
         </div>
-        <v-date-picker
-          v-model="timePeriod"
-          mode="range"
-          />
       </template>
     </main-panel>
   </div>
@@ -79,11 +95,6 @@ export default {
     }
   },
   watch: {
-    sensors: function (newSensors, oldSensors) {
-      if (newSensors !== oldSensors) {
-        this.loadRecentClimateData()
-      }
-    }
   },
   methods: {
     getBatteryStatusFromVoltage: getBatteryStatusFromVoltage,
@@ -131,32 +142,6 @@ export default {
         }
       })
     },
-    loadRecentClimateData: function() {
-      const accessToken = this.$store.state.user.access_token
-      if (accessToken) {
-        const quantity = 1
-        for (let sensor of this.sensors) {
-          if (sensor.id) {
-            HTTP.get(`sensors/${sensor.id}/climate-data`, {
-              headers: {'Authorization': 'Bearer ' + accessToken},
-              query: {'quantity': quantity} 
-            })
-            .then(response => {
-              console.log(response)
-              const data = response.data
-              if (data && data.climate_data) {
-                sensor.climate_data = data.climate_data
-              }
-            })
-            .catch(e => {
-              if (e.response) {
-                console.log(e.respose)
-              }
-            })
-          }
-        }
-      }
-    },
     refreshSensors: function() {
       this.$toasted.show('Refreshing sensors')
       this.loadDashboard()
@@ -172,7 +157,6 @@ export default {
           const data = response.data
           if (data.sensors) {
             for (let sensor of data.sensors) {
-              sensor.climate_data = []
               sensor.historical_data = []
             }
             this.sensors = data.sensors
