@@ -45,13 +45,14 @@
           <button @click="refreshSensors" class="button button--primary">Refresh Climate Data</button>
         </template>
         <template slot="content">
-          <div v-if="sensors[activeSensorIndex]">
-            <div v-if="sensors[activeSensorIndex].recent_climate_data">
+          <div class="dashboard-content">
+            <template v-if="sensors[activeSensorIndex] && sensors[activeSensorIndex].recent_climate_data">
               <h3 class="sub-heading">Recent Sensor Data</h3>
               <p class="text">Date received: {{sensors[activeSensorIndex].recent_climate_data.date}}</p>
-              <ul>
+              <ul class="recent-data-list">
                 <li v-for="(data, index) in sensors[activeSensorIndex].recent_climate_data.climate_data" :key="index">
-                  <p>{{data.type}}: {{data.value}}{{data.unit}}</p>
+                  <p class="text">{{data.type}}</p>
+                  <p class="sub-heading">{{data.value}}{{data.unit}}</p>
                 </li>
               </ul>
 
@@ -68,10 +69,10 @@
               <template v-else>
                 <p>No historical data for this time period.</p>
               </template>
-            </div>
-            <div v-else>
+            </template>
+            <template v-else>
               <p class="text">Sensor has no climate data.</p>
-            </div>
+            </template>
           </div>
         </template>
       </main-panel>

@@ -12,7 +12,7 @@
         <router-link to="/settings" v-if="$store.state.user.logged_in">Settings</router-link>
       </div>
       <div class="nav__side">
-        <button v-if="$store.state.user.logged_in" @click="logout">Logout</button>
+        <button v-if="$store.state.user.logged_in" @click="logout" class="button button--primary">Logout</button>
       </div>
     </div>
     <router-view />
