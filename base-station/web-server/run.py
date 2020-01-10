@@ -500,7 +500,19 @@ class Sensor(Resource):
     def get(self, sensor_id):
         sensor = SensorModel.query.filter_by(id=sensor_id).first()
         if sensor:
-            return {'status': 'Sensor successfully retrieved', 'sensor': sensor.to_dict()}, 200
+            sensor_dict = sensor.to_dict()
+            recent_climate_data = ClimateModel.query.order_by(ClimateModel.id.desc()).filter_by(
+                sensor_id=sensor_dict['id']).first()
+            if recent_climate_data:
+                climate_data = recent_climate_data.to_dict()
+                sensor_data_list = SensorDataModel.query.filter_by(climate_id=recent_climate_data.id)
+                if sensor_data_list:
+                    sensor_data_dict_list = []
+                    for sensor_data in sensor_data_list:
+                        sensor_data_dict_list.append(sensor_data.to_dict())
+                    climate_data['climate_data'] = sensor_data_dict_list
+                sensor_dict['recent_climate_data'] = climate_data
+            return {'status': 'Sensor successfully retrieved', 'sensor': sensor_dict}, 200
         return {'status': 'Error', 'errors': ['Sensor doesn\'t exist']}, 500
 
 
@@ -546,7 +558,19 @@ class Sensors(Resource):
 
             # Convert all sensors into dicts
             for sensor in sensors_list:
-                sensor_dict_list.append(sensor.to_dict())
+                sensor_dict = sensor.to_dict()
+
+                recent_climate_data = ClimateModel.query.order_by(ClimateModel.id.desc()).filter_by(sensor_id=sensor_dict['id']).first()
+                if recent_climate_data:
+                    climate_data = recent_climate_data.to_dict()
+                    sensor_data_list = SensorDataModel.query.filter_by(climate_id=recent_climate_data.id)
+                    if sensor_data_list:
+                        sensor_data_dict_list = []
+                        for sensor_data in sensor_data_list:
+                            sensor_data_dict_list.append(sensor_data.to_dict())
+                        climate_data['climate_data'] = sensor_data_dict_list
+                    sensor_dict['recent_climate_data'] = climate_data
+                sensor_dict_list.append(sensor_dict)
             return {'status': 'Sensors successfully retrieved', 'sensors': sensor_dict_list}, 200
         except:
             return {'status': 'Error', 'errors': ['Error while retrieving sensors from database']}, 500
