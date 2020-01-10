@@ -60,7 +60,14 @@
               v-model="timePeriod"
               mode="range"
               />
-              <chart v-if="historicalDataLoaded" :chart-data="historicalData" :options="chartOptions" class="historical-chart"/>
+              <template v-if="historicalDataLoaded && historicalData">
+                <div v-for="data in historicalData" :key="data.type">
+                  <chart v-if="data" :chart-data="data" :options="chartOptions" class="historical-chart"/>
+                </div>
+              </template>
+              <template v-else>
+                <p>No historical data for this time period.</p>
+              </template>
             </div>
             <div v-else>
               <p class="text">Sensor has no climate data.</p>
@@ -134,31 +141,57 @@ export default {
   methods: {
     getBatteryStatusFromVoltage: getBatteryStatusFromVoltage,
     processHistoricalData: function(climateData) {
-      const datasets = []
+      const historicalData = {}
       const dates = []
-      const temperatures = []
+      const typeColours = {
+        'temperature': '#f87979',
+        'humidity': '#79a6f8',
+        'battery': '#FFE453'
+      }
+      
+      const orderedClimateData = climateData.reverse()
+      const recentClimateData = orderedClimateData[0]
+      const labels = []
+      if (!recentClimateData || !recentClimateData.climate_data) {
+        return false
+      }
 
-      climateData.reverse().forEach(climate => {
+      historicalData['battery'] = {
+        labels: dates,
+        datasets: [{
+          label: 'Battery',
+          backgroundColor: typeColours['battery'],
+          data: []
+        }]
+      }
+
+      for (let climateSensor of recentClimateData.climate_data) {
+        const type = climateSensor.type
+        labels.push(type)
+        const lowercaseType = type.toLowerCase()
+
+        historicalData[lowercaseType] = {
+          labels: dates,
+          datasets: [{
+            label: type,
+            backgroundColor: typeColours[lowercaseType],
+            data: []
+          }]
+        }
+      }
+
+      orderedClimateData.forEach(climate => {
         dates.push(climate.date)
+        historicalData['battery'].datasets[0].data.push(climate.battery_voltage)
         if (climate.climate_data) {
-          climate.climate_data.forEach(sensor => {
-            const type = sensor.type
-            if (type === 'Temperature') {
-              temperatures.push(sensor.value)
-            }
+          const climate_data = climate.climate_data
+          climate_data.forEach(sensor => {
+            historicalData[sensor.type.toLowerCase()].datasets[0].data.push(sensor.value)
           });
         }
       });
-      datasets.push({
-        label: 'Temperature',
-        backgroundColor: '#f87979',
-        data: temperatures
-      })
-
-      this.historicalData = {
-        labels: dates,
-        datasets: datasets 
-      }
+      console.log(historicalData)
+      this.historicalData = historicalData
       this.historicalDataLoaded = true
     },
     loadHistoricalData: function(sensorID) {
