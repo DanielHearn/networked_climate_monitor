@@ -7,11 +7,11 @@
       </template>
       <template slot="content">
         <ul class="list">
-          <li v-for="sensor in sensors" :key="sensor.id" class="list-item" v-bind:class="{ active: sensor.id === activeSensorID }">
+          <li v-for="sensor in sensors" :key="sensor.id" class="list-item" v-bind:class="{ active: sensor.id === activeSensorID }" style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;">
             <p class="heading">{{sensor.id}}: {{sensor.name}}</p>
             <div v-if="sensor.recent_climate_data">
-              <ul>
-                <li v-for="(data, index) in sensor.recent_climate_data.climate_data" :key="index">
+              <ul style="list-style: none; padding: 0; display: flex; flex-direction: row;">
+                <li v-for="(data, index) in sensor.recent_climate_data.climate_data" :key="index" style="padding-right: 0.5em;">
                   <template v-if="data.type === 'Temperature' || data.type === 'Humidity'">  
                     <p class="sub-heading">{{data.type}}: {{data.value}}{{data.unit}}</p>
                   </template>
