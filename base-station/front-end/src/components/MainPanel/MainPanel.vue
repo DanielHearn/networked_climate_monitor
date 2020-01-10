@@ -1,6 +1,6 @@
 <template>
   <div class="main-panel">
-    <div class="main-panel-header">
+    <div class="main-panel-header" v-if="this.$slots.header">
       <slot name="header"></slot>
     </div>
     <div class="main-panel-content">
