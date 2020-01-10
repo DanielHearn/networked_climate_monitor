@@ -15,6 +15,9 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    .heading {
+      margin: 0 0.5em;
+    }
   }
   .main-panel-content {
     padding: 1em;

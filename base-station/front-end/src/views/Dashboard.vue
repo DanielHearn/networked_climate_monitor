@@ -8,12 +8,12 @@
       <template slot="content">
         <ul class="list">
           <li v-for="sensor in sensors" :key="sensor.id" class="list-item" v-bind:class="{ active: sensor.id === activeSensorID }">
-            <p class="text">{{sensor.id}}: {{sensor.name}}</p>
+            <p class="heading">{{sensor.id}}: {{sensor.name}}</p>
             <div v-if="sensor.recent_climate_data">
               <ul>
                 <li v-for="(data, index) in sensor.recent_climate_data.climate_data" :key="index">
                   <template v-if="data.type === 'Temperature' || data.type === 'Humidity'">  
-                    <p class="text">{{data.type}}: {{data.value}}{{data.unit}}</p>
+                    <p class="sub-heading">{{data.type}}: {{data.value}}{{data.unit}}</p>
                   </template>
                 </li>
               </ul>
@@ -42,12 +42,12 @@
       <main-panel v-else>
         <template slot="header">
           <p class="heading">{{sensors[activeSensorIndex].name}} Climate Data</p>
-          <button class="button button--primary">Refresh Climate Data</button>
+          <button @click="refreshSensors" class="button button--primary">Refresh Climate Data</button>
         </template>
         <template slot="content">
           <div v-if="sensors[activeSensorIndex]">
             <div v-if="sensors[activeSensorIndex].recent_climate_data">
-              <h3 class="heading">Recent Sensor Data</h3>
+              <h3 class="sub-heading">Recent Sensor Data</h3>
               <p class="text">Date received: {{sensors[activeSensorIndex].recent_climate_data.date}}</p>
               <ul>
                 <li v-for="(data, index) in sensors[activeSensorIndex].recent_climate_data.climate_data" :key="index">
@@ -55,11 +55,12 @@
                 </li>
               </ul>
 
-              <h3 class="heading">Historical Sensor Data</h3>
-                <v-date-picker
-                v-model="timePeriod"
-                mode="range"
-                />
+              <h3 class="sub-heading">Historical Sensor Data</h3>
+              <v-date-picker
+              v-model="timePeriod"
+              mode="range"
+              />
+              <chart v-if="historicalDataLoaded" :chart-data="historicalData" :options="chartOptions" class="historical-chart"/>
             </div>
             <div v-else>
               <p class="text">Sensor has no climate data.</p>
@@ -76,14 +77,14 @@ import MainPanel from './../components/MainPanel/MainPanel.vue'
 import SidePanel from './../components/SidePanel/SidePanel.vue'
 import {HTTP} from './../static/http-common';
 import {getBatteryStatusFromVoltage} from './../static/helpers'
-//import Chart from './../components/Chart/Chart.js'
+import Chart from './../components/Chart/Chart.js'
 
 export default {
   name: "dashboard",
   components: {
     MainPanel,
-    SidePanel
-    //Chart
+    SidePanel,
+    Chart
   },
   data: function() {
     return {
@@ -91,9 +92,16 @@ export default {
       sensors: [],
       activeSensorID: -1,
       activeSensorIndex: -1,
+      historicalData: {},
+      historicalDataLoaded: false,
+      reloadID: null,
       timePeriod: {
-        start: Date.now(),
-        end: Date.now()
+        start: new Date(Date.now()-86400000),
+        end: new Date()
+      },
+      chartOptions: {
+        responsive: true,
+        maintainAspectRatio: false
       }
     }
   },
@@ -112,12 +120,68 @@ export default {
           this.activeSensorID = lowestSensorID
           this.activeSensorIndex = lowestIndex
         }
-
       }
+    },
+    activeSensorID: function(newID) {
+      this.historicalDataLoaded = false
+      this.loadHistoricalData(newID)
+    },
+    timePeriod: function() {
+      this.historicalDataLoaded = false
+      this.loadHistoricalData(this.activeSensorID)
     }
   },
   methods: {
     getBatteryStatusFromVoltage: getBatteryStatusFromVoltage,
+    processHistoricalData: function(climateData) {
+      const datasets = []
+      const dates = []
+      const temperatures = []
+
+      climateData.reverse().forEach(climate => {
+        dates.push(climate.date)
+        if (climate.climate_data) {
+          climate.climate_data.forEach(sensor => {
+            const type = sensor.type
+            if (type === 'Temperature') {
+              temperatures.push(sensor.value)
+            }
+          });
+        }
+      });
+      datasets.push({
+        label: 'Temperature',
+        backgroundColor: '#f87979',
+        data: temperatures
+      })
+
+      this.historicalData = {
+        labels: dates,
+        datasets: datasets 
+      }
+      this.historicalDataLoaded = true
+    },
+    loadHistoricalData: function(sensorID) {
+      const accessToken = this.$store.state.user.access_token
+      const timePeriod = this.timePeriod
+      const rangeStart = timePeriod.start.toISOString()
+      const rangeEnd = timePeriod.end.toISOString()
+
+      HTTP.get(`sensors/${sensorID}/climate-data?range_start=${rangeStart}&range_end=${rangeEnd}`, {
+        headers: {'Authorization': 'Bearer ' + accessToken},
+      })
+      .then(response => {
+        console.log(response)
+        const data = response.data
+        if (data.climate_data) {
+          this.processHistoricalData(data.climate_data)
+        }
+      })
+      .catch(e => {
+        console.log(e)
+        this.$toasted.show('Error retrieving historical data')
+      })
+    },
     setActiveSensor: function(sensorID) {
       const activeSensor = this.sensors.filter(sensor => sensor.id === sensorID)[0]
       this.activeSensorID = activeSensor.id
@@ -167,7 +231,16 @@ export default {
       this.$toasted.show('Refreshing sensors')
       this.loadDashboard()
     },
-    loadDashboard: function() {
+    loadDashboard: function(firstLoad = false) {
+      if (firstLoad) {
+        if(this.reloadID) {
+          clearInterval(this.reloadID)
+        }
+        this.reloadID = setInterval(() => {
+          this.loadDashboard(false)
+        }, 60000)
+      }
+
       const accessToken = this.$store.state.user.access_token
       if (accessToken) {
         HTTP.get(`sensors`, {
@@ -181,6 +254,10 @@ export default {
               sensor.historical_data = []
             }
             this.sensors = data.sensors
+
+            if (document.hasFocus()) {
+             this.$toasted.show('Loaded climate data')
+            }
           }
         })
         .catch(e => {
@@ -197,16 +274,10 @@ export default {
     console.log('Load dashboard')
 
     if (this.$store.state.user.logged_in) {
-      this.loadDashboard()
-      setInterval(() => {
-        this.loadDashboard()
-      }, 60000)
+      this.loadDashboard(true)
     } else{
       setTimeout(() => {
-        this.loadDashboard()
-        setInterval(() => {
-          this.loadDashboard()
-        }, 60000)
+        this.loadDashboard(true)
       }, 150)
     }
   }

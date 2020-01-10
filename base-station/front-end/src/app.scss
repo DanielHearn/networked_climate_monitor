@@ -143,7 +143,7 @@ input[type="text"] {
 
 .heading {
   font-size: $m-size;
-  font-weight: $medium-weight;
+  font-weight: $semibold-weight;
   margin: 0;
 }
 
@@ -171,4 +171,8 @@ input[type="text"] {
 .sub-text {
   font-size: $xs-size;
   font-weight: $regular-weight;
+}
+
+.historical-chart {
+  max-height: 15em;
 }
