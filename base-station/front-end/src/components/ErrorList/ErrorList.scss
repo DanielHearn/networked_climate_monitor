@@ -1,0 +1,29 @@
+@import "./../../scss/variables.scss";
+
+.error-list {
+  padding: 1em;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  color: $white;
+  background: $red;
+  list-style: none;
+  margin: 0.5em 0;
+  .title {
+    font-size: $s-size;
+    font-weight: $medium-weight;
+  }
+  p {
+    margin: 0;
+    font-size: $s-size;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  li {
+
+    text-align: left;
+  }
+}

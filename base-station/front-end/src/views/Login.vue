@@ -21,12 +21,7 @@
               <input type="text" name="password" v-model="password" placeholder="Password" tabindex="0">
             </div>
             <router-link to="/reset-password" class="link" tabindex="-1">Forgotten your password? Click here</router-link>
-            <ul v-if="errors.length" class="error-box">
-              <p>Errors:</p>
-              <li v-for="(error, index) in errors" :key="index">
-                <p>{{error}}</p>
-              </li>
-            </ul>
+            <error-list v-if="errors.length" title="Errors:" v-bind:errors="errors"/>
             <button type="submit" value="Submit" class="button button--primary" tabindex="0">Login</button>
             <router-link to="/register" class="link">Not registered? Click here to register</router-link>
           </form>
@@ -38,6 +33,7 @@
 
 <script>
 import MainPanel from './../components/MainPanel/MainPanel.vue'
+import ErrorList from './../components/ErrorList/ErrorList.vue'
 import {HTTP} from './../static/http-common';
 import {processErrors} from './../static/helpers';
 import {setStoredAccessToken, setStoredRefreshToken} from './../store/storage.js'
@@ -45,7 +41,8 @@ import {setStoredAccessToken, setStoredRefreshToken} from './../store/storage.js
 export default {
   name: "login",
   components: {
-    MainPanel
+    MainPanel,
+    ErrorList
   },
   data: function() {
     return {

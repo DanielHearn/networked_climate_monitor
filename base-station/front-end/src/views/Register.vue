@@ -24,12 +24,7 @@
               <p class="text">Confirm Password</p>
               <input type="text" name="confirmPassword" v-model="confirmPassword" placeholder="Confirm password"  tabindex="0">
             </div>
-            <ul v-if="errors.length" class="error-box">
-              <p>Errors:</p>
-              <li v-for="(error, index) in errors" :key="index">
-                <p>{{error}}</p>
-              </li>
-            </ul>
+            <error-list v-if="errors.length" title="Errors:" v-bind:errors="errors"/>
             <button type="submit" value="Submit" class="button button--primary" tabindex="0">Register</button>
           </form>
           <router-link to="/login" class="link">Already registered? Click here to login</router-link>
@@ -40,6 +35,7 @@
 </template>
 
 <script>
+import ErrorList from './../components/ErrorList/ErrorList.vue'
 import MainPanel from './../components/MainPanel/MainPanel.vue'
 import {HTTP} from './../static/http-common';
 import {processErrors} from './../static/helpers';
@@ -48,7 +44,8 @@ import {setStoredAccessToken, setStoredRefreshToken} from './../store/storage.js
 export default {
   name: "register",
   components: {
-    MainPanel
+    MainPanel,
+    ErrorList
   },
   data: function() {
     return {

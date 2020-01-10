@@ -79,19 +79,6 @@ body {
   }
 }
 
-.error-box {
-  padding: 1em;
-  display: flex;
-  align-items: flex-start;
-  flex-direction: column;
-  color: $white;
-  background: $red;
-  list-style: none;
-  p {
-    margin: 0;
-  }
-}
-
 .button {
   padding: 0.6em 1em;
   cursor: pointer;
