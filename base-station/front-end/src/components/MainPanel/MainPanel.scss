@@ -10,6 +10,8 @@
   z-index: 10;
   background: $grey-light;
   .main-panel-header {
+    background: $grey-darker;
+    color: $darkest;
     padding: 0.5em;
     display: flex;
     flex-direction: row;

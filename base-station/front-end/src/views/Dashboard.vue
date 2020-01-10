@@ -23,9 +23,13 @@
             <div v-else>
               <p class="text">No climate data for sensor</p>
             </div>
-            <button @click="deleteSensor(sensor.id, sensor.name)" class="button button--secondary">Delete Sensor</button>
-            <button @click="deleteClimate(sensor.id, sensor.name)" class="button button--secondary">Delete Climate Data</button>
-            <button @click="setActiveSensor(sensor.id)" class="button button--primary">View Climate</button>
+            <div>
+              <button @click="setActiveSensor(sensor.id)" class="button button--primary">View Climate</button>
+            </div>
+            <div>
+              <button @click="deleteSensor(sensor.id, sensor.name)" class="button button--secondary">Delete Sensor</button>
+              <button @click="deleteClimate(sensor.id, sensor.name)" class="button button--secondary">Delete Climate Data</button>
+            </div>
           </li>
         </ul>
       </template>
@@ -62,9 +66,7 @@
               mode="range"
               />
               <template v-if="historicalDataLoaded && historicalData">
-                <div v-for="data in historicalData" :key="data.type">
-                  <chart v-if="data" :chart-data="data" :options="chartOptions" class="historical-chart"/>
-                </div>
+                  <chart v-for="data in historicalData" :key="data.type" :chart-data="data" :options="chartOptions" class="historical-chart"/>
               </template>
               <template v-else>
                 <p>No historical data for this time period.</p>
