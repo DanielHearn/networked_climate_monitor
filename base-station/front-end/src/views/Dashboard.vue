@@ -40,13 +40,13 @@
     </main-panel>
     <main-panel v-else>
       <template slot="header">
-        <p class="text">Climate Data</p>
+        <p class="text">{{sensors[activeSensorID].name}} Climate Data</p>
         <button >Refresh ClimateData</button>
       </template>
       <template slot="content">
         <div v-if="sensors[activeSensorID]">
           <div v-if="sensors[activeSensorID].recent_climate_data">
-            <h3 class="heading">Recent Garden Sensor Data</h3>
+            <h3 class="heading">Recent Sensor Data</h3>
             <p class="text">Date received: {{sensors[activeSensorID].recent_climate_data.date}}</p>
             <ul>
               <li v-for="(data, index) in sensors[activeSensorID].recent_climate_data.climate_data" :key="index">
@@ -54,7 +54,7 @@
               </li>
             </ul>
 
-            <h3 class="heading">Recent Garden Sensor Data</h3>
+            <h3 class="heading">Historical Sensor Data</h3>
               <v-date-picker
               v-model="timePeriod"
               mode="range"
@@ -95,6 +95,22 @@ export default {
     }
   },
   watch: {
+    sensors: function (newSensors) {
+      if (newSensors.length && this.activeSensorID === -1) {
+        let lowestSensorID = -1
+        let lowestIndex = -1
+        this.sensors.forEach((sensor, index) => {
+          if (lowestSensorID === -1 || sensor.id < lowestSensorID) {
+            lowestSensorID = sensor.id
+            lowestIndex = index
+          }
+        })
+        if (lowestSensorID !== -1 && lowestIndex !== -1) {
+          this.activeSensorID = lowestIndex
+        }
+
+      }
+    }
   },
   methods: {
     getBatteryStatusFromVoltage: getBatteryStatusFromVoltage,
