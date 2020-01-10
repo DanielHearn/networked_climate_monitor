@@ -8,7 +8,7 @@
       <template slot="content">
         <ul>
           <li v-for="sensor in sensors" :key="sensor.id">
-            <p>{{sensor.name}}</p>
+            <p>{{sensor.id}}: {{sensor.name}}</p>
             <div v-if="sensor.climate_data && sensor.climate_data.length">
               <p>Date received: {{sensor.climate_data[0].date}}</p>
               <p>Battery voltage: {{getBatteryStatusFromVoltage(sensor.climate_data[0].battery_voltage)}}</p>
