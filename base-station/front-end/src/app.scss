@@ -133,6 +133,9 @@ input[type="text"] {
   flex-direction: column;
   align-items: flex-start;
   max-width: 30em;
+  .button, .link {
+    margin: 0.5em 0;
+  }
 }
 
 .title {

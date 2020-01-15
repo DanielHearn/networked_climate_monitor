@@ -6,31 +6,36 @@
         <button @click="refreshSensors" class="button button--primary">Refresh Sensors</button>
       </template>
       <template slot="content">
-        <ul class="list">
-          <li v-for="sensor in sensors" :key="sensor.id" class="list-item" v-bind:class="{ active: sensor.id === activeSensorID }" style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;">
-            <p class="heading">{{sensor.id}}: {{sensor.name}}</p>
-            <div v-if="sensor.recent_climate_data">
-              <ul style="list-style: none; padding: 0; display: flex; flex-direction: row;">
-                <li v-for="(data, index) in sensor.recent_climate_data.climate_data" :key="index" style="padding-right: 0.5em;">
-                  <template v-if="data.type === 'Temperature' || data.type === 'Humidity'">  
-                    <p class="sub-heading">{{data.type}}: {{data.value}}{{data.unit}}</p>
-                  </template>
-                </li>
-              </ul>
-              <p class="text">Date received: {{sensor.recent_climate_data.date}}</p>
-              <p class="text">Battery voltage: {{getBatteryStatusFromVoltage(sensor.recent_climate_data.battery_voltage)}}</p>
-            </div>
-            <div v-else>
-              <p class="text">No climate data for sensor</p>
-            </div>
-            <div>
-              <button @click="setActiveSensor(sensor.id)" class="button button--primary">View Climate</button>
-            </div>
-            <div>
-              <button @click="deleteSensor(sensor.id, sensor.name)" class="button button--secondary">Delete Sensor</button>
-              <button @click="deleteClimate(sensor.id, sensor.name)" class="button button--secondary">Delete Climate Data</button>
-            </div>
+        <ul v-if="sensors.length" class="list">
+          <li v-for="(sensor, index) in sensors" :key="index" class="list-item" v-bind:class="{ active: sensor.id === activeSensorID }" style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;">
+            <template v-if="sensor">
+              <p class="heading">{{sensor.id}}: {{sensor.name}}</p>
+              <div v-if="sensor.recent_climate_data">
+                <ul style="list-style: none; padding: 0; display: flex; flex-direction: row;">
+                  <li v-for="(data, index) in sensor.recent_climate_data.climate_data" :key="index" style="padding-right: 0.5em;">
+                    <template v-if="data.type === 'Temperature' || data.type === 'Humidity'">  
+                      <p class="sub-heading">{{data.type}}: {{data.value}}{{data.unit}}</p>
+                    </template>
+                  </li>
+                </ul>
+                <p class="text">Date received: {{sensor.recent_climate_data.date}}</p>
+                <p class="text">Battery voltage: {{getBatteryStatusFromVoltage(sensor.recent_climate_data.battery_voltage)}}</p>
+              </div>
+              <div v-else>
+                <p class="text">No climate data for sensor</p>
+              </div>
+              <div>
+                <button @click="setActiveSensor(sensor.id)" class="button button--primary">View Climate</button>
+              </div>
+              <div>
+                <button @click="deleteSensor(sensor.id, sensor.name)" class="button button--secondary">Delete Sensor</button>
+                <button @click="deleteClimate(sensor.id, sensor.name)" class="button button--secondary">Delete Climate Data</button>
+              </div>
+            </template>
           </li>
+        </ul>
+        <ul v-else class="list">
+          <li class="list-item"><p class="text">No sensors created. Connect a sensor node to the base station to create a new sensor.</p></li>
         </ul>
       </template>
     </side-panel>
@@ -45,7 +50,7 @@
       </main-panel>
       <main-panel v-else>
         <template slot="header">
-          <p class="heading">{{sensors[activeSensorIndex].name}} Climate Data</p>
+          <p class="heading">{{sensors[activeSensorIndex].id}}: {{sensors[activeSensorIndex].name}} Climate Data</p>
           <button @click="refreshSensors" class="button button--primary">Refresh Climate Data</button>
         </template>
         <template slot="content">
@@ -117,28 +122,38 @@ export default {
   },
   watch: {
     sensors: function (newSensors) {
-      if (newSensors.length && this.activeSensorID === -1) {
-        let lowestSensorID = -1
-        let lowestIndex = -1
-        this.sensors.forEach((sensor, index) => {
-          if (lowestSensorID === -1 || sensor.id < lowestSensorID) {
-            lowestSensorID = sensor.id
-            lowestIndex = index
+      if (newSensors.length ) {
+        const activeSensorExists = !!this.sensors.filter(sensor => sensor.id === this.activeSensorID)
+        if (this.activeSensorID === -1 || !activeSensorExists) {
+          let lowestSensorID = -1
+          let lowestIndex = -1
+          this.sensors.forEach((sensor, index) => {
+            if (lowestSensorID === -1 || sensor.id < lowestSensorID) {
+              lowestSensorID = sensor.id
+              lowestIndex = index
+            }
+          })
+          if (lowestSensorID !== -1 && lowestIndex !== -1) {
+            this.activeSensorID = lowestSensorID
+            this.activeSensorIndex = lowestIndex
           }
-        })
-        if (lowestSensorID !== -1 && lowestIndex !== -1) {
-          this.activeSensorID = lowestSensorID
-          this.activeSensorIndex = lowestIndex
         }
+      } else {
+        this.activeSensorID = -1
+        this.activeSensorIndex = -1
       }
     },
     activeSensorID: function(newID) {
       this.historicalDataLoaded = false
-      this.loadHistoricalData(newID)
+      if (newID !== -1) {
+        this.loadHistoricalData(newID)
+      }
     },
     timePeriod: function() {
       this.historicalDataLoaded = false
-      this.loadHistoricalData(this.activeSensorID)
+      if (this.activeSensorID !== -1) {
+        this.loadHistoricalData(this.activeSensorID)
+      }
     }
   },
   methods: {
@@ -162,7 +177,7 @@ export default {
       historicalData['battery'] = {
         labels: dates,
         datasets: [{
-          label: 'Battery',
+          label: 'Battery Voltage',
           backgroundColor: typeColours['battery'],
           data: []
         }]
@@ -220,8 +235,10 @@ export default {
     },
     setActiveSensor: function(sensorID) {
       const activeSensor = this.sensors.filter(sensor => sensor.id === sensorID)[0]
-      this.activeSensorID = activeSensor.id
-      this.activeSensorIndex = this.sensors.indexOf(activeSensor)
+      if (activeSensor) {
+        this.activeSensorID = activeSensor.id
+        this.activeSensorIndex = this.sensors.indexOf(activeSensor)
+      }
     },
     deleteSensor: function(sensorID, sensorName) {
       const accessToken = this.$store.state.user.access_token
@@ -232,8 +249,7 @@ export default {
         const data = response.data
         if (data && data.status) {
           this.$toasted.show(`Deleted sensor ${sensorName}`)
-          const sensors = this.sensors.slice()
-          this.sensors = sensors.filter(sensor => sensor.id !== sensorID)
+          this.sensors = this.sensors.filter(sensor => sensor.id !== sensorID)
         }
       })
       .catch(e => {
