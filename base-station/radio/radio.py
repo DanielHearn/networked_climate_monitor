@@ -7,9 +7,9 @@ import dateutil.parser
 from apscheduler.schedulers.background import BackgroundScheduler
 
 # Config variables
-node_id = 1
+base_station_id = 255
 network_id = 100
-api_root = 'http://192.168.1.180:5000/api/'
+api_root = 'http://100.89.155.6:5000/api/'
 api_key = 'xgLxTX7Nkem5qc9jllg2'
 encrypt_key = 'pnOvzy105sF5g8Ot'
 number_of_time_periods = 10
@@ -258,7 +258,7 @@ def init_time_periods():
 # Initialise radio and process radio packets
 def run_radio():
     # Initialise the radio and start processing packets
-    with Radio(FREQ_433MHZ, node_id, network_id, isHighPower=True, verbose=False, encryptionKey=encrypt_key) as radio:
+    with Radio(FREQ_433MHZ, base_station_id, network_id, isHighPower=True, verbose=False, encryptionKey=encrypt_key) as radio:
         print("Starting radio loop")
         while True:
 

@@ -11,9 +11,9 @@
 // Node ID must be greater than or equal to 2
 #define NODEID        2
 #define NETWORKID     100
-#define FREQUENCY      RF69_433MHZ
-#define ENCRYPTKEY     "pnOvzy105sF5g8Ot"
-#define BASESTATIONID 1
+#define FREQUENCY     RF69_433MHZ
+#define ENCRYPTKEY    "pnOvzy105sF5g8Ot"
+#define BASESTATIONID 255
 
 // Serial board rate - just used to print debug messages
 #define SERIAL_BAUD   115200
