@@ -492,6 +492,18 @@ class Sensor(Resource):
         sensor = SensorModel.query.filter_by(id=sensor_id).first()
         if sensor:
             sensor.delete()
+            climate_data = ClimateModel.query.filter_by(sensor_id=sensor_id)
+
+            # Delete all climate data
+            for climate in climate_data:
+                climate_dict = climate.to_dict()
+                climate_id = climate_dict['id']
+
+                # Delete all sensor data for the climate data
+                sensor_data = SensorDataModel.query.filter_by(climate_id=climate_id)
+                for sensor in sensor_data:
+                    sensor.delete()
+                climate.delete()
             return {'status': 'Sensor successfully deleted'}, 200
         return {'status': 'Error', 'errors': ['Sensor doesn\'t exist']}, 500
 
@@ -678,7 +690,7 @@ def init():
     scheduler.start()
 
     print('Starting server')
-    app.run(debug=True, host='192.168.1.180')
+    app.run(debug=True, host='0.0.0.0')
 
     # Shutdown any scheduler jobs
     old_climate_job.remove()
