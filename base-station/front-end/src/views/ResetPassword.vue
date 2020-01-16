@@ -6,6 +6,6 @@
 
 <script>
 export default {
-  name: "resetpassword",
-};
+  name: 'resetpassword'
+}
 </script>

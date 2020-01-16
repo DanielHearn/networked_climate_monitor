@@ -1,9 +1,9 @@
 <template>
   <div class="error-list">
-    <p v-if="title" class="title">{{title}}</p>
+    <p v-if="title" class="title">{{ title }}</p>
     <ul>
       <li v-for="(error, index) in errors" :key="index">
-        <p>{{error}}</p>
+        <p>{{ error }}</p>
       </li>
     </ul>
   </div>

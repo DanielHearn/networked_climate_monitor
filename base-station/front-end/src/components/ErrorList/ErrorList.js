@@ -11,5 +11,5 @@ export default {
       default: [],
       required: true
     }
-  },
+  }
 }

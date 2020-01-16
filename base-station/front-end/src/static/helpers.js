@@ -1,8 +1,8 @@
-export const capitalise = (s) => {
+export const capitalise = s => {
   return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
-export const processErrors = (errors) => {
+export const processErrors = errors => {
   const outputErrors = []
   if (Array.isArray(errors)) {
     for (let error of errors) {
@@ -20,7 +20,7 @@ export const processErrors = (errors) => {
   return outputErrors
 }
 
-export const getBatteryStatusFromVoltage = (voltage) => {
+export const getBatteryStatusFromVoltage = voltage => {
   let status = 'Low'
   if (voltage >= 4.1) {
     status = 'High'

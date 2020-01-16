@@ -2,11 +2,8 @@ export default {
   name: 'side-panel',
   props: {},
   data: function() {
-    return {
-    }
+    return {}
   },
-  watch: {
-  },
-  methods: {
-  },
+  watch: {},
+  methods: {}
 }

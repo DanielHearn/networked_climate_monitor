@@ -6,13 +6,27 @@
       </div>
       <div class="nav__links">
         <router-link to="/">Home</router-link>
-        <router-link to="/login" v-if="!$store.state.user.logged_in">Login</router-link>
-        <router-link to="/register" v-if="!$store.state.user.logged_in">Register</router-link>
-        <router-link to="/dashboard" v-if="$store.state.user.logged_in">Dashboard</router-link>
-        <router-link to="/settings" v-if="$store.state.user.logged_in">Settings</router-link>
+        <router-link to="/login" v-if="!$store.state.user.logged_in"
+          >Login</router-link
+        >
+        <router-link to="/register" v-if="!$store.state.user.logged_in"
+          >Register</router-link
+        >
+        <router-link to="/dashboard" v-if="$store.state.user.logged_in"
+          >Dashboard</router-link
+        >
+        <router-link to="/settings" v-if="$store.state.user.logged_in"
+          >Settings</router-link
+        >
       </div>
       <div class="nav__side">
-        <v-button v-if="$store.state.user.logged_in" @click="logout" :type="'primary'" :text="'person'" :isIcon="true"/>
+        <v-button
+          v-if="$store.state.user.logged_in"
+          @click="logout"
+          :type="'primary'"
+          :text="'person'"
+          :isIcon="true"
+        />
       </div>
     </div>
     <router-view />
@@ -24,12 +38,17 @@
 </style>
 
 <script>
-import {HTTP} from './static/http-common'
+import { HTTP } from './static/http-common'
 import vButton from './components/vButton/vButton.vue'
-import {getStoredAccessToken, getStoredRefreshToken, setStoredAccessToken, setStoredRefreshToken} from './store/storage.js'
+import {
+  getStoredAccessToken,
+  getStoredRefreshToken,
+  setStoredAccessToken,
+  setStoredRefreshToken
+} from './store/storage.js'
 
 export default {
-  name: "app",
+  name: 'app',
   components: {
     vButton
   },
@@ -55,31 +74,39 @@ export default {
         this.$router.push('/')
       }
       console.log(accessToken)
-      HTTP.post(`logout/access`, {}, {
-        headers: {'Authorization': 'Bearer ' + accessToken},
-      })
-      .then(response => {
-        const data = response.data
-        if (data.status) {
-          console.log(data.status)
+      HTTP.post(
+        'logout/access',
+        {},
+        {
+          headers: { Authorization: 'Bearer ' + accessToken }
         }
-      })
-      .catch(e => {
-        console.log(e.response)
-      })
+      )
+        .then(response => {
+          const data = response.data
+          if (data.status) {
+            console.log(data.status)
+          }
+        })
+        .catch(e => {
+          console.log(e.response)
+        })
 
-      HTTP.post(`logout/refresh`, {}, {
-        headers: {'Authorization': 'Bearer ' + refreshToken},
-      })
-      .then(response => {
-        const data = response.data
-        if (data.status) {
-          console.log(data.status)
+      HTTP.post(
+        'logout/refresh',
+        {},
+        {
+          headers: { Authorization: 'Bearer ' + refreshToken }
         }
-      })
-      .catch(e => {
-        console.log(e.response)
-      })
+      )
+        .then(response => {
+          const data = response.data
+          if (data.status) {
+            console.log(data.status)
+          }
+        })
+        .catch(e => {
+          console.log(e.response)
+        })
     }
   },
   created: function() {
@@ -87,30 +114,29 @@ export default {
     const refreshToken = getStoredRefreshToken()
 
     if (accessToken) {
-      HTTP.get(`account`, {
-        headers: {'Authorization': 'Bearer ' + accessToken},
+      HTTP.get('account', {
+        headers: { Authorization: 'Bearer ' + accessToken }
       })
-      .then(response => {
-        const data = response.data
-        if (data.status && data.account) {
-          const user = this.$store.state.user
-          user.logged_in = true
-          user.access_token = accessToken
-          user.refresh_token = refreshToken
-          user.email = data.account.email
-          user.user_id = data.account.id
-          user.settings = JSON.parse(data.account.settings.replace(/'/g, '"'))
+        .then(response => {
+          const data = response.data
+          if (data.status && data.account) {
+            const user = this.$store.state.user
+            user.logged_in = true
+            user.access_token = accessToken
+            user.refresh_token = refreshToken
+            user.email = data.account.email
+            user.user_id = data.account.id
+            user.settings = JSON.parse(data.account.settings.replace(/'/g, '"'))
 
-          this.$store.commit('setUser', user)
+            this.$store.commit('setUser', user)
 
-          this.$toasted.show('Logged in')
-        }
-      })
-      .catch(e => {
-        console.log(e.response)
-      })
+            this.$toasted.show('Logged in')
+          }
+        })
+        .catch(e => {
+          console.log(e.response)
+        })
     }
-
   }
-};
+}
 </script>
