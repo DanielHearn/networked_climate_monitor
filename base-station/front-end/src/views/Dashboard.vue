@@ -9,7 +9,10 @@
         <ul v-if="sensors.length" class="list">
           <li v-for="(sensor, index) in sensors" :key="index" class="list-item" v-bind:class="{ active: sensor.id === activeSensorID }" style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;">
             <template v-if="sensor">
-              <p class="heading">{{sensor.id}}: {{sensor.name}}</p>
+              <div style="display: flex; flex-direction: row;">
+                <p class="heading">{{sensor.id}}:</p>
+                <input type="text" v-model="sensor.name" v-on:change="changeSensorName(sensor.id, sensor.name)">
+              </div>
               <div v-if="sensor.recent_climate_data">
                 <ul style="list-style: none; padding: 0; display: flex; flex-direction: row;">
                   <li v-for="(data, index) in sensor.recent_climate_data.climate_data" :key="index" style="padding-right: 0.5em;">
@@ -19,7 +22,7 @@
                   </li>
                 </ul>
                 <p class="text">Date received: {{sensor.recent_climate_data.date}}</p>
-                <p class="text">Battery voltage: {{getBatteryStatusFromVoltage(sensor.recent_climate_data.battery_voltage)}}</p>
+                <p class="text">Battery level: {{getBatteryStatusFromVoltage(sensor.recent_climate_data.battery_voltage)}}</p>
               </div>
               <div v-else>
                 <p class="text">No climate data for sensor</p>
@@ -161,6 +164,24 @@ export default {
   },
   methods: {
     getBatteryStatusFromVoltage: getBatteryStatusFromVoltage,
+    changeSensorName: function(sensorID, sensorName) {
+      const accessToken = this.$store.state.user.access_token
+
+      HTTP.patch(`sensors/${sensorID}`, {
+        name: sensorName,
+      },
+      {headers: {'Authorization': 'Bearer ' + accessToken}})
+      .then(response => {
+        console.log(response)
+        const data = response.data
+        if (data.status) {
+          this.$toasted.show('Sensor name changed')
+        }
+      })
+      .catch(e => {
+        console.log(e)
+      })
+    },
     processHistoricalData: function(climateData) {
       const historicalData = {}
       const dates = []
@@ -345,6 +366,11 @@ export default {
       setTimeout(() => {
         this.loadDashboard(true)
       }, 150)
+    }
+  },
+  beforeDestroy: function () {
+    if(this.reloadID) {
+      clearInterval(this.reloadID)
     }
   }
 };

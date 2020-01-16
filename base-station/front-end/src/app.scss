@@ -37,7 +37,7 @@ body {
   flex-direction: row;
   justify-content: space-between;
   height: 3em;
-  background: grey;
+  background: $darkest;
   color: $white;
   .nav__side {
     display: flex;
@@ -85,10 +85,20 @@ body {
   margin: 0;
   .list-item {
     background: $white;
-    padding: 0.5em;
+    padding-top: 0.5em;
     color: $darkest;
     margin: 0.2em 0;
+    & > div {
+      padding-left: 0.5em;
+      padding-right: 0.5em;
+    }
     &.active {
+      background: $grey-dark;
+      .actions--active {
+        background: $grey-darker;
+      }
+    }
+    .actions--active {
       background: $grey-dark;
     }
   }
@@ -237,4 +247,9 @@ input[type="text"] {
       }
     }
   }
+}
+
+.toasted {
+  font-family: $font-family;
+  font-size: $s-size;
 }
