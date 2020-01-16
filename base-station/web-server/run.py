@@ -17,6 +17,7 @@ from schema import UserSchema, SensorSchema, ClimateDataSchema, ChangePasswordSc
 # Load Flask
 app = Flask(__name__)
 api = Api(app)
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Initialise configuration variables
