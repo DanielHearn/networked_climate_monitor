@@ -95,12 +95,15 @@ body {
 }
 
 .button {
-  padding: 0.6em 1em;
+  padding: calc(.5em - 2px) calc(.8em - 2px);
   cursor: pointer;
   font-family: $font-family;
   font-weight: $medium-weight;
   font-size: $s-size;
   -webkit-appearance: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   &--primary {
     color: $white;
     background: $darkest;
@@ -133,8 +136,30 @@ input[type="text"] {
   flex-direction: column;
   align-items: flex-start;
   max-width: 30em;
+  text-align: left;
   .button, .link {
     margin: 0.5em 0;
+  }
+  .title {
+    width: 100%;
+    text-align: center;
+  }
+  .input-box {
+    width: 100%;
+    input {
+      width: 100%;
+      box-sizing: border-box;
+    }
+  }
+}
+
+.actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0.5em 0;
+  &--active {
+    background: $grey-darker;
   }
 }
 
@@ -178,6 +203,7 @@ input[type="text"] {
 
 .historical-chart {
   max-height: 15em;
+  max-width: 80em;
   width: 100%;
 }
 
@@ -185,6 +211,8 @@ input[type="text"] {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  flex: 1 auto;
+  width: 100%;
   .recent-data-list {
     list-style: none;
     padding: 0;

@@ -12,7 +12,7 @@
         <router-link to="/settings" v-if="$store.state.user.logged_in">Settings</router-link>
       </div>
       <div class="nav__side">
-        <button v-if="$store.state.user.logged_in" @click="logout" class="button button--primary">Logout</button>
+        <v-button v-if="$store.state.user.logged_in" @click="logout" :type="'primary'" :text="'person'" :isIcon="true"/>
       </div>
     </div>
     <router-view />
@@ -25,10 +25,14 @@
 
 <script>
 import {HTTP} from './static/http-common'
+import vButton from './components/vButton/vButton.vue'
 import {getStoredAccessToken, getStoredRefreshToken, setStoredAccessToken, setStoredRefreshToken} from './store/storage.js'
 
 export default {
   name: "app",
+  components: {
+    vButton
+  },
   methods: {
     logout: function() {
       const user = this.$store.state.user

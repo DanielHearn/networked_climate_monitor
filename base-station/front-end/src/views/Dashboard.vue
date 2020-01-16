@@ -3,7 +3,7 @@
     <side-panel>
       <template slot="header">
         <p class="heading">Sensors</p>
-        <button @click="refreshSensors" class="button button--primary">Refresh Sensors</button>
+        <v-button @click.native="refreshSensors" :type="'primary'" :text="'refresh'" :isIcon="true"/>
       </template>
       <template slot="content">
         <ul v-if="sensors.length" class="list">
@@ -24,10 +24,11 @@
               <div v-else>
                 <p class="text">No climate data for sensor</p>
               </div>
-              <div>
+              <div class="actions">
+                <v-button @click.native="setSensorConfig(sensor.id)" :type="'secondary'" :text="'settings'" :isIcon="true"/>
                 <button @click="setActiveSensor(sensor.id)" class="button button--primary">View Climate</button>
               </div>
-              <div>
+              <div v-if="sensor.config" :class="['actions', {'actions--active': sensor.config}]">
                 <button @click="deleteSensor(sensor.id, sensor.name)" class="button button--secondary">Delete Sensor</button>
                 <button @click="deleteClimate(sensor.id, sensor.name)" class="button button--secondary">Delete Climate Data</button>
               </div>
@@ -51,7 +52,7 @@
       <main-panel v-else>
         <template slot="header">
           <p class="heading">{{sensors[activeSensorIndex].id}}: {{sensors[activeSensorIndex].name}} Climate Data</p>
-          <button @click="refreshSensors" class="button button--primary">Refresh Climate Data</button>
+          <v-button @click.native="refreshSensors" :type="'primary'" :text="'refresh'" :isIcon="true"/>
         </template>
         <template slot="content">
           <div class="dashboard-content">
@@ -90,6 +91,7 @@
 <script>
 import MainPanel from './../components/MainPanel/MainPanel.vue'
 import SidePanel from './../components/SidePanel/SidePanel.vue'
+import vButton from './../components/vButton/vButton.vue'
 import {HTTP} from './../static/http-common';
 import {getBatteryStatusFromVoltage} from './../static/helpers'
 import Chart from './../components/Chart/Chart.js'
@@ -99,7 +101,8 @@ export default {
   components: {
     MainPanel,
     SidePanel,
-    Chart
+    Chart,
+    vButton
   },
   data: function() {
     return {
@@ -122,7 +125,7 @@ export default {
   },
   watch: {
     sensors: function (newSensors) {
-      if (newSensors.length ) {
+      if (newSensors.length) {
         const activeSensorExists = !!this.sensors.filter(sensor => sensor.id === this.activeSensorID)
         if (this.activeSensorID === -1 || !activeSensorExists) {
           let lowestSensorID = -1
@@ -166,6 +169,7 @@ export default {
         'humidity': '#79a6f8',
         'battery': '#FFE453'
       }
+      this.historicalData = []
       
       const orderedClimateData = climateData.reverse()
       const recentClimateData = orderedClimateData[0]
@@ -208,11 +212,11 @@ export default {
           });
         }
       });
-      console.log(historicalData)
       this.historicalData = historicalData
       this.historicalDataLoaded = true
     },
     loadHistoricalData: function(sensorID) {
+      console.log('Loading historical')
       const accessToken = this.$store.state.user.access_token
       const timePeriod = this.timePeriod
       const rangeStart = timePeriod.start.toISOString()
@@ -232,6 +236,12 @@ export default {
         console.log(e)
         this.$toasted.show('Error retrieving historical data')
       })
+    },
+    setSensorConfig: function(sensorID) {
+      const selectedSensor = this.sensors.filter(sensor => sensor.id === sensorID)[0]
+      if (selectedSensor) {
+        selectedSensor.config = !selectedSensor.config
+      }
     },
     setActiveSensor: function(sensorID) {
       const activeSensor = this.sensors.filter(sensor => sensor.id === sensorID)[0]
@@ -270,6 +280,7 @@ export default {
           const sensor = this.sensors.filter(sensor => sensor.id === sensorID)[0]
           if (sensor) {
             sensor.climate_data = []
+            delete sensor.recent_climate_data
           }
         }
       })
@@ -293,6 +304,10 @@ export default {
         }, 60000)
       }
 
+      if (this.activeSensorID !== -1) {
+        this.loadHistoricalData(this.activeSensorID)
+      }
+
       const accessToken = this.$store.state.user.access_token
       if (accessToken) {
         HTTP.get(`sensors`, {
@@ -304,6 +319,7 @@ export default {
           if (data.sensors) {
             for (let sensor of data.sensors) {
               sensor.historical_data = []
+              sensor.config = false
             }
             this.sensors = data.sensors
 
@@ -323,8 +339,6 @@ export default {
     }
   },
   created: function() {
-    console.log('Load dashboard')
-
     if (this.$store.state.user.logged_in) {
       this.loadDashboard(true)
     } else{
