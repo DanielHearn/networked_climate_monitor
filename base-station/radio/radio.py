@@ -51,6 +51,16 @@ def convert_type_to_string(type_char):
 
     return types[type_char]
 
+# Converts sensor type character to the equivalent string
+def get_unit_from_type(type):
+    units = {
+        'Humidity': '%',
+        'Temperature': 'c',
+        'Pressure': 'mb'
+    }
+
+    return units[type]
+
 
 # Process packet control data
 def process_packet_control(control):
@@ -114,10 +124,12 @@ def process_packet(packet, radio):
                     climate_parts = climate_part.split('=')
                     if len(climate_parts) == 2:
                         sensor_type = convert_type_to_string(climate_parts[0])
+                        unit = get_unit_from_type(sensor_type)
                         value = climate_parts[1]
                         climate_data_dict = {
                             'type': sensor_type,
-                            'value': value
+                            'value': value,
+                            'unit': unit
                         }
                         climate_api_object['climate_data'].append(climate_data_dict)
 
