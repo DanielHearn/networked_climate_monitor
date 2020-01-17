@@ -70,17 +70,9 @@
               </div>
               <div class="actions">
                 <v-button
-                  v-if="!sensor.config"
                   @click.native="setSensorConfig(sensor.id)"
                   :type="'secondary'"
-                  :text="'settings'"
-                  :isIcon="true"
-                />
-                <v-button
-                  v-else
-                  @click.native="setSensorConfig(sensor.id)"
-                  :type="'secondary'"
-                  :text="'close'"
+                  :text="sensor.config ? 'close' : 'settings'"
                   :isIcon="true"
                 />
                 <button
