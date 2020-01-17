@@ -276,6 +276,8 @@ export default {
         })
     },
     processHistoricalData: function(climateData) {
+      this.historicalData = []
+      this.historicalData = false
       const historicalData = {}
       const dates = []
       const typeColours = {
@@ -283,7 +285,6 @@ export default {
         humidity: '#79a6f8',
         battery: '#FFE453'
       }
-      this.historicalData = []
 
       const orderedClimateData = climateData.reverse()
       const recentClimateData = orderedClimateData[0]
