@@ -402,10 +402,14 @@ class ClimateData(Resource):
 
             # Validate quantity if input
             if input_quantity:
-                int_quantity = int(input_quantity)
+                try:
+                    int_quantity = int(input_quantity)
+                except:
+                    return {'status': 'Error',
+                            'errors': ['Quantity must be an integer']}, 422
                 if int_quantity > default_quantity or int_quantity < 0:
                     return {'status': 'Error',
-                            'errors': ['Quantity must be below or equal to 50 and greater than 0']}, 400
+                            'errors': ['Quantity must be below or equal to 50 and greater than 0']}, 422
                 else:
                     quantity = int_quantity
 
@@ -414,13 +418,13 @@ class ClimateData(Resource):
 
             # Check if range is valid
             if (range_start and range_end is None) or (range_start is None and range_end):
-                return {'status': 'Error', 'errors': ['Invalid date range']}, 400
+                return {'status': 'Error', 'errors': ['Invalid date range']}, 422
             elif (range_start and range_end) and (range_start < range_end):
                 try:
                     date_start = dateutil.parser.parse(range_start)
                     date_end = dateutil.parser.parse(range_end)
                 except:
-                    return {'status': 'Error', 'errors': ['Invalid date range']}, 400
+                    return {'status': 'Error', 'errors': ['Invalid date range']}, 422
 
                 # Get climate data between the two dates with descending date order
                 climate_data = ClimateModel.query.order_by(ClimateModel.id.desc()).filter(
