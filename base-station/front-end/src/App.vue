@@ -2,7 +2,7 @@
   <div id="app">
     <div id="nav">
       <div class="nav__side">
-        <p>Climate Monitor</p>
+        <p class="title--nav">Climate Monitor</p>
       </div>
       <div class="nav__links">
         <router-link to="/">Home</router-link>

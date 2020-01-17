@@ -37,7 +37,7 @@ body {
   flex-direction: row;
   justify-content: space-between;
   height: 3em;
-  background: $darkest;
+  background: $accent;
   color: $white;
   .nav__side {
     display: flex;
@@ -183,6 +183,11 @@ body {
   font-size: $l-size;
   font-weight: $semibold-weight;
   margin: 0;
+  &--nav {
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+  }
 }
 
 .heading {
@@ -220,7 +225,11 @@ body {
 .historical-chart {
   text-align: left;
   padding-top: 0.5em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  margin: 0.5em 0;
   width: 95%;
+  background: $white;
   .chart {
     max-height: 15em;
     max-width: 80em;

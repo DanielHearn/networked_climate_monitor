@@ -1,24 +1,31 @@
 $font-family: "Poppins", Helvetica, Arial, sans-serif;
 
+// Font sizes
 $l-size: 2em;
 $m-size: 1.25em;
 $s-size: 1em;
 $xs-size: 0.9em;
 
+// Transition lengths
 $transition-slow: 0.2s;
 $transition-fast: 0.05s;
 
+// Font Weights
 $bold-weight: 700;
 $semibold-weight: 600;
 $medium-weight: 500;
 $regular-weight: 400;
 
-$accent: #5d61da;
+// Colours
 $dark: #5E5E5E;
 $darker: #535353;
 $darkest: #3B3B3B;
+
 $white: #fefefe;
-$grey-light: #F5F5F5;
-$grey-dark: #E8E8E8;
-$grey-darker: #DCDCDC;
+
+$grey-light: #f7f7f7;
+$grey-dark: #f0f0f0;
+$grey-darker: #ececec;
+
+$accent: #5a67f0;
 $red: #EF6550;
