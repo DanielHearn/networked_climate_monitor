@@ -2,20 +2,34 @@
   <div id="app">
     <div id="nav">
       <div class="nav__side">
-        <p class="title--nav">Climate Monitor</p>
+        <router-link to="/" class="link title--nav"
+          >Climate Monitor</router-link
+        >
       </div>
       <div class="nav__links">
-        <router-link to="/">Home</router-link>
-        <router-link to="/login" v-if="!$store.state.user.logged_in"
+        <router-link to="/" class="link">Home</router-link>
+        <router-link
+          to="/login"
+          v-if="!$store.state.user.logged_in"
+          class="link"
           >Login</router-link
         >
-        <router-link to="/register" v-if="!$store.state.user.logged_in"
+        <router-link
+          to="/register"
+          v-if="!$store.state.user.logged_in"
+          class="link"
           >Register</router-link
         >
-        <router-link to="/dashboard" v-if="$store.state.user.logged_in"
+        <router-link
+          to="/dashboard"
+          v-if="$store.state.user.logged_in"
+          class="link"
           >Dashboard</router-link
         >
-        <router-link to="/settings" v-if="$store.state.user.logged_in"
+        <router-link
+          to="/settings"
+          v-if="$store.state.user.logged_in"
+          class="link"
           >Settings</router-link
         >
       </div>
