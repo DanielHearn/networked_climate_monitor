@@ -13,7 +13,7 @@ class SensorSchema(Schema):
     user_id = fields.Integer(required=True)
 
 class SensorDataSchema(Schema):
-    value = fields.Float(required=True),
+    value = fields.Float(required=True)
     type = fields.Str(required=True, validate=validate.Length(min=0, max=100))
     unit = fields.Str(required=True, validate=validate.Length(min=0, max=20))
 
