@@ -138,7 +138,7 @@
                   sensors[activeSensorIndex].recent_climate_data
               "
             >
-              <h3 class="sub-heading">Recent Sensor Data</h3>
+              <h3 class="heading">Recent Sensor Data</h3>
               <p class="text">
                 Date received:
                 {{ sensors[activeSensorIndex].recent_climate_data.date }}
@@ -154,16 +154,23 @@
                 </li>
               </ul>
 
-              <h3 class="sub-heading">Historical Sensor Data</h3>
+              <h3 class="heading">Historical Sensor Data</h3>
               <v-date-picker v-model="timePeriod" mode="range" />
               <template v-if="historicalDataLoaded && historicalData">
-                <chart
+                <div
                   v-for="data in historicalData"
                   :key="data.type"
-                  :chart-data="data"
-                  :options="chartOptions"
                   class="historical-chart"
-                />
+                >
+                  <h3 class="sub-heading">
+                    {{ data.title }}
+                  </h3>
+                  <chart
+                    :chart-data="data"
+                    :options="chartOptions"
+                    class="chart"
+                  />
+                </div>
               </template>
               <template v-else>
                 <p>No historical data for this time period.</p>
@@ -294,26 +301,30 @@ export default {
       }
 
       historicalData['battery'] = {
+        title: 'Battery Level',
         labels: dates,
         datasets: [
           {
-            label: 'Battery Voltage',
+            label: 'Battery Voltage (v)',
             backgroundColor: typeColours['battery'],
             data: []
           }
         ]
       }
 
+      // Collect sensor types from recent climate data
       for (let climateSensor of recentClimateData.climate_data) {
         const type = climateSensor.type
+        const unit = climateSensor.unit
         labels.push(type)
         const lowercaseType = type.toLowerCase()
 
         historicalData[lowercaseType] = {
+          title: type,
           labels: dates,
           datasets: [
             {
-              label: type,
+              label: `${type} (${unit})`,
               backgroundColor: typeColours[lowercaseType],
               data: []
             }
@@ -321,6 +332,7 @@ export default {
         }
       }
 
+      // Put climate data into the corresponding datasets
       orderedClimateData.forEach(climate => {
         dates.push(climate.date)
         historicalData['battery'].datasets[0].data.push(climate.battery_voltage)

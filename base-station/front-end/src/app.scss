@@ -212,9 +212,13 @@ input[type="text"] {
 }
 
 .historical-chart {
-  max-height: 15em;
-  max-width: 80em;
-  width: 100%;
+  text-align: left;
+  padding-top: 0.5em;
+  width: 95%;
+  .chart {
+    max-height: 15em;
+    max-width: 80em;
+  }
 }
 
 .dashboard-content {
