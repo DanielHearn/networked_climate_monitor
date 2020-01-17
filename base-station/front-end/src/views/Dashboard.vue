@@ -5,7 +5,7 @@
         <p class="heading">Sensors</p>
         <v-button
           @click.native="refreshSensors"
-          :type="'primary'"
+          :type="'secondary'"
           :text="'refresh'"
           :isIcon="true"
         />
@@ -22,7 +22,7 @@
             <template v-if="sensor">
               <div style="display: flex; flex-direction: row;">
                 <p class="heading" style="margin-right: 0.5em;">
-                  {{ sensor.id }}:
+                  Node {{ sensor.id }}:
                 </p>
                 <input
                   type="text"
@@ -30,11 +30,11 @@
                   v-model="sensor.name"
                   v-on:change="changeSensorName(sensor.id, sensor.name)"
                 />
-                <v-button :type="'primary'" :text="'edit'" :isIcon="true" />
+                <v-button :type="'secondary'" :text="'edit'" :isIcon="true" />
               </div>
               <div v-if="sensor.recent_climate_data">
                 <ul
-                  style="list-style: none; padding: 0; display: flex; flex-direction: row;"
+                  style="list-style: none; padding: 0; margin-top: 0.5em; display: flex; flex-direction: row;"
                 >
                   <li
                     v-for="(data, index) in sensor.recent_climate_data
@@ -47,7 +47,7 @@
                         data.type === 'Temperature' || data.type === 'Humidity'
                       "
                     >
-                      <p class="sub-heading">
+                      <p class="text text--bold" style="margin: 0.5em 0 0 0;">
                         {{ data.type }}: {{ data.value }}{{ data.unit }}
                       </p>
                     </template>
@@ -75,29 +75,26 @@
                   :text="sensor.config ? 'close' : 'settings'"
                   :isIcon="true"
                 />
-                <button
-                  @click="setActiveSensor(sensor.id)"
-                  class="button button--primary"
-                >
-                  View Climate
-                </button>
+                <v-button
+                  @click.native="setActiveSensor(sensor.id)"
+                  :type="'primary'"
+                  :text="'View Climate'"
+                />
               </div>
               <div
                 v-if="sensor.config"
                 :class="['actions', { 'actions--active': sensor.config }]"
               >
-                <button
-                  @click="deleteSensor(sensor.id, sensor.name)"
-                  class="button button--secondary"
-                >
-                  Delete Sensor
-                </button>
-                <button
-                  @click="deleteClimate(sensor.id, sensor.name)"
-                  class="button button--secondary"
-                >
-                  Delete Climate Data
-                </button>
+                <v-button
+                  @click.native="deleteSensor(sensor.id, sensor.name)"
+                  :type="'tertiary'"
+                  :text="'Delete Sensor'"
+                />
+                <v-button
+                  @click.native="deleteClimate(sensor.id, sensor.name)"
+                  :type="'tertiary'"
+                  :text="'Delete Climate Data'"
+                />
               </div>
             </template>
           </li>
@@ -124,12 +121,12 @@
       <main-panel v-else>
         <template slot="header">
           <p class="heading">
-            {{ sensors[activeSensorIndex].id }}:
+            Node {{ sensors[activeSensorIndex].id }}:
             {{ sensors[activeSensorIndex].name }} Climate Data
           </p>
           <v-button
             @click.native="refreshSensors"
-            :type="'primary'"
+            :type="'secondary'"
             :text="'refresh'"
             :isIcon="true"
           />
@@ -221,7 +218,28 @@ export default {
       },
       chartOptions: {
         responsive: true,
-        maintainAspectRatio: false
+        maintainAspectRatio: false,
+        legend: {
+          labels: {
+            fontFamily: 'Poppins'
+          }
+        },
+        scales: {
+          yAxes: [
+            {
+              ticks: {
+                fontFamily: 'Arial'
+              }
+            }
+          ],
+          xAxes: [
+            {
+              ticks: {
+                fontFamily: 'Arial'
+              }
+            }
+          ]
+        }
       }
     }
   },

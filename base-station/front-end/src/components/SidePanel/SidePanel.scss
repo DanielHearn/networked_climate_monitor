@@ -2,7 +2,7 @@
 
 .side-panel {
   width: 40em;
-  background: $grey-light;
+  background: $white;
   color: $white;
   z-index: 1;
   height: 100%;
@@ -19,6 +19,7 @@
     align-items: center;
     .heading {
       margin: 0 0.5em;
+      color: $darkest;
     }
   }
   .side-panel-content {

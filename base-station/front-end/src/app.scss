@@ -87,19 +87,25 @@ body {
     background: $white;
     padding-top: 0.5em;
     color: $darkest;
-    margin: 0.2em 0;
+    border-bottom: 5px solid $grey-dark;
     & > div {
       padding-left: 0.5em;
       padding-right: 0.5em;
     }
     &.active {
-      background: $grey-dark;
+      background: $grey-darker;
       .actions--active {
         background: $grey-darker;
       }
     }
-    .actions--active {
-      background: $grey-dark;
+    .actions {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      padding: 0.5em;
+      .button {
+        margin-right: 0.5em;
+      }
     }
   }
 }
@@ -117,10 +123,15 @@ body {
   user-select: none;
   &--primary {
     color: $white;
+    background: $accent;
+    border: 2px solid $accent;
+  }
+  &--secondary {
+    color: $white;
     background: $darkest;
     border: 2px solid $darkest;
   }
-  &--secondary {
+  &--tertiary {
     border: 2px solid $darkest;
     background: transparent;
     color: $darkest;
@@ -129,6 +140,9 @@ body {
 
 .input {
   &--text {
+    font-family: $font-family;
+    font-weight: $medium-weight;
+    font-size: $s-size;
     padding: 0.8em 0.75em;
     background: $white;
     border: 2px solid $darkest;
@@ -169,16 +183,6 @@ body {
   }
 }
 
-.actions {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  padding: 0.5em 0;
-  &--active {
-    background: $grey-darker;
-  }
-}
-
 .title {
   font-size: $l-size;
   font-weight: $semibold-weight;
@@ -205,6 +209,9 @@ body {
 .text {
   font-size: $s-size;
   font-weight: $regular-weight;
+  &--bold {
+    font-weight: $semibold-weight;
+  }
 }
 
 .link {
@@ -245,6 +252,7 @@ body {
   .recent-data-list {
     list-style: none;
     padding: 0;
+    margin-top: 0;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -271,4 +279,23 @@ body {
 .toasted {
   font-family: $font-family;
   font-size: $s-size;
+}
+
+.vc-text-base {
+  font-family: $font-family;
+  font-size: $s-size;
+}
+
+.vc-popover-content-wrapper {
+  font-family: $font-family;
+}
+
+*::-webkit-scrollbar {
+  width: 16px;
+}
+*::-webkit-scrollbar-track {
+  background: $dark; 
+}
+*::-webkit-scrollbar-thumb {
+  background: $darkest;
 }
