@@ -2,7 +2,7 @@
   <div class="content">
     <side-panel>
       <template slot="header">
-        <p class="heading">Sensors</p>
+        <p class="sub-heading">Sensors</p>
         <v-button
           @click.native="refreshSensors"
           :type="'secondary'"
@@ -66,7 +66,7 @@
                 </p>
               </div>
               <div v-else>
-                <p class="text">No climate data for sensor</p>
+                <p class="text">No climate data for this sensor</p>
               </div>
               <div class="actions">
                 <v-button
@@ -112,7 +112,7 @@
     <template v-if="!$store.state.mobile">
       <main-panel v-if="activeSensorIndex === -1">
         <template slot="header">
-          <p class="heading">Climate Data</p>
+          <p class="sub-heading">Climate Data</p>
         </template>
         <template slot="content">
           <p class="text">No sensor selected</p>
@@ -120,7 +120,7 @@
       </main-panel>
       <main-panel v-else>
         <template slot="header">
-          <p class="heading">
+          <p class="sub-heading">
             Node {{ sensors[activeSensorIndex].id }}:
             {{ sensors[activeSensorIndex].name }} Climate Data
           </p>
