@@ -403,13 +403,15 @@ export default {
         .then(response => {
           const data = response.data
           if (data && data.status) {
-            this.$toasted.show(`Deleted climate data for sensor: ${sensorName}`)
             const sensor = this.sensors.filter(
               sensor => sensor.id === sensorID
             )[0]
             if (sensor) {
               sensor.climate_data = []
-              delete sensor.recent_climate_data
+              sensor.recent_climate_data = null
+              this.$toasted.show(
+                `Deleted climate data for sensor: ${sensorName}`
+              )
             }
           }
         })
@@ -423,16 +425,7 @@ export default {
       this.$toasted.show('Refreshing sensors')
       this.loadDashboard()
     },
-    loadDashboard: function(firstLoad = false) {
-      if (firstLoad) {
-        if (this.reloadID) {
-          clearInterval(this.reloadID)
-        }
-        this.reloadID = setInterval(() => {
-          this.loadDashboard(false)
-        }, 60000)
-      }
-
+    loadDashboard: function() {
       if (this.activeSensorID !== -1) {
         this.loadHistoricalData(this.activeSensorID)
       }
@@ -465,18 +458,32 @@ export default {
       } else {
         this.$router.push('/login')
       }
+    },
+    createDashboardReloadInterval: function() {
+      // Reload dashboard every minute
+      this.reloadID = setInterval(() => {
+        this.loadDashboard(false)
+      }, 60000)
+    },
+    initDashboard: function() {
+      // Load the dashboard immediately if logged in or wait
+      // to see if user can be logged in from localstorage data
+      if (this.$store.state.user.logged_in) {
+        this.loadDashboard(true)
+        this.createDashboardReloadInterval()
+      } else {
+        setTimeout(() => {
+          this.loadDashboard(true)
+          this.createDashboardReloadInterval()
+        }, 150)
+      }
     }
   },
   created: function() {
-    if (this.$store.state.user.logged_in) {
-      this.loadDashboard(true)
-    } else {
-      setTimeout(() => {
-        this.loadDashboard(true)
-      }, 150)
-    }
+    this.initDashboard()
   },
   beforeDestroy: function() {
+    // Clear dashboard reloading ID before route changes
     if (this.reloadID) {
       clearInterval(this.reloadID)
     }
