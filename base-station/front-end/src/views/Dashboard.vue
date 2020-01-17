@@ -167,7 +167,7 @@
                   </h3>
                   <chart
                     :chart-data="data"
-                    :options="chartOptions"
+                    :options="data.options"
                     class="chart"
                   />
                 </div>
@@ -300,6 +300,20 @@ export default {
         return false
       }
 
+      const batteryChartOptions = Object.assign({}, this.chartOptions)
+      batteryChartOptions.scales = {
+        yAxes: [
+          {
+            ticks: {
+              beginAtZero: true,
+              callback: function(value) {
+                return `${value}v`
+              }
+            }
+          }
+        ]
+      }
+
       historicalData['battery'] = {
         title: 'Battery Level',
         labels: dates,
@@ -309,7 +323,8 @@ export default {
             backgroundColor: typeColours['battery'],
             data: []
           }
-        ]
+        ],
+        options: batteryChartOptions
       }
 
       // Collect sensor types from recent climate data
@@ -318,6 +333,19 @@ export default {
         const unit = climateSensor.unit
         labels.push(type)
         const lowercaseType = type.toLowerCase()
+        const chartOptions = Object.assign({}, this.chartOptions)
+        chartOptions.scales = {
+          yAxes: [
+            {
+              ticks: {
+                beginAtZero: true,
+                callback: function(value) {
+                  return `${value}${unit}`
+                }
+              }
+            }
+          ]
+        }
 
         historicalData[lowercaseType] = {
           title: type,
@@ -328,7 +356,8 @@ export default {
               backgroundColor: typeColours[lowercaseType],
               data: []
             }
-          ]
+          ],
+          options: chartOptions
         }
       }
 
