@@ -12,15 +12,15 @@ class SensorSchema(Schema):
     sensor_id = fields.Integer(required=True)
     user_id = fields.Integer(required=True)
 
+class SensorDataSchema(Schema):
+    value = fields.Float(required=True),
+    type = fields.Str(required=True, validate=validate.Length(min=0, max=100))
+    unit = fields.Str(required=True, validate=validate.Length(min=0, max=20))
 
 class ClimateDataSchema(Schema):
     battery_voltage = fields.Float(required=True)
     date = fields.DateTime(required=True)
-    climate_data = fields.List(fields.Dict(
-        value=fields.Integer(required=True),
-        type=fields.Str(required=True, validate=validate.Length(min=0, max=100)),
-        unit=fields.Str(required=True, validate=validate.Length(min=0, max=20))
-    ), required=True)
+    climate_data = fields.List(fields.Nested(SensorDataSchema), required=True)
 
 
 class ChangePasswordSchema(Schema):
