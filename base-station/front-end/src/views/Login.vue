@@ -11,6 +11,7 @@
               <p class="text">Email</p>
               <input
                 type="text"
+                class="input--text"
                 name="email"
                 v-model="email"
                 placeholder="Email"
@@ -21,6 +22,7 @@
               <p class="text">Password</p>
               <input
                 type="text"
+                class="input--text"
                 name="password"
                 v-model="password"
                 placeholder="Password"

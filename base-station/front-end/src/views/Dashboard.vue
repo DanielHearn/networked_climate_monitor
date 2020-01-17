@@ -21,12 +21,16 @@
           >
             <template v-if="sensor">
               <div style="display: flex; flex-direction: row;">
-                <p class="heading">{{ sensor.id }}:</p>
+                <p class="heading" style="margin-right: 0.5em;">
+                  {{ sensor.id }}:
+                </p>
                 <input
                   type="text"
+                  class="input--text input--small"
                   v-model="sensor.name"
                   v-on:change="changeSensorName(sensor.id, sensor.name)"
                 />
+                <v-button :type="'primary'" :text="'edit'" :isIcon="true" />
               </div>
               <div v-if="sensor.recent_climate_data">
                 <ul

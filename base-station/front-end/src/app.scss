@@ -126,13 +126,18 @@ body {
   }
 }
 
-input[type="text"] {
-  padding: 0.8em 0.75em;
-  background: $white;
-  border: 2px solid $darkest;
-  font-weight: $medium-weight;
-  font-size: $s-size;
-  -webkit-appearance: none;
+.input {
+  &--text {
+    padding: 0.8em 0.75em;
+    background: $white;
+    border: 2px solid $darkest;
+    font-weight: $medium-weight;
+    font-size: $s-size;
+    -webkit-appearance: none;
+  }
+  &--small {
+    padding: 0.4em 0.325em;
+  }
 }
 
 .form {
