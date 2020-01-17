@@ -37,7 +37,7 @@
         <v-button
           v-if="$store.state.user.logged_in"
           @click="logout"
-          :type="'primary'"
+          :type="'secondary'"
           :text="'person'"
           :isIcon="true"
         />

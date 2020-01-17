@@ -115,7 +115,7 @@
           <p class="sub-heading">Climate Data</p>
         </template>
         <template slot="content">
-          <p class="text">No sensor selected</p>
+          <p class="heading">No sensor selected</p>
         </template>
       </main-panel>
       <main-panel v-else>
@@ -156,7 +156,10 @@
               </ul>
 
               <h3 class="heading">Historical Sensor Data</h3>
-              <v-date-picker v-model="timePeriod" mode="range" />
+              <div class="input-box">
+                <p class="text">Historical Range</p>
+                <v-date-picker v-model="timePeriod" mode="range" />
+              </div>
               <template v-if="historicalDataLoaded && historicalData">
                 <div
                   v-for="data in historicalData"
@@ -178,7 +181,7 @@
               </template>
             </template>
             <template v-else>
-              <p class="text">Sensor has no climate data.</p>
+              <p class="heading">Sensor has no climate data.</p>
             </template>
           </div>
         </template>
