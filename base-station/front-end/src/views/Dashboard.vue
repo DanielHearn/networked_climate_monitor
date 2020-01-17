@@ -21,7 +21,10 @@
           >
             <template v-if="sensor">
               <div style="display: flex; flex-direction: row;">
-                <p class="heading" style="margin-right: 0.5em;">
+                <p
+                  class="heading"
+                  style="margin-right: 0.5em; display: flex; align-items: center;"
+                >
                   Node {{ sensor.id }}:
                 </p>
                 <input
