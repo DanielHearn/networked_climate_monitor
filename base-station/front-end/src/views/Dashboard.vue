@@ -270,14 +270,14 @@ export default {
           yAxes: [
             {
               ticks: {
-                fontFamily: 'Arial'
+                fontFamily: 'Poppins'
               }
             }
           ],
           xAxes: [
             {
               ticks: {
-                fontFamily: 'Arial'
+                fontFamily: 'Poppins'
               }
             }
           ]
