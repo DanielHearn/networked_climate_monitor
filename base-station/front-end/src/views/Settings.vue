@@ -1,5 +1,4 @@
 <template>
-        </li>
   <div class="content">
     <side-panel
       v-if="
@@ -85,14 +84,26 @@
                 :text="'Back'"
               />
               <p v-if="!$store.state.user.logged_in">Please log in</p>
-              <ul>
-                <li
-                  v-for="(setting, key) in this.$store.state.user.settings"
-                  :key="key"
-                >
-                  <p>{{ key }}: {{ setting }}</p>
-                </li>
-              </ul>
+              <template v-else-if="settings">
+                <div v-if="settings.temperature_unit">
+                  <p>Temperature Unit:</p>
+                  <input
+                    type="radio"
+                    id="temp_unit_c"
+                    value="c"
+                    v-model="settings.temperature_unit"
+                  />
+                  <label for="temp_unit_c">Celsius</label>
+                  <br />
+                  <input
+                    type="radio"
+                    id="temp_unit_f"
+                    value="f"
+                    v-model="settings.temperature_unit"
+                  />
+                  <label for="temp_unit_f">Farenheit</label>
+                </div>
+              </template>
             </div>
           </template>
         </template>
@@ -108,7 +119,9 @@
                 :type="'tertiary'"
                 :text="'Back'"
               />
-              <p>LINK</p>
+              <router-link to="/reset-password" class="link"
+                >Change Password</router-link
+              >
             </div>
           </template>
         </template>
@@ -132,7 +145,21 @@ export default {
   },
   data: function() {
     return {
-      activeCategoryID: -1
+      activeCategoryID: -1,
+      settings: {}
+    }
+  },
+  watch: {
+    settings: {
+      handler: function(newSettings, oldSettings) {
+        if (Object.keys(oldSettings).length > 0) {
+          const user = this.$store.state.user
+          user.settings = Object.assign({}, newSettings)
+          this.$store.commit('setUser', user)
+          this.updateSettings()
+        }
+      },
+      deep: true
     }
   },
   methods: {
@@ -149,7 +176,7 @@ export default {
               user.settings = JSON.parse(
                 data.account.settings.replace(/'/g, '"')
               )
-
+              this.settings = Object.assign({}, this.$store.state.user.settings)
               this.$store.commit('setUser', user)
             }
           })
@@ -161,6 +188,28 @@ export default {
       } else {
         this.$router.push('/login')
       }
+    },
+    updateSettings: function() {
+      const accessToken = this.$store.state.user.access_token
+      const stringifiedSettings = JSON.stringify(this.settings)
+
+      HTTP.patch(
+        'account',
+        { settings: stringifiedSettings },
+        {
+          headers: { Authorization: 'Bearer ' + accessToken }
+        }
+      )
+        .then(response => {
+          console.log(response)
+          const data = response.data
+          if (data.status) {
+            this.$toasted.show('Settings updated')
+          }
+        })
+        .catch(e => {
+          console.log(e)
+        })
     }
   },
   created: function() {
