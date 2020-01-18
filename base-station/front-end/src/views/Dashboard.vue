@@ -51,6 +51,7 @@
                   class="input--text input--small"
                   v-model="sensor.name"
                   v-on:change="changeSensorName(sensor.id, sensor.name)"
+                  @blur="sensor.editing = false"
                   v-if="sensor.editing"
                 />
                 <v-button
@@ -478,9 +479,12 @@ export default {
       }
     },
     setSensorEditing: function(sensorID) {
-      const selectedSensor = this.sensors.filter(
-        sensor => sensor.id === sensorID
-      )[0]
+      const selectedSensor = this.sensors.filter(sensor => {
+        if (sensorID !== sensor.id) {
+          sensor.editing = false
+        }
+        return sensor.id === sensorID
+      })[0]
       if (selectedSensor) {
         selectedSensor.editing = !selectedSensor.editing
       }
