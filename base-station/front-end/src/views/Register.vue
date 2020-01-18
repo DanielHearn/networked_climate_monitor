@@ -1,7 +1,9 @@
 <template>
   <main-panel>
     <template slot="content">
-      <div style="display: flex; align-items: center; flex-direction: column;">
+      <div
+        style="display: flex; align-items: center; flex-direction: column; flex: 1 auto;"
+      >
         <h1 class="title">Climate Monitor</h1>
         <h2 class="heading">Account Registration</h2>
         <div class="content-column">

@@ -2,7 +2,8 @@
   <main-panel>
     <template slot="content">
       <div class="content-column">
-        <h2 class="title">Introduction</h2>
+        <h2 class="title">Climate Monitor</h2>
+        <h3 class="heading">Home</h3>
         <p>
           The networked climate monitor project provides access to the recent
           and historical climate data from the sensors.

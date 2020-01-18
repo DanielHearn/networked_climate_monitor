@@ -65,7 +65,7 @@
       </div>
     </div>
     <div class="mobile-menu" v-if="$store.state.mobileMenu">
-      <ul>
+      <ul @click="toggleMenu">
         <router-link to="/" class="link">Home</router-link>
         <router-link
           to="/login"
@@ -115,11 +115,6 @@ export default {
   name: 'app',
   components: {
     vButton
-  },
-  watch: {
-    $route: function() {
-      this.$store.commit('setMobileMenu', false)
-    }
   },
   methods: {
     logout: function() {
