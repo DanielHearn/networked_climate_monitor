@@ -1,72 +1,63 @@
 <template>
   <main-panel>
     <template slot="content">
-      <div
-        style="display: flex; align-items: center; flex-direction: column; flex: 1 auto;"
-      >
+      <div class="content-column">
         <h1 class="title">Climate Monitor</h1>
         <h2 class="heading">Account Registration</h2>
-        <div class="content-column">
-          <p class="text">
-            Enter an email and password to register the account.
-          </p>
-          <form
-            id="register"
-            class="form"
-            @submit="checkRegister"
-            method="post"
-          >
-            <div class="input-box">
-              <p class="text">Email</p>
-              <input
-                type="text"
-                class="input--text"
-                name="email"
-                v-model="email"
-                placeholder="Email"
-                tabindex="0"
-              />
-            </div>
-            <div class="input-box">
-              <p class="text">Password</p>
-              <input
-                type="text"
-                class="input--text"
-                name="password"
-                v-model="password"
-                placeholder="Password"
-                tabindex="0"
-              />
-            </div>
-            <div class="input-box">
-              <p class="text">Confirm Password</p>
-              <input
-                type="text"
-                class="input--text" 
-                name="confirmPassword"
-                v-model="confirmPassword"
-                placeholder="Confirm password"
-                tabindex="0"
-              />
-            </div>
-            <error-list
-              v-if="errors.length"
-              title="Errors:"
-              v-bind:errors="errors"
-            />
-            <button
-              type="submit"
-              value="Submit"
-              class="button button--primary"
+        <p class="text">
+          Enter an email and password to register the account.
+        </p>
+        <form id="register" class="form" @submit="checkRegister" method="post">
+          <div class="input-box">
+            <p class="text">Email</p>
+            <input
+              type="text"
+              class="input--text"
+              name="email"
+              v-model="email"
+              placeholder="Email"
               tabindex="0"
-            >
-              Register
-            </button>
-          </form>
-          <router-link to="/login" class="link"
-            >Already registered? Click here to login</router-link
+            />
+          </div>
+          <div class="input-box">
+            <p class="text">Password</p>
+            <input
+              type="text"
+              class="input--text"
+              name="password"
+              v-model="password"
+              placeholder="Password"
+              tabindex="0"
+            />
+          </div>
+          <div class="input-box">
+            <p class="text">Confirm Password</p>
+            <input
+              type="text"
+              class="input--text"
+              name="confirmPassword"
+              v-model="confirmPassword"
+              placeholder="Confirm password"
+              tabindex="0"
+            />
+          </div>
+          <error-list
+            v-if="errors.length"
+            title="Errors:"
+            v-bind:errors="errors"
+          />
+          <button
+            type="submit"
+            value="Submit"
+            class="button button--primary"
+            tabindex="0"
           >
-        </div>
+            Register
+          </button>
+        </form>
+        <router-link to="/login" class="link"
+          >Already registered? Click here to login</router-link
+        >
       </div>
     </template>
   </main-panel>
@@ -122,7 +113,7 @@ export default {
       }
 
       if (password !== newPassword) {
-        this.errors.push('Passwords don\'t match.')
+        this.errors.push('Password and confirm password be identical.')
         valid = false
       }
 

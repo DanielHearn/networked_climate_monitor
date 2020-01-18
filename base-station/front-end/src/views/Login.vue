@@ -1,57 +1,53 @@
 <template>
   <main-panel>
     <template slot="content">
-      <div
-        style="display: flex; align-items: center; flex-direction: column; flex: 1 auto;"
-      >
+      <div class="content-column">
         <h1 class="title">Climate Monitor</h1>
         <h2 class="heading">Login</h2>
-        <div class="content-column">
-          <p class="text">Enter an email and password to login.</p>
-          <form id="login" class="form" @submit="checkLogin" method="post">
-            <div class="input-box">
-              <p class="text">Email</p>
-              <input
-                type="text"
-                class="input--text"
-                name="email"
-                v-model="email"
-                placeholder="Email"
-                tabindex="0"
-              />
-            </div>
-            <div class="input-box">
-              <p class="text">Password</p>
-              <input
-                type="text"
-                class="input--text"
-                name="password"
-                v-model="password"
-                placeholder="Password"
-                tabindex="0"
-              />
-            </div>
-            <router-link to="/reset-password" class="link" tabindex="-1"
-              >Forgotten your password? Click here</router-link
-            >
-            <error-list
-              v-if="errors.length"
-              title="Errors:"
-              v-bind:errors="errors"
-            />
-            <button
-              type="submit"
-              value="Submit"
-              class="button button--primary"
+        <p class="text">Enter an email and password to login.</p>
+        <form id="login" class="form" @submit="checkLogin" method="post">
+          <div class="input-box">
+            <p class="text">Email</p>
+            <input
+              type="text"
+              class="input--text"
+              name="email"
+              v-model="email"
+              placeholder="Email"
               tabindex="0"
-            >
-              Login
-            </button>
-            <router-link to="/register" class="link"
-              >Not registered? Click here to register</router-link
-            >
-          </form>
-        </div>
+            />
+          </div>
+          <div class="input-box">
+            <p class="text">Password</p>
+            <input
+              type="text"
+              class="input--text"
+              name="password"
+              v-model="password"
+              placeholder="Password"
+              tabindex="0"
+            />
+          </div>
+          <router-link to="/reset-password" class="link" tabindex="-1"
+            >Forgotten your password? Click here</router-link
+          >
+          <error-list
+            v-if="errors.length"
+            title="Errors:"
+            v-bind:errors="errors"
+          />
+          <button
+            type="submit"
+            value="Submit"
+            class="button button--primary"
+            tabindex="0"
+          >
+            Login
+          </button>
+          <router-link to="/register" class="link"
+            >Not registered? Click here to register</router-link
+          >
+        </form>
       </div>
     </template>
   </main-panel>
