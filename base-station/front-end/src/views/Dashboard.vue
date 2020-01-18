@@ -29,6 +29,20 @@
                 <p
                   class="heading"
                   style="margin-right: 0.25em; display: flex; align-items: center;"
+                  :class="{
+                    underline: sensor.id === activeSensorID
+                  }"
+                  v-if="!sensor.editing"
+                >
+                  Node {{ sensor.id }}: {{ sensor.name }}
+                </p>
+                <p
+                  v-else
+                  class="heading"
+                  style="margin-right: 0.25em; display: flex; align-items: center;"
+                  :class="{
+                    underline: sensor.id === activeSensorID
+                  }"
                 >
                   Node {{ sensor.id }}:
                 </p>
@@ -39,13 +53,6 @@
                   v-on:change="changeSensorName(sensor.id, sensor.name)"
                   v-if="sensor.editing"
                 />
-                <p
-                  v-else
-                  class="heading"
-                  style="margin-right: 0.25em; display: flex; align-items: center;"
-                >
-                  {{ sensor.name }}
-                </p>
                 <v-button
                   @click.native="setSensorEditing(sensor.id)"
                   :type="'tertiary'"
