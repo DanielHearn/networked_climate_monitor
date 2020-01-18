@@ -144,7 +144,7 @@
           <p class="heading">No sensor selected</p>
         </template>
       </main-panel>
-      <main-panel v-else>
+      <main-panel v-else-if="sensors[activeSensorIndex]">
         <template slot="header">
           <p class="sub-heading">
             Node {{ sensors[activeSensorIndex].id }}:
