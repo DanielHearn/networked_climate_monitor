@@ -1,6 +1,11 @@
 <template>
   <div class="content">
-    <side-panel>
+    <side-panel
+      v-if="
+        !$store.state.mobile ||
+          ($store.state.mobile && activeSensorIndex === -1)
+      "
+    >
       <template slot="header">
         <p class="sub-heading">Sensors</p>
         <v-button
@@ -23,7 +28,7 @@
               <div style="display: flex; flex-direction: row;">
                 <p
                   class="heading"
-                  style="margin-right: 0.5em; display: flex; align-items: center;"
+                  style="margin-right: 0.25em; display: flex; align-items: center;"
                 >
                   Node {{ sensor.id }}:
                 </p>
@@ -32,8 +37,21 @@
                   class="input--text input--small"
                   v-model="sensor.name"
                   v-on:change="changeSensorName(sensor.id, sensor.name)"
+                  v-if="sensor.editing"
                 />
-                <v-button :type="'secondary'" :text="'edit'" :isIcon="true" />
+                <p
+                  v-else
+                  class="heading"
+                  style="margin-right: 0.25em; display: flex; align-items: center;"
+                >
+                  {{ sensor.name }}
+                </p>
+                <v-button
+                  @click.native="setSensorEditing(sensor.id)"
+                  :type="'tertiary'"
+                  :text="'edit'"
+                  :isIcon="true"
+                />
               </div>
               <div v-if="sensor.recent_climate_data">
                 <ul
@@ -112,7 +130,12 @@
         </ul>
       </template>
     </side-panel>
-    <template v-if="!$store.state.mobile">
+    <template
+      v-if="
+        !$store.state.mobile ||
+          ($store.state.mobile && activeSensorIndex !== -1)
+      "
+    >
       <main-panel v-if="activeSensorIndex === -1">
         <template slot="header">
           <p class="sub-heading">Climate Data</p>
@@ -125,7 +148,7 @@
         <template slot="header">
           <p class="sub-heading">
             Node {{ sensors[activeSensorIndex].id }}:
-            {{ sensors[activeSensorIndex].name }} Climate Data
+            {{ sensors[activeSensorIndex].name }}
           </p>
           <v-button
             @click.native="refreshSensors"
@@ -136,13 +159,19 @@
         </template>
         <template slot="content">
           <div class="dashboard-content">
+            <v-button
+              v-if="$store.state.mobile"
+              @click.native="backToSensorList()"
+              :type="'tertiary'"
+              :text="'Back'"
+            />
             <template
               v-if="
                 sensors[activeSensorIndex] &&
                   sensors[activeSensorIndex].recent_climate_data
               "
             >
-              <h3 class="heading">Recent Sensor Data</h3>
+              <h3 class="heading">Recent Climate Data</h3>
               <p class="text">
                 Date received:
                 {{ sensors[activeSensorIndex].recent_climate_data.date }}
@@ -158,7 +187,7 @@
                 </li>
               </ul>
 
-              <h3 class="heading">Historical Sensor Data</h3>
+              <h3 class="heading">Historical Climate Data</h3>
               <div class="input-box">
                 <p class="text">Historical Range</p>
                 <v-date-picker v-model="timePeriod" mode="range" />
@@ -251,7 +280,7 @@ export default {
   },
   watch: {
     sensors: function(newSensors) {
-      if (newSensors.length) {
+      if (newSensors.length && !this.$store.state.mobile) {
         const activeSensorExists = !!this.sensors.filter(
           sensor => sensor.id === this.activeSensorID
         )
@@ -431,11 +460,22 @@ export default {
         })
     },
     setSensorConfig: function(sensorID) {
+      const selectedSensor = this.sensors.filter(sensor => {
+        if (sensorID !== sensor.id) {
+          sensor.config = false
+        }
+        return sensor.id === sensorID
+      })[0]
+      if (selectedSensor) {
+        selectedSensor.config = !selectedSensor.config
+      }
+    },
+    setSensorEditing: function(sensorID) {
       const selectedSensor = this.sensors.filter(
         sensor => sensor.id === sensorID
       )[0]
       if (selectedSensor) {
-        selectedSensor.config = !selectedSensor.config
+        selectedSensor.editing = !selectedSensor.editing
       }
     },
     setActiveSensor: function(sensorID) {
@@ -512,6 +552,7 @@ export default {
               for (let sensor of data.sensors) {
                 sensor.historical_data = []
                 sensor.config = false
+                sensor.editing = false
               }
               this.sensors = data.sensors
 
@@ -547,6 +588,10 @@ export default {
           this.createDashboardReloadInterval()
         }, 150)
       }
+    },
+    backToSensorList: function() {
+      this.activeSensorID = -1
+      this.activeSensorIndex = -1
     }
   },
   created: function() {

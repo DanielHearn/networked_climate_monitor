@@ -192,6 +192,9 @@ body {
   align-items: flex-start;
   max-width: 30em;
   text-align: left;
+  padding: 1em;
+  margin-top: 1em;
+  background: $white;
   .button, .link {
     margin: 0.5em 0;
   }
@@ -294,7 +297,8 @@ body {
       height: 4em;
       padding: 1em;
       background: $white;
-      margin: 0 1em;
+      margin-right: 1em;
+      margin-bottom: 1em;
       text-align: left;
       box-shadow: #e8e8e8 2px 3px 3px;
       p {
@@ -324,6 +328,29 @@ input.vc-text-base.vc-border {
 
 .vc-popover-content-wrapper {
   font-family: $font-family;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.mobile-menu {
+  display: flex;
+  flex: 1 auto;
+  background: $darkest;
+  justify-content: center;
+  align-items: center;
+  ul {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    .link {
+      color: $white;
+      padding: 1em 0;
+      font-size: $m-size;
+      font-weight: $medium-weight;
+    }
+  }
 }
 
 *::-webkit-scrollbar {

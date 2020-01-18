@@ -1,12 +1,25 @@
 <template>
-  <div id="app">
+  <div
+    id="app"
+    :class="{
+      'mobile-menu--active': $store.state.mobileMenu,
+      mobile: $store.state.mobile
+    }"
+  >
     <div id="nav">
       <div class="nav__side">
-        <router-link to="/" class="link title--nav"
+        <router-link to="/" class="link title--nav" v-if="!$store.state.mobile"
           >Climate Monitor</router-link
         >
+        <v-button
+          v-else
+          @click.native="logout"
+          :type="'secondary'"
+          :text="'person'"
+          :isIcon="true"
+        />
       </div>
-      <div class="nav__links">
+      <div class="nav__links" v-if="!$store.state.mobile">
         <router-link to="/" class="link">Home</router-link>
         <router-link
           to="/login"
@@ -35,15 +48,52 @@
       </div>
       <div class="nav__side">
         <v-button
-          v-if="$store.state.user.logged_in"
-          @click="logout"
+          v-if="$store.state.user.logged_in && !$store.state.mobile"
+          @click.native="logout"
           :type="'secondary'"
           :text="'person'"
           :isIcon="true"
         />
+        <v-button
+          v-if="$store.state.mobile"
+          @click.native="toggleMenu"
+          :type="'secondary'"
+          :text="$store.state.mobileMenu ? 'close' : 'menu'"
+          :isIcon="true"
+          style="margin-left: 2em;"
+        />
       </div>
     </div>
-    <router-view />
+    <div class="mobile-menu" v-if="$store.state.mobileMenu">
+      <ul>
+        <router-link to="/" class="link">Home</router-link>
+        <router-link
+          to="/login"
+          v-if="!$store.state.user.logged_in"
+          class="link"
+          >Login</router-link
+        >
+        <router-link
+          to="/register"
+          v-if="!$store.state.user.logged_in"
+          class="link"
+          >Register</router-link
+        >
+        <router-link
+          to="/dashboard"
+          v-if="$store.state.user.logged_in"
+          class="link"
+          >Dashboard</router-link
+        >
+        <router-link
+          to="/settings"
+          v-if="$store.state.user.logged_in"
+          class="link"
+          >Settings</router-link
+        >
+      </ul>
+    </div>
+    <router-view :class="{ hidden: $store.state.mobileMenu }" />
   </div>
 </template>
 
@@ -65,6 +115,11 @@ export default {
   name: 'app',
   components: {
     vButton
+  },
+  watch: {
+    $route: function() {
+      this.$store.commit('setMobileMenu', false)
+    }
   },
   methods: {
     logout: function() {
@@ -121,9 +176,18 @@ export default {
         .catch(e => {
           console.log(e.response)
         })
+    },
+    checkScreenSize: function() {
+      this.$store.commit('setMobile', window.innerWidth <= 800)
+    },
+    toggleMenu: function() {
+      this.$store.commit('setMobileMenu', !this.$store.state.mobileMenu)
     }
   },
   created: function() {
+    this.checkScreenSize()
+    window.addEventListener('resize', this.checkScreenSize)
+
     const accessToken = getStoredAccessToken()
     const refreshToken = getStoredRefreshToken()
 
