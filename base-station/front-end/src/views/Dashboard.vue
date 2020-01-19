@@ -238,6 +238,8 @@ import { HTTP } from './../static/http-common'
 import { getBatteryStatusFromVoltage } from './../static/helpers'
 import Chart from './../components/Chart/Chart.js'
 
+import { startOfYesterday, endOfToday } from 'date-fns'
+
 export default {
   name: 'dashboard',
   components: {
@@ -256,8 +258,8 @@ export default {
       historicalDataLoaded: false,
       reloadID: null,
       timePeriod: {
-        start: new Date(Date.now() - 86400000),
-        end: new Date()
+        start: startOfYesterday(),
+        end: endOfToday()
       },
       chartOptions: {
         responsive: true,
@@ -443,7 +445,6 @@ export default {
       this.historicalDataLoaded = true
     },
     loadHistoricalData: function(sensorID) {
-      console.log('Loading historical')
       const accessToken = this.$store.state.user.access_token
       const timePeriod = this.timePeriod
       const rangeStart = timePeriod.start.toISOString()
