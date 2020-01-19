@@ -3,6 +3,7 @@ from datetime import timedelta, datetime
 from flask import Flask, render_template, jsonify, request
 from flask_restful import Api, Resource
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.ext.hybrid import hybrid_method
 from sqlalchemy_serializer import SerializerMixin
 from passlib.hash import bcrypt
 from marshmallow import ValidationError, validate
@@ -161,6 +162,14 @@ class ClimateModel(db.Model, SerializerMixin):
 
     def __repr__(self):
         return '<Climate %r>' % self.id
+
+    @hybrid_method
+    def interval(self, n):
+        return self.id % n == 0
+
+    @interval.expression
+    def interval(cls, n):
+        return cls.id % n == 0
 
     def save(self):
         db.session.add(self)
@@ -426,11 +435,28 @@ class ClimateData(Resource):
                 except:
                     return {'status': 'Error', 'errors': ['Invalid date range']}, 422
 
+                days_in_range = (date_end - date_start).days
+                data_interval = 1
+                if days_in_range > 120:
+                    data_interval = 20
+                elif days_in_range > 60:
+                    data_interval = 10
+                elif days_in_range > 30:
+                    data_interval = 7
+                elif days_in_range > 14:
+                    data_interval = 6
+                elif days_in_range > 7:
+                    data_interval = 5
+                elif days_in_range > 2:
+                    data_interval = 4
+                elif days_in_range > 1:
+                    data_interval = 3
+
                 # Get climate data between the two dates with descending date order
                 climate_data = ClimateModel.query.order_by(ClimateModel.id.desc()).filter(
                     ClimateModel.sensor_id == sensor_id,
+                    ClimateModel.interval(data_interval),
                     ClimateModel.date <= date_end,
-
                     ClimateModel.date >= date_start)
             else:
                 # Get the most recent climate data limited by the specified quantity
