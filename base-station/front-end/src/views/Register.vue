@@ -22,7 +22,7 @@
           <div class="input-box">
             <p class="text">Password</p>
             <input
-              type="text"
+              type="password"
               class="input--text"
               name="password"
               v-model="password"
