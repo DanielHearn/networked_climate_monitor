@@ -14,7 +14,7 @@
         <v-button
           v-else
           @click.native="logout"
-          :type="'secondary'"
+          :hierachyLevel="'secondary'"
           :text="'person'"
           :isIcon="true"
         />
@@ -50,14 +50,14 @@
         <v-button
           v-if="$store.state.user.logged_in && !$store.state.mobile"
           @click.native="logout"
-          :type="'secondary'"
+          :hierachyLevel="'secondary'"
           :text="'person'"
           :isIcon="true"
         />
         <v-button
           v-if="$store.state.mobile"
           @click.native="toggleMenu"
-          :type="'secondary'"
+          :hierachyLevel="'secondary'"
           :text="$store.state.mobileMenu ? 'close' : 'menu'"
           :isIcon="true"
           style="margin-left: 2em;"
@@ -207,7 +207,11 @@ export default {
           }
         })
         .catch(e => {
-          console.log(e.response)
+          if (e.response) {
+            this.$toasted.show('Stored account credentials are invalid')
+          } else if (e.request) {
+            this.$toasted.show('Error contacting server')
+          }
         })
     }
   }

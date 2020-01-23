@@ -9,6 +9,7 @@
           <div class="input-box">
             <p class="text">Email</p>
             <input
+              type="email"
               class="input--text"
               name="email"
               v-model="email"
