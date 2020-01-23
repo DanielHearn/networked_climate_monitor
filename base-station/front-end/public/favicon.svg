@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="svg4496"
+   width="32"
+   height="32"
+   viewBox="0 0 32 32"
+   sodipodi:docname="favicon.svg"
+   inkscape:version="0.92.1 r15371"
+   inkscape:export-filename="C:\Users\hearn\Documents\GitHub\networked_climate_monitor\base-station\front-end\public\rect5075.png"
+   inkscape:export-xdpi="783.97778"
+   inkscape:export-ydpi="783.97778">
+  <metadata
+     id="metadata4502">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs4500" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1183"
+     inkscape:window-height="720"
+     id="namedview4498"
+     showgrid="false"
+     inkscape:zoom="10.429825"
+     inkscape:cx="27.126416"
+     inkscape:cy="15.172995"
+     inkscape:window-x="1068"
+     inkscape:window-y="108"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg4496" />
+  <rect
+     style="opacity:0.98999999;fill:#5a67f0;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1;paint-order:markers stroke fill"
+     id="rect5049"
+     width="30.979031"
+     height="31.347828"
+     x="-31.489515"
+     y="0.32608604"
+     ry="4"
+     transform="scale(-1,1)" />
+  <rect
+     style="opacity:0.98999999;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:0;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1;paint-order:markers stroke fill"
+     id="rect5075"
+     width="9.999999"
+     height="11.999999"
+     x="4.0000005"
+     y="16"
+     ry="3" />
+  <rect
+     style="opacity:0.98999999;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:0;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1;paint-order:markers stroke fill"
+     id="rect5075-8-7"
+     width="9.9999905"
+     height="23.999996"
+     x="18"
+     y="4.0000024"
+     ry="2.9999998" />
+</svg>
