@@ -1,7 +1,7 @@
 export default {
   name: 'v-button',
   props: {
-    type: {
+    hierachyLevel: {
       type: String,
       default: 'primary',
       required: true
@@ -19,7 +19,7 @@ export default {
   },
   computed: {
     typeClass: function() {
-      return `button--${this.type}`
+      return `button--${this.hierachyLevel}`
     }
   }
 }

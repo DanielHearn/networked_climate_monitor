@@ -340,6 +340,14 @@ input.vc-text-base.vc-border {
   display: none !important;
 }
 
+.historical-actions {
+  display: flex;
+  flex-direction: row;
+  .button {
+    margin-right: 0.5em;
+  }
+}
+
 .mobile-menu {
   display: flex;
   flex: 1 auto;

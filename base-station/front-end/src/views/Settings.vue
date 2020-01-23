@@ -30,7 +30,7 @@
               <div class="actions">
                 <v-button
                   @click.native="activeCategoryID = 0"
-                  :type="'primary'"
+                  :hierachyLevel="'primary'"
                   :text="'Edit settings'"
                 />
               </div>
@@ -56,7 +56,7 @@
               <div class="actions">
                 <v-button
                   @click.native="activeCategoryID = 1"
-                  :type="'primary'"
+                  :hierachyLevel="'primary'"
                   :text="'Manage account'"
                 />
               </div>
@@ -80,7 +80,7 @@
               <v-button
                 v-if="$store.state.mobile"
                 @click.native="activeCategoryID = -1"
-                :type="'tertiary'"
+                :hierachyLevel="'tertiary'"
                 :text="'Back'"
               />
               <p v-if="!$store.state.user.logged_in">Please log in</p>
@@ -116,7 +116,7 @@
               <v-button
                 v-if="$store.state.mobile"
                 @click.native="activeCategoryID = -1"
-                :type="'tertiary'"
+                :hierachyLevel="'tertiary'"
                 :text="'Back'"
               />
               <router-link to="/reset-password" class="link"

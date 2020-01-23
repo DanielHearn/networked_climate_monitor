@@ -10,7 +10,7 @@
         <p class="sub-heading">Sensors</p>
         <v-button
           @click.native="refreshSensors"
-          :type="'secondary'"
+          :hierachyLevel="'secondary'"
           :text="'refresh'"
           :isIcon="true"
         />
@@ -56,7 +56,7 @@
                 />
                 <v-button
                   @click.native="setSensorEditing(sensor.id)"
-                  :type="'tertiary'"
+                  :hierachyLevel="'tertiary'"
                   :text="'edit'"
                   :isIcon="true"
                 />
@@ -100,13 +100,13 @@
               <div class="actions">
                 <v-button
                   @click.native="setSensorConfig(sensor.id)"
-                  :type="'secondary'"
+                  :hierachyLevel="'secondary'"
                   :text="sensor.config ? 'close' : 'settings'"
                   :isIcon="true"
                 />
                 <v-button
                   @click.native="setActiveSensor(sensor.id)"
-                  :type="'primary'"
+                  :hierachyLevel="'primary'"
                   :text="'View Climate'"
                 />
               </div>
@@ -116,12 +116,12 @@
               >
                 <v-button
                   @click.native="deleteSensor(sensor.id, sensor.name)"
-                  :type="'tertiary'"
+                  :hierachyLevel="'tertiary'"
                   :text="'Delete Sensor'"
                 />
                 <v-button
                   @click.native="deleteClimate(sensor.id, sensor.name)"
-                  :type="'tertiary'"
+                  :hierachyLevel="'tertiary'"
                   :text="'Delete Climate Data'"
                 />
               </div>
@@ -160,7 +160,7 @@
           </p>
           <v-button
             @click.native="refreshSensors"
-            :type="'secondary'"
+            :hierachyLevel="'secondary'"
             :text="'refresh'"
             :isIcon="true"
           />
@@ -170,7 +170,7 @@
             <v-button
               v-if="$store.state.mobile"
               @click.native="backToSensorList()"
-              :type="'tertiary'"
+              :hierachyLevel="'tertiary'"
               :text="'Back'"
             />
             <template
@@ -199,6 +199,28 @@
               <div class="input-box">
                 <p class="text">Historical Range</p>
                 <v-date-picker v-model="timePeriod" mode="range" />
+              </div>
+              <div class="historical-actions">
+                <v-button
+                  @click.native="rangeLastDay()"
+                  :hierachyLevel="'secondary'"
+                  :text="'1 Day'"
+                />
+                <v-button
+                  @click.native="rangeLast2Days()"
+                  :hierachyLevel="'secondary'"
+                  :text="'2 Days'"
+                />
+                <v-button
+                  @click.native="rangeLastWeek()"
+                  :hierachyLevel="'secondary'"
+                  :text="'1 Week'"
+                />
+                <v-button
+                  @click.native="rangeLastMonth()"
+                  :hierachyLevel="'secondary'"
+                  :text="'1 Month'"
+                />
               </div>
               <template v-if="historicalDataLoaded && historicalData">
                 <div
@@ -238,7 +260,7 @@ import { HTTP } from './../static/http-common'
 import { getBatteryStatusFromVoltage } from './../static/helpers'
 import Chart from './../components/Chart/Chart.js'
 
-import { startOfYesterday, endOfToday } from 'date-fns'
+import { sub, startOfYesterday, endOfToday, startOfToday } from 'date-fns'
 
 export default {
   name: 'dashboard',
@@ -258,7 +280,7 @@ export default {
       historicalDataLoaded: false,
       reloadID: null,
       timePeriod: {
-        start: startOfYesterday(),
+        start: startOfToday(),
         end: endOfToday()
       },
       chartOptions: {
@@ -604,6 +626,34 @@ export default {
     backToSensorList: function() {
       this.activeSensorID = -1
       this.activeSensorIndex = -1
+    },
+    rangeLastDay: function() {
+      this.timePeriod = {
+        start: startOfToday(),
+        end: endOfToday()
+      }
+    },
+    rangeLast2Days: function() {
+      this.timePeriod = {
+        start: startOfYesterday(),
+        end: endOfToday()
+      }
+    },
+    rangeLastWeek: function() {
+      const date = sub(startOfToday(), { days: 7 })
+
+      this.timePeriod = {
+        start: date,
+        end: endOfToday()
+      }
+    },
+    rangeLastMonth: function() {
+      const date = sub(startOfToday(), { months: 1 })
+
+      this.timePeriod = {
+        start: date,
+        end: endOfToday()
+      }
     }
   },
   created: function() {

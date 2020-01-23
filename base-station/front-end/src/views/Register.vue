@@ -11,7 +11,7 @@
           <div class="input-box">
             <p class="text">Email</p>
             <input
-              type="text"
+              type="email"
               class="input--text"
               name="email"
               v-model="email"
@@ -33,7 +33,7 @@
           <div class="input-box">
             <p class="text">Confirm Password</p>
             <input
-              type="text"
+              type="password"
               class="input--text"
               name="confirmPassword"
               v-model="confirmPassword"
@@ -46,14 +46,12 @@
             title="Errors:"
             v-bind:errors="errors"
           />
-          <button
+          <v-button
+            :hierachyLevel="'primary'"
+            :text="'Register'"
             type="submit"
-            value="Submit"
-            class="button button--primary"
             tabindex="0"
-          >
-            Register
-          </button>
+          />
         </form>
         <router-link to="/login" class="link"
           >Already registered? Click here to login</router-link
@@ -72,12 +70,14 @@ import {
   setStoredAccessToken,
   setStoredRefreshToken
 } from './../store/storage.js'
+import vButton from './../components/vButton/vButton.vue'
 
 export default {
   name: 'register',
   components: {
     MainPanel,
-    ErrorList
+    ErrorList,
+    vButton
   },
   data: function() {
     return {
