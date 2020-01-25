@@ -56,11 +56,14 @@ body {
     }
   }
   .nav__links {
-    justify-content: space-between;
+    width: 100%;
+    position: absolute;
+    margin: 0 auto;
+    justify-content: center;
     align-items: center;
     display: flex;
     .link {
-      padding: 0 0.35em;
+      padding: 0.5em 0.6em;
       justify-content: center;
       align-items: center;
       display: flex;
