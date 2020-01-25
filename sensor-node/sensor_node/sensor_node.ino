@@ -9,7 +9,7 @@
 
 // Define radio configuration
 // Node ID must be greater than or equal to 2
-#define NODEID        2
+#define NODEID        1
 #define NETWORKID     100
 #define FREQUENCY     RF69_433MHZ
 #define ENCRYPTKEY    "pnOvzy105sF5g8Ot"
@@ -65,6 +65,13 @@ void setup() {
     while (1);
   }
 
+  // Set sensor to use forced mode
+  bme.setSampling(Adafruit_BME280::MODE_FORCED,
+                  Adafruit_BME280::SAMPLING_X1, // temperature
+                  Adafruit_BME280::SAMPLING_X1, // pressure
+                  Adafruit_BME280::SAMPLING_X1, // humidity
+                  Adafruit_BME280::FILTER_OFF   );
+
   // Change radio power to preserve battery if the radio has good signal with the base station
   #ifdef ENABLE_ATC
     radio.enableAutoPower(ATC_RSSI);
@@ -106,6 +113,7 @@ void sendClimateData() {
 
   // Retrieve climate data and put into radio packet payload
   if (bme_status) {
+    bme.takeForcedMeasurement();
     boolean valid_temp = false;
     float temp = 0;
     int t_i;
@@ -246,7 +254,7 @@ void sendClimateData() {
 
   if(initialised) {
     radio.sleep();
-    long sleep_ms = send_interval - loop_drift - 16500;
+    long sleep_ms = send_interval - loop_drift;
     micro_sleep(sleep_ms);    
   }
 }
@@ -331,7 +339,7 @@ void initialise() {
     micro_sleep(sleep_ms);
   } else {
     Serial.println("Waiting before the first sensor reading");
-    long sleep_ms = initial_delay - loop_drift - 8000;
+    long sleep_ms = initial_delay - loop_drift;
     micro_sleep(sleep_ms);
   }
 }
