@@ -217,14 +217,7 @@ export default {
     if (!this.$store.state.mobile) {
       this.activeCategoryID = 0
     }
-
-    if (this.$store.state.user.logged_in) {
-      this.loadSettings()
-    } else {
-      setTimeout(() => {
-        this.loadSettings()
-      }, 150)
-    }
+    this.settings = this.$store.state.user.settings
   }
 }
 </script>

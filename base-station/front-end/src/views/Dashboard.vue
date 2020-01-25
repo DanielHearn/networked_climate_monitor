@@ -71,11 +71,19 @@
                     :key="index"
                     style="padding-right: 0.5em;"
                   >
-                    <template
-                      v-if="
-                        data.type === 'Temperature' || data.type === 'Humidity'
-                      "
-                    >
+                    <template v-if="data.type === 'Temperature'">
+                      <p class="text text--bold" style="margin: 0.5em 0 0 0;">
+                        {{ data.type }}:
+                        {{
+                          formatClimateData(
+                            data.type,
+                            data.value,
+                            settings.temperature_unit
+                          )
+                        }}
+                      </p>
+                    </template>
+                    <template v-if="data.type === 'Humidity'">
                       <p class="text text--bold" style="margin: 0.5em 0 0 0;">
                         {{ data.type }}: {{ data.value }}{{ data.unit }}
                       </p>
@@ -191,7 +199,18 @@
                   :key="index"
                 >
                   <p class="text">{{ data.type }}</p>
-                  <p class="sub-heading">{{ data.value }}{{ data.unit }}</p>
+                  <p class="sub-heading" v-if="data.type === 'Temperature'">
+                    {{
+                      formatClimateData(
+                        data.type,
+                        data.value,
+                        settings.temperature_unit
+                      )
+                    }}
+                  </p>
+                  <p class="sub-heading" v-else>
+                    {{ formatClimateData(data.type, data.value, data.unit) }}
+                  </p>
                 </li>
               </ul>
 
@@ -257,7 +276,11 @@ import MainPanel from './../components/MainPanel/MainPanel.vue'
 import SidePanel from './../components/SidePanel/SidePanel.vue'
 import vButton from './../components/vButton/vButton.vue'
 import { HTTP } from './../static/http-common'
-import { getBatteryStatusFromVoltage } from './../static/helpers'
+import {
+  getBatteryStatusFromVoltage,
+  formatClimateData,
+  convertTemperature
+} from './../static/helpers'
 import Chart from './../components/Chart/Chart.js'
 
 import { sub, startOfYesterday, endOfToday, startOfToday } from 'date-fns'
@@ -274,6 +297,7 @@ export default {
     return {
       errors: [],
       sensors: [],
+      settings: {},
       activeSensorID: -1,
       activeSensorIndex: -1,
       historicalData: {},
@@ -349,6 +373,7 @@ export default {
     }
   },
   methods: {
+    formatClimateData: formatClimateData,
     getBatteryStatusFromVoltage: getBatteryStatusFromVoltage,
     changeSensorName: function(sensorID, sensorName) {
       const accessToken = this.$store.state.user.access_token
@@ -419,10 +444,18 @@ export default {
       // Collect sensor types from recent climate data
       for (let climateSensor of recentClimateData.climate_data) {
         const type = climateSensor.type
-        const unit = climateSensor.unit
+        let unit = climateSensor.unit
+        let value = climateSensor.value
+
         labels.push(type)
         const lowercaseType = type.toLowerCase()
         const chartOptions = Object.assign({}, this.chartOptions)
+
+        if (type === 'Temperature') {
+          unit = `°${this.settings.temperature_unit.toUpperCase()}`
+          value = convertTemperature(value, this.settings.temperature_unit)
+        }
+
         chartOptions.scales = {
           yAxes: [
             {
@@ -457,8 +490,13 @@ export default {
         if (climate.climate_data) {
           const climate_data = climate.climate_data
           climate_data.forEach(sensor => {
+            let value = sensor.value
+            if (sensor.type === 'Temperature') {
+              value = convertTemperature(value, this.settings.temperature_unit)
+            }
+
             historicalData[sensor.type.toLowerCase()].datasets[0].data.push(
-              sensor.value
+              value
             )
           })
         }
@@ -573,6 +611,8 @@ export default {
       if (this.activeSensorID !== -1) {
         this.loadHistoricalData(this.activeSensorID)
       }
+
+      this.settings = this.$store.state.user.settings
 
       const accessToken = this.$store.state.user.access_token
       if (accessToken) {
