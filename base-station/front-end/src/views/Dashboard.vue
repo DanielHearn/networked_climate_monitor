@@ -314,7 +314,6 @@ export default {
     return {
       errors: [],
       sensors: [],
-      settings: {},
       activeSensorID: -1,
       activeSensorIndex: -1,
       historicalData: {},
@@ -332,6 +331,9 @@ export default {
         return this.sensors[this.activeSensorIndex]
       }
       return {}
+    },
+    settings: function() {
+      return this.$store.state.user.settings
     }
   },
   watch: {
@@ -604,8 +606,6 @@ export default {
       if (this.activeSensorID !== -1) {
         this.loadHistoricalData(this.activeSensorID)
       }
-
-      this.settings = this.$store.state.user.settings
 
       const accessToken = this.$store.state.user.access_token
       if (accessToken) {
