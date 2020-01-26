@@ -187,27 +187,12 @@
                 Date received:
                 {{ activeSensor.recent_climate_data.date }}
               </p>
-              <ul class="recent-data-list">
-                <li
-                  v-for="(data, index) in activeSensor.recent_climate_data
-                    .climate_data"
-                  :key="index"
-                >
-                  <p class="text">{{ data.type }}</p>
-                  <p class="sub-heading" v-if="data.type === 'Temperature'">
-                    {{
-                      formatClimateData(
-                        data.type,
-                        data.value,
-                        settings.temperature_unit
-                      )
-                    }}
-                  </p>
-                  <p class="sub-heading" v-else>
-                    {{ formatClimateData(data.type, data.value, data.unit) }}
-                  </p>
-                </li>
-              </ul>
+              <recent-climate-data
+                :recent-climate-data="
+                  activeSensor.recent_climate_data.climate_data
+                "
+                :temperature-unit="settings.temperature_unit"
+              />
 
               <h3 class="heading">Historical Climate Data</h3>
               <div class="input-box">
@@ -273,6 +258,7 @@
 import MainPanel from './../components/MainPanel/MainPanel.vue'
 import SidePanel from './../components/SidePanel/SidePanel.vue'
 import vButton from './../components/vButton/vButton.vue'
+import RecentClimateData from './../components/RecentClimateData/RecentClimateData.vue'
 import { HTTP } from './../static/http-common'
 import {
   getBatteryStatusFromVoltage,
@@ -321,7 +307,8 @@ export default {
     MainPanel,
     SidePanel,
     Chart,
-    vButton
+    vButton,
+    RecentClimateData
   },
   data: function() {
     return {
