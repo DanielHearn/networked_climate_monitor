@@ -160,11 +160,11 @@
           <p class="heading">No sensor selected</p>
         </template>
       </main-panel>
-      <main-panel v-else-if="sensors[activeSensorIndex]">
+      <main-panel v-else-if="activeSensor">
         <template slot="header">
           <p class="sub-heading">
-            Node {{ sensors[activeSensorIndex].id }}:
-            {{ sensors[activeSensorIndex].name }}
+            Node {{ activeSensor.id }}:
+            {{ activeSensor.name }}
           </p>
           <v-button
             @click.native="refreshSensors"
@@ -181,21 +181,16 @@
               :hierachyLevel="'tertiary'"
               :text="'Back'"
             />
-            <template
-              v-if="
-                sensors[activeSensorIndex] &&
-                  sensors[activeSensorIndex].recent_climate_data
-              "
-            >
+            <template v-if="activeSensor && activeSensor.recent_climate_data">
               <h3 class="heading">Recent Climate Data</h3>
               <p class="text">
                 Date received:
-                {{ sensors[activeSensorIndex].recent_climate_data.date }}
+                {{ activeSensor.recent_climate_data.date }}
               </p>
               <ul class="recent-data-list">
                 <li
-                  v-for="(data, index) in sensors[activeSensorIndex]
-                    .recent_climate_data.climate_data"
+                  v-for="(data, index) in activeSensor.recent_climate_data
+                    .climate_data"
                   :key="index"
                 >
                   <p class="text">{{ data.type }}</p>
@@ -335,6 +330,14 @@ export default {
           ]
         }
       }
+    }
+  },
+  computed: {
+    activeSensor: function() {
+      if (this.activeSensorIndex !== -1 && this.activeSensorIndex !== -1) {
+        return this.sensors[this.activeSensorIndex]
+      }
+      return {}
     }
   },
   watch: {
