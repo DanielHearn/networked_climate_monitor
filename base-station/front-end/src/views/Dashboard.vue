@@ -257,8 +257,11 @@
                   />
                 </div>
               </template>
-              <template v-else>
+              <template v-else-if="!historicalData">
                 <p>No historical data for this time period.</p>
+              </template>
+              <template v-else-if="!historicalDataLoaded">
+                <p>Historical data loading.</p>
               </template>
             </template>
             <template v-else>
