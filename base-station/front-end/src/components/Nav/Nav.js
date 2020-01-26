@@ -20,7 +20,6 @@ export default {
       user.access_token = ''
       user.refresh_token = ''
       user.email = ''
-      user.user_id = 0
       this.$store.commit('setUser', user)
 
       setStoredAccessToken('')

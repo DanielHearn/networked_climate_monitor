@@ -79,7 +79,6 @@ export default {
             user.access_token = accessToken
             user.refresh_token = refreshToken
             user.email = data.account.email
-            user.user_id = data.account.id
             user.settings = JSON.parse(data.account.settings.replace(/'/g, '"'))
 
             this.$store.commit('setUser', user)

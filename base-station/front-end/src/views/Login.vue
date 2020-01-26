@@ -91,7 +91,6 @@ export default {
             user.access_token = data.access_token
             user.refresh_token = data.refresh_token
             user.email = email
-            user.user_id = 1
 
             setStoredAccessToken(data.access_token)
             setStoredRefreshToken(data.refresh_token)

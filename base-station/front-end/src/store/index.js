@@ -14,8 +14,7 @@ export default new Vuex.Store({
       refresh_token: '',
       logged_in: false,
       email: '',
-      settings: {},
-      user_id: 0
+      settings: {}
     }
   },
   mutations: {
