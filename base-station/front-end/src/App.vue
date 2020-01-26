@@ -6,64 +6,7 @@
       mobile: $store.state.mobile
     }"
   >
-    <div id="nav">
-      <div class="nav__side">
-        <router-link to="/" class="link title--nav" v-if="!$store.state.mobile"
-          >Climate Monitor</router-link
-        >
-        <v-button
-          v-else
-          @click.native="logout"
-          :hierachyLevel="'secondary'"
-          :text="'person'"
-          :isIcon="true"
-        />
-      </div>
-      <div class="nav__links" v-if="!$store.state.mobile">
-        <router-link to="/" class="link">Home</router-link>
-        <router-link
-          to="/login"
-          v-if="!$store.state.user.logged_in"
-          class="link"
-          >Login</router-link
-        >
-        <router-link
-          to="/register"
-          v-if="!$store.state.user.logged_in"
-          class="link"
-          >Register</router-link
-        >
-        <router-link
-          to="/dashboard"
-          v-if="$store.state.user.logged_in"
-          class="link"
-          >Dashboard</router-link
-        >
-        <router-link
-          to="/settings"
-          v-if="$store.state.user.logged_in"
-          class="link"
-          >Settings</router-link
-        >
-      </div>
-      <div class="nav__side">
-        <v-button
-          v-if="$store.state.user.logged_in && !$store.state.mobile"
-          @click.native="logout"
-          :hierachyLevel="'secondary'"
-          :text="'person'"
-          :isIcon="true"
-        />
-        <v-button
-          v-if="$store.state.mobile"
-          @click.native="toggleMenu"
-          :hierachyLevel="'secondary'"
-          :text="$store.state.mobileMenu ? 'close' : 'menu'"
-          :isIcon="true"
-          style="margin-left: 2em;"
-        />
-      </div>
-    </div>
+    <v-nav></v-nav>
     <div class="mobile-menu" v-if="$store.state.mobileMenu">
       <ul @click="toggleMenu">
         <router-link to="/" class="link">Home</router-link>
@@ -103,80 +46,18 @@
 
 <script>
 import { HTTP } from './static/http-common'
-import vButton from './components/vButton/vButton.vue'
-import {
-  getStoredAccessToken,
-  getStoredRefreshToken,
-  setStoredAccessToken,
-  setStoredRefreshToken
-} from './store/storage.js'
+import { getStoredAccessToken, getStoredRefreshToken } from './store/storage.js'
+
+import vNav from './components/Nav/Nav.vue'
 
 export default {
   name: 'app',
   components: {
-    vButton
+    vNav
   },
   methods: {
-    logout: function() {
-      const user = this.$store.state.user
-      const accessToken = user.access_token
-      const refreshToken = user.refresh_token
-
-      user.logged_in = false
-      user.access_token = ''
-      user.refresh_token = ''
-      user.email = ''
-      user.user_id = 0
-      this.$store.commit('setUser', user)
-
-      setStoredAccessToken('')
-      setStoredRefreshToken('')
-
-      this.$toasted.show('Logged out')
-
-      if (this.$route.name !== 'home') {
-        this.$router.push('/')
-      }
-      console.log(accessToken)
-      HTTP.post(
-        'logout/access',
-        {},
-        {
-          headers: { Authorization: 'Bearer ' + accessToken }
-        }
-      )
-        .then(response => {
-          const data = response.data
-          if (data.status) {
-            console.log(data.status)
-          }
-        })
-        .catch(e => {
-          console.log(e.response)
-        })
-
-      HTTP.post(
-        'logout/refresh',
-        {},
-        {
-          headers: { Authorization: 'Bearer ' + refreshToken }
-        }
-      )
-        .then(response => {
-          const data = response.data
-          if (data.status) {
-            console.log(data.status)
-          }
-        })
-        .catch(e => {
-          console.log(e.response)
-        })
-    },
     checkScreenSize: function() {
       this.$store.commit('setMobile', window.innerWidth <= 800)
-    },
-    toggleMenu: function() {
-      this.$store.commit('setMobileMenu', !this.$store.state.mobileMenu)
     }
   },
   created: function() {
