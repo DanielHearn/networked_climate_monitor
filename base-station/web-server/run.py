@@ -349,7 +349,9 @@ class Users(Resource):
         user = UserModel.return_first()
         if not user:
             return {'status': 'Error', 'errors': ['The account has not been created']}, 500
-        return {'status': 'Account successfully retrieved', 'account': user.to_dict()}, 200
+        user = user.to_dict()
+        del user['password']
+        return {'status': 'Account successfully retrieved', 'account': user}, 200
 
 
 class ClimateData(Resource):
