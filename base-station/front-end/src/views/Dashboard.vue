@@ -431,6 +431,7 @@ export default {
           {
             label: 'Battery Voltage (v)',
             backgroundColor: typeColours['battery'],
+            spanGaps: true,
             data: []
           }
         ],
@@ -472,6 +473,7 @@ export default {
             {
               label: `${type} (${unit})`,
               backgroundColor: typeColours[lowercaseType],
+              spanGaps: true,
               data: []
             }
           ],
@@ -485,15 +487,26 @@ export default {
         historicalData['battery'].datasets[0].data.push(climate.battery_voltage)
         if (climate.climate_data) {
           const climate_data = climate.climate_data
+          const usedTypes = []
+
           climate_data.forEach(sensor => {
             let value = sensor.value
             if (sensor.type === 'Temperature') {
               value = convertTemperature(value, this.settings.temperature_unit)
             }
+            usedTypes.push(sensor.type)
 
             historicalData[sensor.type.toLowerCase()].datasets[0].data.push(
               value
             )
+          })
+
+          // Put null data to fill gaps in charts if sensor type is missing from
+          // the current climate data object but is in other objects
+          labels.forEach(label => {
+            if (usedTypes.indexOf(label) === -1) {
+              historicalData[label.toLowerCase()].datasets[0].data.push(null)
+            }
           })
         }
       })
