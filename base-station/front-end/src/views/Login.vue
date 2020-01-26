@@ -78,6 +78,56 @@ export default {
     }
   },
   methods: {
+    login: function(email, password) {
+      HTTP.post('login', {
+        email: email,
+        password: password
+      })
+        .then(response => {
+          const data = response.data
+          if (data.status && data.access_token && data.refresh_token) {
+            const user = this.$store.state.user
+            user.logged_in = true
+            user.access_token = data.access_token
+            user.refresh_token = data.refresh_token
+            user.email = email
+            user.user_id = 1
+
+            setStoredAccessToken(data.access_token)
+            setStoredRefreshToken(data.refresh_token)
+
+            HTTP.get('account', {
+              headers: { Authorization: 'Bearer ' + data.access_token }
+            })
+              .then(response => {
+                const data = response.data
+                if (data.status && data.account) {
+                  const user = this.$store.state.user
+                  user.settings = JSON.parse(
+                    data.account.settings.replace(/'/g, '"')
+                  )
+
+                  this.$store.commit('setUser', user)
+                }
+              })
+              .catch(e => {
+                console.log(e)
+              })
+
+            this.$store.commit('setUser', user)
+            this.$toasted.show('Logged in')
+
+            this.$router.push('/dashboard')
+          }
+        })
+        .catch(e => {
+          if (e.response && e.response.data && e.response.data.errors) {
+            this.errors = processErrors(e.response.data.errors)
+          } else {
+            this.errors.push(e)
+          }
+        })
+    },
     checkLogin: function(e) {
       e.preventDefault()
       this.errors = []
@@ -102,55 +152,7 @@ export default {
       }
 
       if (valid) {
-        HTTP.post('login', {
-          email: email,
-          password: password
-        })
-          .then(response => {
-            console.log(response)
-            const data = response.data
-            if (data.status && data.access_token && data.refresh_token) {
-              const user = this.$store.state.user
-              user.logged_in = true
-              user.access_token = data.access_token
-              user.refresh_token = data.refresh_token
-              user.email = email
-              user.user_id = 1
-
-              setStoredAccessToken(data.access_token)
-              setStoredRefreshToken(data.refresh_token)
-
-              HTTP.get('account', {
-                headers: { Authorization: 'Bearer ' + data.access_token }
-              })
-                .then(response => {
-                  const data = response.data
-                  if (data.status && data.account) {
-                    const user = this.$store.state.user
-                    user.settings = JSON.parse(
-                      data.account.settings.replace(/'/g, '"')
-                    )
-
-                    this.$store.commit('setUser', user)
-                  }
-                })
-                .catch(e => {
-                  console.log(e)
-                })
-
-              this.$store.commit('setUser', user)
-              this.$toasted.show('Logged in')
-
-              this.$router.push('/dashboard')
-            }
-          })
-          .catch(e => {
-            if (e.response && e.response.data && e.response.data.errors) {
-              this.errors = processErrors(e.response.data.errors)
-            } else {
-              this.errors.push(e)
-            }
-          })
+        this.login(email, password)
       }
     }
   }
