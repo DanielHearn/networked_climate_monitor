@@ -201,19 +201,17 @@ export default {
         }
       )
         .then(response => {
-          console.log(response)
           const data = response.data
           if (data.status) {
             this.$toasted.show('Settings updated')
           }
         })
         .catch(e => {
-          console.log(e)
+          console.warn(e)
         })
     }
   },
   created: function() {
-    console.log('Load settings')
     if (!this.$store.state.mobile) {
       this.activeCategoryID = 0
     }

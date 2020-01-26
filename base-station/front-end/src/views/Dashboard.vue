@@ -399,14 +399,13 @@ export default {
         { headers: { Authorization: 'Bearer ' + accessToken } }
       )
         .then(response => {
-          console.log(response)
           const data = response.data
           if (data.status) {
             this.$toasted.show('Sensor name changed')
           }
         })
         .catch(e => {
-          console.log(e)
+          console.warn(e)
         })
     },
     processHistoricalData: function(climateData) {
@@ -525,14 +524,13 @@ export default {
         }
       )
         .then(response => {
-          console.log(response)
           const data = response.data
           if (data.climate_data) {
             this.processHistoricalData(data.climate_data)
           }
         })
         .catch(e => {
-          console.log(e)
+          console.warn(e)
           this.$toasted.show('Error retrieving historical data')
         })
     },
@@ -581,7 +579,7 @@ export default {
         })
         .catch(e => {
           if (e.response) {
-            console.log(e.response)
+            console.warn(e.response)
           }
         })
     },
@@ -607,7 +605,7 @@ export default {
         })
         .catch(e => {
           if (e.response) {
-            console.log(e.response)
+            console.warn(e.response)
           }
         })
     },
@@ -628,7 +626,6 @@ export default {
           headers: { Authorization: 'Bearer ' + accessToken }
         })
           .then(response => {
-            console.log(response)
             const data = response.data
             if (data.sensors) {
               for (let sensor of data.sensors) {

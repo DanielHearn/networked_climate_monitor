@@ -30,7 +30,7 @@ export default {
       if (this.$route.name !== 'home') {
         this.$router.push('/')
       }
-      console.log(accessToken)
+
       HTTP.post(
         'logout/access',
         {},
@@ -38,14 +38,9 @@ export default {
           headers: { Authorization: 'Bearer ' + accessToken }
         }
       )
-        .then(response => {
-          const data = response.data
-          if (data.status) {
-            console.log(data.status)
-          }
-        })
+        .then(() => {})
         .catch(e => {
-          console.log(e.response)
+          console.warn(e.response)
         })
 
       HTTP.post(
@@ -55,14 +50,9 @@ export default {
           headers: { Authorization: 'Bearer ' + refreshToken }
         }
       )
-        .then(response => {
-          const data = response.data
-          if (data.status) {
-            console.log(data.status)
-          }
-        })
+        .then(() => {})
         .catch(e => {
-          console.log(e.response)
+          console.warn(e.response)
         })
     },
     toggleMenu: function() {

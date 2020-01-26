@@ -153,7 +153,7 @@ export default {
                 }
               })
               .catch(e => {
-                console.log(e)
+                console.warn(e)
               })
 
             this.$store.commit('setUser', user)
