@@ -283,6 +283,38 @@ import Chart from './../components/Chart/Chart.js'
 
 import { sub, startOfYesterday, endOfToday, startOfToday } from 'date-fns'
 
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  legend: {
+    labels: {
+      fontFamily: 'Poppins'
+    }
+  },
+  scales: {
+    yAxes: [
+      {
+        ticks: {
+          fontFamily: 'Poppins'
+        }
+      }
+    ],
+    xAxes: [
+      {
+        ticks: {
+          fontFamily: 'Poppins'
+        }
+      }
+    ]
+  }
+}
+
+const typeColours = {
+  temperature: '#f87979',
+  humidity: '#79a6f8',
+  battery: '#FFE453'
+}
+
 export default {
   name: 'dashboard',
   components: {
@@ -304,31 +336,6 @@ export default {
       timePeriod: {
         start: startOfToday(),
         end: endOfToday()
-      },
-      chartOptions: {
-        responsive: true,
-        maintainAspectRatio: false,
-        legend: {
-          labels: {
-            fontFamily: 'Poppins'
-          }
-        },
-        scales: {
-          yAxes: [
-            {
-              ticks: {
-                fontFamily: 'Poppins'
-              }
-            }
-          ],
-          xAxes: [
-            {
-              ticks: {
-                fontFamily: 'Poppins'
-              }
-            }
-          ]
-        }
       }
     }
   },
@@ -407,11 +414,6 @@ export default {
       this.historicalData = false
       const historicalData = {}
       const dates = []
-      const typeColours = {
-        temperature: '#f87979',
-        humidity: '#79a6f8',
-        battery: '#FFE453'
-      }
 
       const orderedClimateData = climateData.reverse()
       const recentClimateData = orderedClimateData[0]
@@ -420,7 +422,7 @@ export default {
         return false
       }
 
-      const batteryChartOptions = Object.assign({}, this.chartOptions)
+      const batteryChartOptions = Object.assign({}, chartOptions)
       batteryChartOptions.scales = {
         yAxes: [
           {
@@ -455,14 +457,14 @@ export default {
 
         labels.push(type)
         const lowercaseType = type.toLowerCase()
-        const chartOptions = Object.assign({}, this.chartOptions)
+        const climateChartOptions = Object.assign({}, chartOptions)
 
         if (type === 'Temperature') {
           unit = `°${this.settings.temperature_unit.toUpperCase()}`
           value = convertTemperature(value, this.settings.temperature_unit)
         }
 
-        chartOptions.scales = {
+        climateChartOptions.scales = {
           yAxes: [
             {
               ticks: {
@@ -485,7 +487,7 @@ export default {
               data: []
             }
           ],
-          options: chartOptions
+          options: climateChartOptions
         }
       }
 
