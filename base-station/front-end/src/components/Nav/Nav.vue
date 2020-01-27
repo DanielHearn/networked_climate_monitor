@@ -4,13 +4,7 @@
       <router-link to="/" class="link title--nav" v-if="!$store.state.mobile"
         >Climate Monitor</router-link
       >
-      <v-button
-        v-else
-        @click.native="logout"
-        :hierachyLevel="'secondary'"
-        :text="'person'"
-        :isIcon="true"
-      />
+      <logout-button v-else />
     </div>
     <div class="nav__links">
       <template v-if="!$store.state.mobile">
