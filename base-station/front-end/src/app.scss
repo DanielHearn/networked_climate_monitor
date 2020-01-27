@@ -276,29 +276,6 @@ input.vc-text-base.vc-border {
   }
 }
 
-.mobile-menu {
-  display: flex;
-  flex: 1 auto;
-  background: $darkest;
-  justify-content: center;
-  align-items: center;
-  ul {
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-    .link {
-      color: $white;
-      padding: 1em 0;
-      font-size: $m-size;
-      font-weight: $medium-weight;
-      text-decoration: none;
-    }
-    .router-link-exact-active {
-      text-decoration: underline;
-    }
-  }
-}
-
 .underline {
   text-decoration: underline;
 }
