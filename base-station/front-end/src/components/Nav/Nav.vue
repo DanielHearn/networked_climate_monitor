@@ -39,13 +39,7 @@
       </template>
     </div>
     <div class="nav__side nav__right">
-      <v-button
-        v-if="$store.state.user.logged_in && !$store.state.mobile"
-        @click.native="logout"
-        :hierachyLevel="'secondary'"
-        :text="'person'"
-        :isIcon="true"
-      />
+      <logout-button v-if="$store.state.user.logged_in && !$store.state.mobile"/>
       <v-button
         v-if="$store.state.mobile"
         @click.native="toggleMenu"
