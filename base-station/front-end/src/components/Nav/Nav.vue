@@ -12,7 +12,8 @@
         :isIcon="true"
       />
     </div>
-    <div class="nav__links" v-if="!$store.state.mobile">
+    <div class="nav__links" >
+      <template v-if="!$store.state.mobile">
       <router-link to="/" class="link">Home</router-link>
       <router-link to="/login" v-if="!$store.state.user.logged_in" class="link"
         >Login</router-link
@@ -35,6 +36,7 @@
         class="link"
         >Settings</router-link
       >
+      </template>
     </div>
     <div class="nav__side nav__right">
       <v-button
