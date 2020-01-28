@@ -41,8 +41,6 @@ unsigned bme_status;
 boolean initialised = false;
 long send_interval = 60000;
 long initialisation_interval = 60000;
-long loop_drift = 0;
-int drift = 1000;
 
 // Setup
 void setup() {
@@ -126,8 +124,7 @@ void sendClimateData() {
         valid_temp = true;
         t_i = t_retries;
       } else {
-        loop_drift += 100;
-        micro_sleep(100);
+        delay(100);
       }
     }
     if (valid_temp) {
@@ -160,8 +157,7 @@ void sendClimateData() {
         valid_hum = true;
         h_i = h_retries;
       } else {
-        loop_drift += 100;
-        micro_sleep(100);
+        delay(100);
       }
     }
     if (valid_hum) {
@@ -194,8 +190,7 @@ void sendClimateData() {
         valid_pressure = true;
         p_i = p_retries;
       } else {
-        loop_drift += 100;
-        micro_sleep(100);
+        delay(100);
       }
     }
     if (valid_pressure) {
@@ -226,17 +221,18 @@ void sendClimateData() {
     radio.receiveDone();
 
     // Send climate data to base station with retries if no ack is receies
-    if (radio.sendWithRetry(BASESTATIONID, payload_data, sizeof(payload_data), 3, 200)) {
+    if (radio.sendWithRetry(BASESTATIONID, payload_data, sizeof(payload_data), 3, 500)) {
       Serial.println("Succefully send with ACK");
-
-      loop_drift += 500;
-      delay(500);
+      
+      //delay(500);
 
       // Check if re-initialisation request recieved
       int i;
-      int retries = 3;
+      int retries = 5;
+      boolean packet_received = false;
+      
       for (i = 0; i < retries; ++i) {
-        Serial.println("Checking for re-init packet");
+        Serial.println("Checking for time or re-init packet");
         if (radio.receiveDone()) {
           Serial.println("Packet received");
     
@@ -246,6 +242,7 @@ void sendClimateData() {
             packet_data[i] = c;
           }
 
+          String packet_type = "";
           String data = packet_data;
           int split_index = data.indexOf('|');
           String control_data = data.substring(0, split_index);
@@ -261,23 +258,54 @@ void sendClimateData() {
 
             String key_string = token_string.substring(0, part_split_index);
             String value_string = token_string.substring(part_split_index + 1);
-
-            if (key_string == "T" && value_string == "RI") {
-              Serial.println("Re-initialisation request received");
-              initialised = false;
-              
+            
+            if (key_string == "T") {
+              packet_type = value_string;
               i = retries;
+              packet_received = true;
             }
 
             token = strtok(NULL, ",");
+          }
+
+        
+          if(packet_type == "RI") {
+            Serial.println("Re-initialisation request received");
+            initialised = false;
+          } else if (packet_type == "T") {
+            Serial.println("Time period received");
+            String main_data = data.substring(split_index + 1);
+      
+            int packet_end_split_index = main_data.indexOf('_');
+            main_data = main_data.substring(0, packet_end_split_index);
+      
+            int str_len = main_data.length() + 1;
+            char char_array[str_len];
+            main_data.toCharArray(char_array, str_len);
+            char *token = strtok(char_array, ",");
+      
+            while (token != NULL)
+            {
+              String token_string = token;
+              int part_split_index = token_string.indexOf('=');
+      
+              String key_string = token_string.substring(0, part_split_index);
+              String value_string = token_string.substring(part_split_index + 1);
+      
+              if (key_string == "next") {
+                send_interval = value_string.toInt();
+                Serial.println(send_interval);
+              }
+      
+              token = strtok(NULL, ",");
+            }
           }
           
           if (radio.ACKRequested()) {
             radio.sendACK();
           }
         }
-        if (initialised) {
-          loop_drift += 1000;
+        if (!packet_received) {
           delay(1000);
         }
       }
@@ -291,7 +319,7 @@ void sendClimateData() {
 
   if(initialised) {
     radio.sleep();
-    long sleep_ms = send_interval - loop_drift;
+    long sleep_ms = send_interval;
     micro_sleep(sleep_ms);    
   }
 }
@@ -303,18 +331,11 @@ void initialise() {
   Serial.println("Attempting initialisation");
   long initial_delay = 0;
 
-  char payload_data[] = "____________________________________________________________";
-  payload_data[0] = 'T';
-  payload_data[1] = '=';
-  payload_data[2] = 'I';
-  payload_data[3] = '|';
-
-  Serial.println(payload_data);
-
+  char payload_data[] = "T=I|________________________________________________________";
   radio.send(BASESTATIONID,  payload_data, sizeof(payload_data), false);
 
   int i;
-  int retries = 3;
+  int retries = 5;
   for (i = 0; i < retries; ++i) {
     if (radio.receiveDone()) {
       Serial.println("Received time period packet");
@@ -324,8 +345,7 @@ void initialise() {
         packet_data[i] = c;
       }
 
-      if (radio.ACKRequested())
-      {
+      if (radio.ACKRequested()) {
         radio.sendACK();
       }
 
@@ -350,10 +370,9 @@ void initialise() {
         String key_string = token_string.substring(0, part_split_index);
         String value_string = token_string.substring(part_split_index + 1);
 
-        if (key_string == "initial") {
+        if (key_string == "next") {
           initial_delay = value_string.toInt();
-        } else if (key_string == "interval") {
-          send_interval = value_string.toInt();
+          Serial.println(initial_delay);
         }
 
         token = strtok(NULL, ",");
@@ -363,7 +382,6 @@ void initialise() {
       initialised = true;
     }
     if (initialised == false) {
-      loop_drift += 250;
       delay(250);
     }
   }
@@ -372,18 +390,17 @@ void initialise() {
 
   if (initialised == false) {
     Serial.println("Waiting before attempting initialisation again");
-    long sleep_ms = initialisation_interval - loop_drift;
+    long sleep_ms = initialisation_interval;
     micro_sleep(sleep_ms);
   } else {
     Serial.println("Waiting before the first sensor reading");
-    long sleep_ms = initial_delay - loop_drift;
+    long sleep_ms = initial_delay;
     micro_sleep(sleep_ms);
   }
 }
 
 // Run the main program loop
 void loop() {
-  loop_drift = 0;
   if (initialised) {
     sendClimateData();
   } else {
