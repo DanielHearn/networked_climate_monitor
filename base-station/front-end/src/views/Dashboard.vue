@@ -301,6 +301,14 @@ const typeColours = {
   battery: '#FFE453'
 }
 
+function getTypeColor(lowercaseType) {
+  if (typeColours[lowercaseType]) {
+    return typeColours[lowercaseType]
+  } else {
+    return '#FFE453'
+  }
+}
+
 export default {
   name: 'dashboard',
   components: {
@@ -402,9 +410,8 @@ export default {
       this.historicalData = false
       const historicalData = {}
       const dates = []
-
-      const orderedClimateData = climateData.reverse()
-      const recentClimateData = orderedClimateData[0]
+      const orderedClimateData = climateData.slice().reverse()
+      const recentClimateData = climateData[0]
       const labels = []
       if (!recentClimateData || !recentClimateData.climate_data) {
         return false
@@ -472,7 +479,7 @@ export default {
           datasets: [
             {
               label: `${type} (${unit})`,
-              backgroundColor: typeColours[lowercaseType],
+              backgroundColor: getTypeColor(lowercaseType),
               spanGaps: true,
               data: []
             }
@@ -496,9 +503,11 @@ export default {
             }
             usedTypes.push(sensor.type)
 
-            historicalData[sensor.type.toLowerCase()].datasets[0].data.push(
-              value
-            )
+            if (historicalData[sensor.type.toLowerCase()]) {
+              historicalData[sensor.type.toLowerCase()].datasets[0].data.push(
+                value
+              )
+            }
           })
 
           // Put null data to fill gaps in charts if sensor type is missing from
