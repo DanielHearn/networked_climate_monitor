@@ -177,9 +177,46 @@ void sendClimateData() {
       payload_data[data_index+4] = hum_chars[2];
       payload_data[data_index+5] = hum_chars[3];
       payload_data[data_index+6] = hum_chars[4];
-      data_index += 7;
+      payload_data[data_index+7] = ',';
+      data_index += 8;
       valid_data = true;
     }
+    
+    boolean valid_pressure = false;
+    float pressure = 0;
+    int p_i;
+    int p_retries = 3;
+
+    // Attempt to get valid humditity with 3 attempts
+    for (p_i = 1; p_i < p_retries; ++p_i) {
+      pressure = bme.readPressure() / 100.0F;
+      if (pressure != null) {
+        valid_pressure = true;
+        p_i = p_retries;
+      } else {
+        loop_drift += 100;
+        micro_sleep(100);
+      }
+    }
+    if (valid_pressure) {
+      // Place pressure into char array with 2 decimal points
+      char pressure_chars[7];
+      dtostrf(pressure, 7, 2, pressure_chars);
+
+      // Put humidity into payload
+      payload_data[data_index] = 'P';
+      payload_data[data_index+1] = '=';
+      payload_data[data_index+2] = pressure_chars[0];
+      payload_data[data_index+3] = pressure_chars[1];
+      payload_data[data_index+4] = pressure_chars[2];
+      payload_data[data_index+5] = pressure_chars[3];
+      payload_data[data_index+6] = pressure_chars[4];
+      payload_data[data_index+7] = pressure_chars[5];
+      payload_data[data_index+8] = pressure_chars[6];
+      data_index += 9;
+      valid_data = true;
+    }
+    
   }
 
   Serial.println(payload_data);
