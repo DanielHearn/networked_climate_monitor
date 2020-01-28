@@ -88,6 +88,12 @@ float getBatteryVoltage() {
   return analogRead(VBATPIN) * 2 * 3.3 / 1024;
 }
 
+void retrySensorReading() {
+  delay(500);
+  bme.takeForcedMeasurement();
+  delay(500);
+}
+
 // Read sensor values and send to base station
 void sendClimateData() {
   Serial.println("Sending climate data");
@@ -126,7 +132,7 @@ void sendClimateData() {
         valid_temp = true;
         t_i = t_retries;
       } else {
-        delay(100);
+        retrySensorReading();
       }
     }
     if (valid_temp) {
@@ -159,7 +165,7 @@ void sendClimateData() {
         valid_hum = true;
         h_i = h_retries;
       } else {
-        delay(100);
+        retrySensorReading();
       }
     }
     if (valid_hum) {
@@ -192,7 +198,7 @@ void sendClimateData() {
         valid_pressure = true;
         p_i = p_retries;
       } else {
-        delay(100);
+        retrySensorReading();
       }
     }
     if (valid_pressure) {
