@@ -34,13 +34,14 @@
 #define VBATPIN A9
 
 Adafruit_BME280 bme;
-RFM69 radio(RF69_SPI_CS, RF69_IRQ_PIN, false, RF69_IRQ_NUM);
+RFM69_ATC radio(RF69_SPI_CS, RF69_IRQ_PIN, false, RF69_IRQ_NUM);
 
 // Define global variables
 unsigned bme_status;
 boolean initialised = false;
 long send_interval = 60000;
 long initialisation_interval = 60000;
+int target_rssi = -80;
 
 // Setup
 void setup() {
@@ -55,6 +56,7 @@ void setup() {
   radio.promiscuous(false);
 
   radio.setHighPower();
+  radio.enableAutoPower(target_rssi);
 
   // Load BME280 sensor
   bme_status = bme.begin();
