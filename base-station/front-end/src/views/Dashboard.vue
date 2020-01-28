@@ -281,7 +281,14 @@ import {
 } from './../static/helpers'
 import Chart from './../components/Chart/Chart.js'
 
-import { sub, startOfYesterday, endOfToday, startOfToday } from 'date-fns'
+import {
+  sub,
+  startOfYesterday,
+  endOfToday,
+  startOfToday,
+  startOfDay,
+  endOfDay
+} from 'date-fns'
 
 const chartOptions = {
   responsive: true,
@@ -394,6 +401,21 @@ export default {
       this.historicalDataLoaded = false
       if (this.activeSensorID !== -1) {
         this.loadHistoricalData(this.activeSensorID)
+
+        // Set time period to start and end of dates if custom date range is used
+        if (this.historicalRangeType === 'custom') {
+          const periodStart = startOfDay(this.timePeriod.start)
+          const periodEnd = endOfDay(this.timePeriod.end)
+          if (
+            this.timePeriod.start.toString() !== periodStart.toString() ||
+            this.timePeriod.end.toString() !== periodEnd.toString()
+          ) {
+            this.timePeriod = {
+              start: periodStart,
+              end: periodEnd
+            }
+          }
+        }
       }
     }
   },
