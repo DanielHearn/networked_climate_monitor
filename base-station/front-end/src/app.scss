@@ -74,6 +74,15 @@ body {
   }
 }
 
+.date-picker {
+  &.active {
+    color: green;
+    input.vc-border {
+      border: 2px solid $accent;
+    }
+  }
+}
+
 .input {
   &--text {
     font-family: $font-family;

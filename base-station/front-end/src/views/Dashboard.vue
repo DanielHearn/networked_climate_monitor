@@ -197,28 +197,42 @@
               <h3 class="heading">Historical Climate Data</h3>
               <div class="input-box">
                 <p class="text">Historical Range</p>
-                <v-date-picker v-model="timePeriod" mode="range" />
+                <v-date-picker
+                  v-model="timePeriod"
+                  mode="range"
+                  @drag="
+                    () => {
+                      historicalRangeType = 'custom'
+                    }
+                  "
+                  class="date-picker"
+                  :class="{ active: historicalRangeType === 'custom' }"
+                />
               </div>
               <div class="historical-actions">
                 <v-button
                   @click.native="rangeLastDay()"
                   :hierachyLevel="'secondary'"
                   :text="'1 Day'"
+                  :class="{ active: historicalRangeType === '1-day' }"
                 />
                 <v-button
                   @click.native="rangeLast2Days()"
                   :hierachyLevel="'secondary'"
                   :text="'2 Days'"
+                  :class="{ active: historicalRangeType === '2-days' }"
                 />
                 <v-button
                   @click.native="rangeLastWeek()"
                   :hierachyLevel="'secondary'"
                   :text="'1 Week'"
+                  :class="{ active: historicalRangeType === '1-week' }"
                 />
                 <v-button
                   @click.native="rangeLastMonth()"
                   :hierachyLevel="'secondary'"
                   :text="'1 Month'"
+                  :class="{ active: historicalRangeType === '1-month' }"
                 />
               </div>
               <template v-if="historicalDataLoaded && historicalData">
@@ -326,6 +340,7 @@ export default {
       activeSensorIndex: -1,
       historicalData: {},
       historicalDataLoaded: false,
+      historicalRangeType: '1-day',
       reloadID: null,
       timePeriod: {
         start: startOfToday(),
@@ -682,18 +697,21 @@ export default {
       this.activeSensorIndex = -1
     },
     rangeLastDay: function() {
+      this.historicalRangeType = '1-day'
       this.timePeriod = {
         start: startOfToday(),
         end: endOfToday()
       }
     },
     rangeLast2Days: function() {
+      this.historicalRangeType = '2-days'
       this.timePeriod = {
         start: startOfYesterday(),
         end: endOfToday()
       }
     },
     rangeLastWeek: function() {
+      this.historicalRangeType = '1-week'
       const date = sub(startOfToday(), { days: 7 })
 
       this.timePeriod = {
@@ -702,6 +720,7 @@ export default {
       }
     },
     rangeLastMonth: function() {
+      this.historicalRangeType = '1-month'
       const date = sub(startOfToday(), { months: 1 })
 
       this.timePeriod = {

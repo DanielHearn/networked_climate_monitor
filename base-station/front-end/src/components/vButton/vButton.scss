@@ -27,6 +27,15 @@
     transition: background $transition-fast;
     &:hover {
       background: $darkester;
+      border: 2px solid $darkester;
+    }
+    &.active {
+      background: $accent;
+      border: 2px solid $accent;
+      &:hover {
+        background: $accent-dark;
+        border: 2px solid $accent-dark;
+      }
     }
   }
   &--tertiary {
