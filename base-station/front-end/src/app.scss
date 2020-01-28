@@ -74,46 +74,6 @@ body {
   }
 }
 
-.button {
-  padding: calc(.5em - 2px) calc(.8em - 2px);
-  cursor: pointer;
-  font-family: $font-family;
-  font-weight: $medium-weight;
-  font-size: $s-size;
-  -webkit-appearance: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  user-select: none;
-  &--primary {
-    color: $white;
-    background: $accent;
-    border: 2px solid $accent;
-    transition: background $transition-fast;
-    &:hover {
-      background: $accent-dark;
-    }
-  }
-  &--secondary {
-    color: $white;
-    background: $darkest;
-    border: 2px solid $darkest;
-    transition: background $transition-fast;
-    &:hover {
-      background: $darkester;
-    }
-  }
-  &--tertiary {
-    border: 2px solid $darkest;
-    background: $white;
-    color: $darkest;
-    transition: background $transition-fast;
-    &:hover {
-      background: $grey-dark;
-    }
-  }
-}
-
 .input {
   &--text {
     font-family: $font-family;
