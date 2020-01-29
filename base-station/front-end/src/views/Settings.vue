@@ -85,23 +85,63 @@
               />
               <p v-if="!$store.state.user.logged_in">Please log in</p>
               <template v-else-if="settings">
-                <div v-if="settings.temperature_unit">
-                  <p>Temperature Unit:</p>
-                  <input
-                    type="radio"
-                    id="temp_unit_c"
-                    value="c"
-                    v-model="settings.temperature_unit"
-                  />
-                  <label for="temp_unit_c">Celsius</label>
-                  <br />
-                  <input
-                    type="radio"
-                    id="temp_unit_f"
-                    value="f"
-                    v-model="settings.temperature_unit"
-                  />
-                  <label for="temp_unit_f">Farenheit</label>
+                <div class="input-box">
+                  <p class="sub-heading">Temperature Unit:</p>
+                  <div class="radio-container">
+                    <div
+                      class="radio-option"
+                      :class="{ active: settings.temperature_unit === 'c' }"
+                    >
+                      <label for="temp_unit_c"
+                        >Celsius
+                        <input
+                          type="radio"
+                          id="temp_unit_c"
+                          value="c"
+                          v-model="settings.temperature_unit"
+                          class="radio"/>
+                        <span class="input">
+                          <i
+                            v-if="settings.temperature_unit === 'c'"
+                            class="material-icons"
+                            >done</i
+                          >
+                          <i v-else class="material-icons"></i> </span
+                      ></label>
+                    </div>
+                    <div
+                      class="radio-option"
+                      :class="{ active: settings.temperature_unit === 'f' }"
+                    >
+                      <label for="temp_unit_f"
+                        >Farenheit
+                        <input
+                          type="radio"
+                          id="temp_unit_f"
+                          value="f"
+                          v-model="settings.temperature_unit"
+                          class="radio"/>
+                        <span class="input">
+                          <i
+                            v-if="settings.temperature_unit === 'f'"
+                            class="material-icons"
+                            >done</i
+                          >
+                          <i v-else class="material-icons"></i> </span
+                      ></label>
+                    </div>
+                  </div>
+                  <p
+                    class="text italics"
+                    v-if="settings.temperature_unit === 'c'"
+                  >
+                    Temperatures are stored in celsius and will be displayed in
+                    celsius.
+                  </p>
+                  <p class="text italics" v-else>
+                    Temperatures are stored in celsius and will be displayed in
+                    farenheit
+                  </p>
                 </div>
               </template>
             </div>

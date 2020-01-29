@@ -37,6 +37,7 @@ body {
   align-items: flex-start;
   flex-direction: column;
   padding: 0.4em 0;
+  text-align: left;
   p {
     margin: 0;
   }
@@ -190,6 +191,10 @@ body {
   }
 }
 
+.italics {
+  font-style: italic;
+}
+
 .link {
   font-size: $s-size;
   font-weight: $medium-weight;
@@ -272,6 +277,53 @@ input.vc-text-base.vc-border {
 
 .underline {
   text-decoration: underline;
+}
+
+.radio-container {
+  display: flex;
+  flex-direction: column;
+  .radio-option {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 0.25em 0;
+    label {
+      display: flex;
+      width: 8em;
+      align-items: center;
+      justify-content: space-between;
+      &:hover .input {
+        background: $dark;
+        border-color: $darkest;
+      }
+    }
+    .input {
+      width: 1.8em;
+      height: 1.8em;
+      background: #d2d2d2;
+      border: solid 2px $darkest;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: $white;
+      transition: $transition-fast background ease-in-out, $transition-fast border-color ease-in-out;
+    }
+    &.active {
+      .input {
+        background: $accent;
+        border-color: $accent;
+      }
+      &:hover .input {
+        background: $accent-dark;
+        border-color: $accent-dark;
+      }
+    }
+    .radio {
+      display: none;
+
+    }
+  }
 }
 
 *::-webkit-scrollbar {

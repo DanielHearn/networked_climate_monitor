@@ -195,21 +195,23 @@
               />
 
               <h3 class="heading">Historical Climate Data</h3>
-              <div class="input-box">
-                <p class="text">Historical Range</p>
-                <v-date-picker
-                  v-model="timePeriod"
-                  mode="range"
-                  @drag="
-                    () => {
-                      historicalRangeType = 'custom'
-                    }
-                  "
-                  class="date-picker"
-                  :class="{ active: historicalRangeType === 'custom' }"
-                />
-              </div>
               <div class="historical-actions">
+                <div class="input-box">
+                  <p class="text">Historical Range</p>
+                  <v-date-picker
+                    v-model="timePeriod"
+                    mode="range"
+                    @drag="
+                      () => {
+                        historicalRangeType = 'custom'
+                      }
+                    "
+                    class="date-picker"
+                    :class="{ active: historicalRangeType === 'custom' }"
+                    color="purple"
+                    is-dark
+                  />
+                </div>
                 <v-button
                   @click.native="rangeLastDay()"
                   :hierachyLevel="'secondary'"
