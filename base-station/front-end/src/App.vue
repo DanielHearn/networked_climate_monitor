@@ -57,6 +57,7 @@ export default {
               user.access_token = accessToken
               user.refresh_token = refreshToken
               user.email = data.account.email
+              user.reset_token = data.account.reset_token
 
               // Parse the settings json data from a string
               user.settings = JSON.parse(

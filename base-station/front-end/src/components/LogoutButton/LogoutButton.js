@@ -10,7 +10,7 @@ export default {
   components: {
     vButton
   },
-  computed: {
+  methods: {
     logout: function() {
       const user = this.$store.state.user
       const accessToken = user.access_token
@@ -54,6 +54,6 @@ export default {
         .catch(e => {
           console.warn(e.response)
         })
-    },
+    }
   }
 }

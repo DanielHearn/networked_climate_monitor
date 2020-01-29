@@ -24,5 +24,5 @@ class ClimateDataSchema(Schema):
 
 
 class ChangePasswordSchema(Schema):
-    reset_token = fields.Str(required=True, validate=validate.Length(equal=20))
+    reset_token = fields.Str(required=True, validate=validate.Length(equal=40))
     password = fields.Str(required=True, validate=validate.Length(min=8, max=40))

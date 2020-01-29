@@ -159,9 +159,22 @@
                 :hierachyLevel="'tertiary'"
                 :text="'Back'"
               />
-              <router-link to="/reset-password" class="link"
-                >Change Password</router-link
-              >
+              <div class="settings-box">
+                <router-link to="/reset-password" class="link"
+                  >Change Password</router-link
+                >
+              </div>
+              <div class="settings-box">
+                <p class="sub-heading">Reset Token</p>
+                <p class="text italics">
+                  This reset token can be used to reset the account password on
+                  the password reset page.
+                </p>
+                <p class="text">
+                  Reset Token:
+                  <span class="bold">{{ $store.state.user.reset_token }}</span>
+                </p>
+              </div>
             </div>
           </template>
         </template>
