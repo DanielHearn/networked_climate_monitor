@@ -334,7 +334,7 @@ void sendClimateData() {
   if(initialised) {
     radio.sleep();
     long sleep_ms = send_interval;
-    delay(sleep_ms);    
+    micro_sleep(sleep_ms);    
   }
 }
 
@@ -448,11 +448,11 @@ void initialise() {
     if (initialised == false) {
       Serial.println("Waiting before attempting initialisation again");
       long sleep_ms = initialisation_interval;
-      delay(sleep_ms);
+      micro_sleep(sleep_ms);
     } else {
       Serial.println("Waiting before the first sensor reading");
       long sleep_ms = initial_delay;
-      delay(sleep_ms);
+      micro_sleep(sleep_ms);
     }
   } else {
     node_id = storedNodeId;
@@ -518,11 +518,11 @@ void initialise() {
     if (initialised == false) {
       Serial.println("Waiting before attempting initialisation again");
       long sleep_ms = initialisation_interval;
-      delay(sleep_ms);
+      micro_sleep(sleep_ms);
     } else {
       Serial.println("Waiting before the first sensor reading");
       long sleep_ms = initial_delay;
-      delay(sleep_ms);
+      micro_sleep(sleep_ms);
     }
   }
 }
