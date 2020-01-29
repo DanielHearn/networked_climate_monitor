@@ -687,8 +687,24 @@ export default {
             if (data.sensors) {
               for (let sensor of data.sensors) {
                 sensor.historical_data = []
-                sensor.config = false
-                sensor.editing = false
+
+                // Preserve config and sensor name editing when sensors are reloaded
+                const oldSensors = this.sensors.slice()
+                if (oldSensors.length) {
+                  const oldSensor = this.sensors.filter(
+                    oldSensor => oldSensor.id === sensor.id
+                  )[0]
+                  if (oldSensor) {
+                    sensor.config = oldSensor.config
+                    sensor.editing = oldSensor.editing
+                  } else {
+                    sensor.config = false
+                    sensor.editing = false
+                  }
+                } else {
+                  sensor.config = false
+                  sensor.editing = false
+                }
               }
               this.sensors = data.sensors
 
