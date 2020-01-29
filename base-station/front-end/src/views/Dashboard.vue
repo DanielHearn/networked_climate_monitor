@@ -371,24 +371,8 @@ export default {
   watch: {
     sensors: function(newSensors) {
       if (newSensors.length && !this.$store.state.mobile) {
-        const activeSensorExists = !!this.sensors.filter(
-          sensor => sensor.id === this.activeSensorID
-        )
-        if (this.activeSensorID === -1 || !activeSensorExists) {
-          let lowestSensorID = -1
-          let lowestIndex = -1
-          this.sensors.forEach((sensor, index) => {
-            if (lowestSensorID === -1 || sensor.id < lowestSensorID) {
-              lowestSensorID = sensor.id
-              lowestIndex = index
-            }
-          })
-          if (lowestSensorID !== -1 && lowestIndex !== -1) {
-            this.activeSensorID = lowestSensorID
-            this.activeSensorIndex = lowestIndex
-          }
-        }
-      } else {
+        this.makeNextActiveSensor()
+      } else if (!newSensors.length && !this.$store.state.mobile) {
         this.activeSensorID = -1
         this.activeSensorIndex = -1
       }
@@ -424,6 +408,25 @@ export default {
   methods: {
     formatClimateData: formatClimateData,
     getBatteryStatusFromVoltage: getBatteryStatusFromVoltage,
+    makeNextActiveSensor: function() {
+      const activeSensorExists = !!this.sensors.filter(
+        sensor => sensor.id === this.activeSensorID
+      )
+      if (this.activeSensorID === -1 || !activeSensorExists) {
+        let lowestSensorID = -1
+        let lowestIndex = -1
+        this.sensors.forEach((sensor, index) => {
+          if (lowestSensorID === -1 || sensor.id < lowestSensorID) {
+            lowestSensorID = sensor.id
+            lowestIndex = index
+          }
+        })
+        if (lowestSensorID !== -1 && lowestIndex !== -1) {
+          this.activeSensorID = lowestSensorID
+          this.activeSensorIndex = lowestIndex
+        }
+      }
+    },
     changeSensorName: function(sensorID, sensorName) {
       const accessToken = this.$store.state.user.access_token
 
@@ -625,6 +628,12 @@ export default {
           if (data && data.status) {
             this.$toasted.show(`Deleted sensor ${sensorName}`)
             this.sensors = this.sensors.filter(sensor => sensor.id !== sensorID)
+
+            if (sensorID === this.activeSensorID && !this.$store.state.mobile) {
+              this.activeSensorIndex = -1
+              this.activeSensorID = -1
+              this.makeNextActiveSensor()
+            }
           }
         })
         .catch(e => {
