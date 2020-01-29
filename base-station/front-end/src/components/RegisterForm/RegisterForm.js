@@ -56,6 +56,8 @@ export default {
       }
     },
     register: function(email, password) {
+      this.$toasted.show('Sending register request')
+
       HTTP.post('account', {
         email: email,
         password: password
@@ -92,9 +94,6 @@ export default {
 
             this.$store.commit('setUser', user)
             this.$toasted.show('Registered')
-            this.$toasted.show('Logged in')
-
-            this.$router.push('/dashboard')
           }
         })
         .catch(e => {

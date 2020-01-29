@@ -22,6 +22,8 @@ export default {
   },
   methods: {
     login: function(email, password) {
+      this.$toasted.show('Sending login request')
+
       HTTP.post('login', {
         email: email,
         password: password
