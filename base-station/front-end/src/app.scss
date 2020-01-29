@@ -74,11 +74,29 @@ body {
   }
 }
 
+.mobile {
+  .historical-actions .input-box {
+    width: 100%;
+    margin-bottom: 1em;
+    .date-picker {
+      width: 100%;
+    }
+  }
+}
+
 .date-picker {
+  display: flex;
   &.active {
     color: green;
     input.vc-border {
       border: 2px solid $accent;
+    }
+  }
+  &.vc-container {
+    font-family: $font-family;
+    .vc-grid-cell .vc-day-content {
+      font-weight: 400;
+      color: $white;
     }
   }
 }
@@ -239,8 +257,15 @@ input.vc-text-base.vc-border {
 
 .historical-actions {
   display: flex;
+  align-items: flex-end;
   flex-direction: row;
+  flex-wrap: wrap;
+  padding: 0.4em 0;
   .button {
+    margin-right: 0.5em;
+  }
+  .input-box {
+    padding: 0;
     margin-right: 0.5em;
   }
 }
