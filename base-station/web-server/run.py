@@ -657,6 +657,34 @@ class ChangePassword(Resource):
             return {'status': 'Successfully reset password', 'new_reset_token': new_reset_token}, 200
         return {'status': 'Error', 'errors': ['Invalid password reset token']}, 401
 
+class NextAvailableSensorID(Resource):
+    def get(self):
+        input_api_key = request.args.get('api_key')
+
+        if input_api_key == api_key:
+            sensors_list = SensorModel.query.all()
+
+            if len(sensors_list):
+                sensor_dict_list = []
+
+                # Convert all sensors into dicts
+                for sensor in sensors_list:
+                    sensor_dict = sensor.to_dict()
+                    sensor_dict_list.append(sensor_dict)
+
+                # Sort sensors by sensor ID
+                sorted_sensor_list = sorted(sensor_dict_list, key=lambda x: x['id'])
+
+                # If there are no missing sequential IDs in the list then list length
+                next_sensor_id = len(sorted_sensor_list)+1
+
+                # Find first missing ID from the sensor list
+                for i, sensor in enumerate(sorted_sensor_list, start=1):
+                    if i != sensor['id']:
+                        next_sensor_id = i
+                return {'ID': next_sensor_id}, 200
+            return {'ID': 1}, 200
+        return {'status': 'Error', 'errors': ['Invalid API key']}, 401
 
 ## RESOURCES
 
@@ -672,7 +700,7 @@ api.add_resource(ChangePassword, '/api/accounts/actions/change-password')
 api.add_resource(Sensor, '/api/sensors/<int:sensor_id>')
 api.add_resource(Sensors, '/api/sensors')
 api.add_resource(ClimateData, '/api/sensors/<int:sensor_id>/climate-data')
-
+api.add_resource(NextAvailableSensorID, '/api/sensors/actions/next-available-sensor-id')
 
 ## ROUTES
 

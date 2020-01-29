@@ -125,8 +125,29 @@ def milliseconds_to_time_period(time_period):
     return milliseconds_till_start
 
 
+def get_next_available_sensor_id():
+    params = {
+        'api_key': api_key
+    }
+
+    sensor_next_id_url = api_root + 'sensors/actions/next-available-sensor-id'
+    response = requests.get(sensor_next_id_url, params=params)
+    response_data = response.json()
+    if response_data['ID']:
+        return response_data['ID']
+    else:
+        print('Couldn\'t retrieve next sensor ID')
+        return None
+
+
 def process_initialisation(radio, sensor_id, packet_datetime):
     print('Type: Node Initialisation')
+    new_id = sensor_id
+
+    # Allocate sensor ID for new sensor
+    if sensor_id == 254:
+        print('Allocating ID for new sensor')
+        new_id = get_next_available_sensor_id()
 
     # Calculate time period
     assigned_period = None
@@ -134,7 +155,7 @@ def process_initialisation(radio, sensor_id, packet_datetime):
 
     for period in time_periods:
         sensor = time_periods[period]
-        if sensor == sensor_id:
+        if sensor == new_id:
             assigned_period = period
             break
         elif sensor is None:
@@ -146,29 +167,30 @@ def process_initialisation(radio, sensor_id, packet_datetime):
         return None
     else:
         # Assign time period
-        time_periods.update({str(assigned_period): sensor_id})
+        time_periods.update({str(assigned_period): new_id})
 
     print('Assigned sensor with period: ' + assigned_period)
 
     start_time = milliseconds_to_time_period(assigned_period)
 
     # Create sensor object to track connected sensors
-    id_str = str(sensor_id)
+    id_str = str(new_id)
     sensor = create_sensor(id_str, packet_datetime, start_time)
     connected_sensors[id_str] = sensor
 
-    payload_data = 'T=T|next=' + str(start_time)
+    payload_data = 'T=T|id=' + str(new_id) + ',next=' + str(start_time)
+    print(payload_data)
     print('Assigned start_time: ' + str(start_time))
 
     # Send back time period
     radio.send(sensor_id, payload_data)
 
     # Assemble sensor object
-    sensor_name = 'Sensor ' + str(sensor_id)
+    sensor_name = 'Sensor ' + str(new_id)
     sensor_api_object = {
         'name': sensor_name,
         'user_id': 1,
-        'sensor_id': sensor_id
+        'sensor_id': new_id
     }
     params = {
         'api_key': api_key
