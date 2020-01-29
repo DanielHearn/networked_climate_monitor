@@ -437,25 +437,29 @@ class ClimateData(Resource):
                 except:
                     return {'status': 'Error', 'errors': ['Invalid date range']}, 422
 
+
+                sensor_climate_data = ClimateModel.query.filter_by(sensor_id=sensor_id)
+                climate_data_length = sensor_climate_data.count()
                 days_in_range = (date_end - date_start).days
                 data_interval = 1
-                if days_in_range > 120:
+
+                if days_in_range > 120 and climate_data_length > 2880:
                     data_interval = 20
-                elif days_in_range > 60:
+                elif days_in_range > 60 and climate_data_length > 1440:
                     data_interval = 10
-                elif days_in_range > 30:
+                elif days_in_range > 30 and climate_data_length > 720:
                     data_interval = 7
-                elif days_in_range > 14:
+                elif days_in_range > 14 and climate_data_length > 360:
                     data_interval = 6
-                elif days_in_range > 7:
+                elif days_in_range > 7 and climate_data_length > 168:
                     data_interval = 5
-                elif days_in_range > 2:
+                elif days_in_range > 2 and climate_data_length > 48:
                     data_interval = 4
-                elif days_in_range > 1:
+                elif days_in_range > 1 and climate_data_length > 24:
                     data_interval = 3
 
                 # Get climate data between the two dates with descending date order
-                climate_data = ClimateModel.query.order_by(ClimateModel.id.desc()).filter(
+                climate_data = sensor_climate_data.order_by(ClimateModel.id.desc()).filter(
                     ClimateModel.sensor_id == sensor_id,
                     ClimateModel.interval(data_interval),
                     ClimateModel.date <= date_end,
