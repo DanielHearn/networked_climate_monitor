@@ -169,10 +169,14 @@ def process_climate_data(packet_data, sensor_id, control_dict, main_data):
 
         # Generate climate data dictionary from key value pair in packet
         if len(climate_parts) == 2:
+            sensor_type = convert_type_to_string(climate_parts[0])
+            unit = get_unit_from_type(sensor_type)
+            value = climate_parts[1]
+
             climate_data_dict = {
-                'type': convert_type_to_string(climate_parts[0]),
-                'value': get_unit_from_type(sensor_type),
-                'unit': climate_parts[1]
+                'type': sensor_type,
+                'value': value,
+                'unit': unit
             }
             climate_api_object['climate_data'].append(climate_data_dict)
 
