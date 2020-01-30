@@ -15,7 +15,7 @@ from flask_cors import CORS
 
 # Local imports
 from helpers import get_unit_from_type, create_settings, generate_reset_key
-from schema import UserSchema, SensorSchema, ClimateDataSchema, ChangePasswordSchema
+from schema import UserSchema, SensorSchema, ClimateDataSchema, ChangePasswordSchema, UserPatchSchema, SensorPatchSchema
 
 # Load Flask
 app = Flask(__name__)
@@ -450,7 +450,9 @@ class SensorDataModel(db.Model, SerializerMixin):
 # Load schemas to evaluate the correctness of data in the API
 climate_data_schema = ClimateDataSchema()
 sensor_schema = SensorSchema()
+sensor_patch_schema = SensorPatchSchema()
 user_schema = UserSchema()
+user_patch_schema = UserPatchSchema()
 change_password_schema = ChangePasswordSchema()
 
 
@@ -625,12 +627,22 @@ class Users(Resource):
             return {'status': 'Error', 'errors': ['The account has not been created']}, 500
 
         # Update user data if it exists in the request body
+        user_patch_data = {}
         if 'email' in json_data:
             user.email = json_data['email']
+            user_patch_data['email'] = json_data['email']
         if 'password' in json_data:
             user.password = UserModel.generate_hash(json_data['password'])
+            user_patch_data['password'] = json_data['password']
         if 'settings' in json_data:
             user.settings = json_data['settings']
+            user_patch_data['settings'] = json_data['settings']
+
+        # Validate and deserialize request body data
+        try:
+            user_patch_schema.load(user_patch_data)
+        except ValidationError as err:
+            return {'status': 'Error', 'errors': err.messages}, 422
 
         # Update user
         db.session.commit()
@@ -848,10 +860,19 @@ class Sensor(Resource):
                 return {'status': 'Error', 'errors': ['No input data provided']}, 400
 
             # Update sensor data if it exists in the request body
+            sensor_patch_data = {}
             if 'name' in json_data:
                 sensor.name = json_data['name']
+                sensor_patch_data['name'] = json_data['name']
             if 'sensor_id' in json_data:
                 sensor.id = json_data['sensor_id']
+                sensor_patch_data['sensor_id'] = json_data['sensor_id']
+
+            # Validate and deserialize request body data
+            try:
+                sensor_patch_schema.load(sensor_patch_data)
+            except ValidationError as err:
+                return {'status': 'Error', 'errors': err.messages}, 422
 
             # Update sensor
             db.session.commit()

@@ -12,6 +12,15 @@ class UserSchema(Schema):
     settings = fields.Str(dump_only=True, required=True)
 
 
+class UserPatchSchema(Schema):
+    """
+    Schema representing a user
+    """
+    email = fields.Email(required=False, validate=validate.Length(min=0, max=120))
+    password = fields.Str(required=False, validate=validate.Length(min=8, max=40))
+    settings = fields.Str(required=False)
+
+
 class SensorSchema(Schema):
     """
     Schema representing a sensor
@@ -19,6 +28,15 @@ class SensorSchema(Schema):
     name = fields.Str(required=True, validate=validate.Length(min=0, max=40))
     sensor_id = fields.Integer(required=True)
     user_id = fields.Integer(required=True)
+
+
+class SensorPatchSchema(Schema):
+    """
+    Schema representing a user
+    """
+    name = fields.Str(required=False, validate=validate.Length(min=0, max=40))
+    sensor_id = fields.Integer(required=False)
+    user_id = fields.Integer(required=False)
 
 
 class SensorDataSchema(Schema):
