@@ -8,30 +8,32 @@
 #include <LowPower.h>
 #include <EEPROM.h>
 
-// Define radio configuration
+// Radio configuration
 #define NETWORKID     100
 #define FREQUENCY     RF69_433MHZ
 #define ENCRYPTKEY    "pnOvzy105sF5g8Ot"
 #define BASESTATIONID 255
+#define EMPTYPACKET   "____________________________________________________________"
 
-// Serial board rate - just used to print debug messages
+// Serial configuration
 #define SERIAL_BAUD   115200
 
-// Define radio pins
+// Radio pins
 #define RF69_RESET    4
 #define RF69_SPI_CS   8
 #define RF69_IRQ_PIN  7
 #define RF69_IRQ_NUM  4
 
-// Define sensor pins
+// Sensor pins
 #define BME_SCK 13
 #define BME_MISO 12
 #define BME_MOSI 11
 #define BME_CS 10
 
-// Define battery pin
+// Battery pin
 #define VBATPIN A9
 
+// Load modules
 Adafruit_BME280 bme;
 RFM69_ATC radio(RF69_SPI_CS, RF69_IRQ_PIN, false, RF69_IRQ_NUM);
 
@@ -41,6 +43,7 @@ boolean initialised = false;
 long send_interval = 60000;
 long initialisation_interval = 60000;
 int target_rssi = -80;
+boolean new_node = false;
 
 // Node ID starts 254 until loaded from EEPROM or assigned by base station via initialisation
 int node_id = 254;
@@ -56,6 +59,7 @@ void setup() {
   delay(20000);
 }
 
+// Initialise all connected sensors
 void initSensors() {
   // Load BME280 sensor
   bme_status = bme.begin();
@@ -72,38 +76,50 @@ void initSensors() {
                   Adafruit_BME280::FILTER_OFF   );
 }
 
+// Initialise the radio module with a node ID
 void initRadio(int node_id) {
+  Serial.print("Initialising radio with node ID: ");
+  Serial.println(node_id);
+   
   // Reset the radio
   resetRadio();
 
   // Initialize the radio
   radio.initialize(FREQUENCY, node_id, NETWORKID);
   radio.promiscuous(false);
-
   radio.setHighPower();
+  radio.encrypt(ENCRYPTKEY);
 
   // Enable ATC to low battery usage when close to base station
   radio.enableAutoPower(target_rssi);
-  
-  radio.encrypt(ENCRYPTKEY);
 }
 
-// Read battery level and convert it to voltage level
+// Read battery level and convert it to voltage
 float getBatteryVoltage() {
   return analogRead(VBATPIN) * 2 * 3.3 / 1024;
 }
 
 // Retrieve sensor reading with delays before and after to reduce the chance of invalid sensor data
-void retrySensorReading() {
+void retryBmeSensorReading() {
   delay(500);
   bme.takeForcedMeasurement();
   delay(500);
 }
 
+// Create initialisation packet data
+String generateInitPacket() {
+  String packet_data = EMPTYPACKET;
+  packet_data.setCharAt(0, 'T');
+  packet_data.setCharAt(1, '=');
+  packet_data.setCharAt(2, 'I');
+  packet_data.setCharAt(3, '|');
+  return packet_data;
+}
+
 // Read sensor values and send to base station
 void sendClimateData() {
   Serial.println("Sending climate data");
-  char payload_data[] = "____________________________________________________________";
+  char payload_data[] = EMPTYPACKET;
   boolean valid_data = false;
 
   // Create control data
@@ -138,7 +154,7 @@ void sendClimateData() {
         valid_temp = true;
         t_i = t_retries;
       } else {
-        retrySensorReading();
+        retryBmeSensorReading();
       }
     }
     if (valid_temp) {
@@ -171,7 +187,7 @@ void sendClimateData() {
         valid_hum = true;
         h_i = h_retries;
       } else {
-        retrySensorReading();
+        retryBmeSensorReading();
       }
     }
     if (valid_hum) {
@@ -204,7 +220,7 @@ void sendClimateData() {
         valid_pressure = true;
         p_i = p_retries;
       } else {
-        retrySensorReading();
+        retryBmeSensorReading();
       }
     }
     if (valid_pressure) {
@@ -224,8 +240,7 @@ void sendClimateData() {
       payload_data[data_index+8] = pressure_chars[6];
       data_index += 9;
       valid_data = true;
-    }
-    
+    }    
   }
 
   Serial.println(payload_data);
@@ -237,93 +252,7 @@ void sendClimateData() {
     // Send climate data to base station with retries if no ack is receies
     if (radio.sendWithRetry(BASESTATIONID, payload_data, sizeof(payload_data), 3, 500)) {
       Serial.println("Succefully send with ACK");
-      
-      delay(500);
-
-      // Check if re-initialisation request recieved
-      int i;
-      int retries = 5;
-      boolean packet_received = false;
-      
-      for (i = 0; i < retries; ++i) {
-        Serial.println("Checking for time or re-init packet");
-        if (radio.receiveDone()) {
-          Serial.println("Packet received");
-    
-          char packet_data[] = "____________________________________________________________";
-          for (byte i = 0; i < radio.DATALEN; i++) {
-            char c = radio.DATA[i];
-            packet_data[i] = c;
-          }
-
-          String packet_type = "";
-          String data = packet_data;
-          int split_index = data.indexOf('|');
-          String control_data = data.substring(0, split_index);
-          int str_len = control_data.length() + 1;
-          char char_array[str_len];
-          control_data.toCharArray(char_array, str_len);
-          char *token = strtok(char_array, ",");
-
-          while (token != NULL)
-          {
-            String token_string = token;
-            int part_split_index = token_string.indexOf('=');
-
-            String key_string = token_string.substring(0, part_split_index);
-            String value_string = token_string.substring(part_split_index + 1);
-            
-            if (key_string == "T") {
-              packet_type = value_string;
-              i = retries;
-              packet_received = true;
-            }
-
-            token = strtok(NULL, ",");
-          }
-
-        
-          if(packet_type == "RI") {
-            Serial.println("Re-initialisation request received");
-            initialised = false;
-          } else if (packet_type == "T") {
-            Serial.println("Time period received");
-            String main_data = data.substring(split_index + 1);
-      
-            int packet_end_split_index = main_data.indexOf('_');
-            main_data = main_data.substring(0, packet_end_split_index);
-      
-            int str_len = main_data.length() + 1;
-            char char_array[str_len];
-            main_data.toCharArray(char_array, str_len);
-            char *token = strtok(char_array, ",");
-      
-            while (token != NULL)
-            {
-              String token_string = token;
-              int part_split_index = token_string.indexOf('=');
-      
-              String key_string = token_string.substring(0, part_split_index);
-              String value_string = token_string.substring(part_split_index + 1);
-      
-              if (key_string == "next") {
-                send_interval = value_string.toInt();
-                Serial.println(send_interval);
-              }
-      
-              token = strtok(NULL, ",");
-            }
-          }
-          
-          if (radio.ACKRequested()) {
-            radio.sendACK();
-          }
-        }
-        if (!packet_received) {
-          delay(1000);
-        }
-      }
-
+      processPacket();
     } else {
       Serial.println("Unsucessfull send with no ACK");
     }
@@ -331,6 +260,7 @@ void sendClimateData() {
     Serial.println("Invalid data from sensor");
   }
 
+  // Sleep node until next time period
   if(initialised) {
     radio.sleep();
     long sleep_ms = send_interval;
@@ -362,168 +292,153 @@ int getStoredNodeId() {
   return 254;
 }
 
-
+// Store node ID into EEPROM
 void storeNodeId(int nodeId) {
   clearEEPROM();
   EEPROM.write(0, nodeId);
   Serial.println("Node ID stored");
 }
 
+// Handle ACK requests in a packet
+void processACK() {
+  if (radio.ACKRequested()) {
+    radio.sendACK();
+  }
+}
+
+// Read packet data from radio
+void readPacketFromRadio(char packet_data[]) {
+  for (byte i = 0; i < radio.DATALEN; i++) {
+    char c = radio.DATA[i];
+    packet_data[i] = c;
+  }
+  Serial.println(packet_data);
+}
+
+// Process radio packet
+void processPacket() {
+  int i;
+  int retries = 10;
+  boolean packet_received = false;
+
+  // Attempt reading packet multiple times
+  for (i = 0; i < retries; ++i) {
+    Serial.println("Checking for packet");
+    if (radio.receiveDone()) {
+      Serial.println("Packet received");
+
+      char packet_data[] = EMPTYPACKET;
+      readPacketFromRadio(packet_data);
+
+      String packet_type = "";
+      String data = packet_data;
+      
+      int split_index = data.indexOf('|');
+      String control_data = data.substring(0, split_index);
+      int str_len = control_data.length() + 1;
+      char char_array[str_len];
+      control_data.toCharArray(char_array, str_len);
+      char *control_token = strtok(char_array, ",");
+      
+      //Process control data in packet
+      while (control_token != NULL)
+      {
+        String token_string = control_token;
+        int part_split_index = token_string.indexOf('=');
+
+        String key_string = token_string.substring(0, part_split_index);
+        String value_string = token_string.substring(part_split_index + 1);
+
+        // Track packet type
+        if (key_string == "T") {
+          packet_type = value_string;
+          i = retries;
+          packet_received = true;
+        }
+
+        control_tokenken = strtok(NULL, ",");
+      }
+
+      // 
+      String main_data = data.substring(split_index + 1);
+      int packet_end_split_index = main_data.indexOf('_');
+      main_data = main_data.substring(0, packet_end_split_index);
+      int main_str_len = main_data.length() + 1;
+      char main_char_array[main_str_len];
+      main_data.toCharArray(main_char_array, main_str_len);
+      char *main_token = strtok(main_char_array, ",");
+
+      //Process main data in packet
+      while (main_token != NULL)
+      {
+        String token_string = main_token;
+        int part_split_index = token_string.indexOf('=');
+
+        String key_string = token_string.substring(0, part_split_index);
+        String value_string = token_string.substring(part_split_index + 1);
+
+        // Perform actions based on packet data
+        if (packet_type == "I" && key_string == "id" && new_node == true) {
+          Serial.println("Initial node ID received");
+          node_id = value_string.toInt();
+          storeNodeId(node_id);
+        } else if (packet_type == "T" && key_string == "next") {
+          Serial.println("Time period received");
+          send_interval = value_string.toInt();
+          if(initialised == false) {
+            initialised = true;
+          }
+        } else if(packet_type == "RI") {
+          Serial.println("Re-initialisation request received");
+          initialised = false;
+        }
+
+        main_token = strtok(NULL, ",");
+      }
+      
+      processACK();
+    }
+    if (!packet_received) {
+      delay(250);
+    }
+  }
+}
+
 void initialise() {
   Serial.println("Attempting initialisation");
   long initial_delay = 0;
 
-  int storedNodeId = getStoredNodeId();
-  Serial.println(storedNodeId);
+  int node_id = getStoredNodeId();
+  new_node = node_id == 254;
+  Serial.println(node_id);
+  initRadio(node_id);
 
-  // Node hasn't been initialised so initialise with base station with node ID 254
-  if(storedNodeId == 254) {
-    initRadio(storedNodeId);
+  // Create initialisation packet
+  String init_packet = generateInitPacket();
+  int init_packet_length = init_packet.length() + 1;
+  char payload_data[init_packet_length];
+  init_packet.toCharArray(payload_data, init_packet_length);
 
-    char payload_data[] = "T=I|________________________________________________________";
-    radio.send(BASESTATIONID,  payload_data, sizeof(payload_data), false);
-  
-    int i;
-    int retries = 5;
-    for (i = 0; i < retries; ++i) {
-      if (radio.receiveDone()) {
-        Serial.println("Received node id packet");
-    
-        char packet_data[] = "____________________________________________________________";
-        for (byte i = 0; i < radio.DATALEN; i++) {
-          char c = radio.DATA[i];
-          packet_data[i] = c;
-        }
-        Serial.println(packet_data);
-  
-        if (radio.ACKRequested()) {
-          radio.sendACK();
-        }
-  
-        String data = packet_data;
-        int split_index = data.indexOf('|');
-        String control_data = data.substring(0, split_index);
-        String main_data = data.substring(split_index + 1);
-  
-        int packet_end_split_index = main_data.indexOf('_');
-        main_data = main_data.substring(0, packet_end_split_index);
-  
-        int str_len = main_data.length() + 1;
-        char char_array[str_len];
-        main_data.toCharArray(char_array, str_len);
-        char *token = strtok(char_array, ",");
-  
-        while (token != NULL)
-        {
-          String token_string = token;
-          int part_split_index = token_string.indexOf('=');
-  
-          String key_string = token_string.substring(0, part_split_index);
-          String value_string = token_string.substring(part_split_index + 1);
+  // Send initialisation packet
+  radio.send(BASESTATIONID,  payload_data, sizeof(payload_data), false);
+  processPacket();
 
-          if (key_string == "id") {
-            node_id = value_string.toInt();
-            storeNodeId(node_id);
-          }
-          if (key_string == "next") {
-            initial_delay = value_string.toInt();
-          }
-  
-          token = strtok(NULL, ",");
-        }
-  
-        i = retries;
-        initialised = true;
-      }
-      if (initialised == false) {
-        delay(500);
-      }
-    }
-
-    Serial.println("Re-init radio with ID:");
-    Serial.println(node_id);
+  // Re-initialise radio with new node ID
+  if(new_node) {
     initRadio(node_id);
     radio.sleep();
-    
-    if (initialised == false) {
-      Serial.println("Waiting before attempting initialisation again");
-      long sleep_ms = initialisation_interval;
-      micro_sleep(sleep_ms);
-    } else {
-      Serial.println("Waiting before the first sensor reading");
-      long sleep_ms = initial_delay;
-      micro_sleep(sleep_ms);
-    }
+  } 
+
+  radio.sleep();
+
+  if (initialised == false) {
+    Serial.println("Waiting before attempting initialisation again");
+    long sleep_ms = initialisation_interval;
+    micro_sleep(sleep_ms);
   } else {
-    node_id = storedNodeId;
-    initRadio(node_id);
-
-    char payload_data[] = "T=I|________________________________________________________";
-    radio.send(BASESTATIONID,  payload_data, sizeof(payload_data), false);
-    
-    int i;
-    int retries = 5;
-    for (i = 0; i < retries; ++i) {
-      if (radio.receiveDone()) {
-        Serial.println("Received time period packet");
-        char packet_data[] = "____________________________________________________________";
-        for (byte i = 0; i < radio.DATALEN; i++) {
-          char c = radio.DATA[i];
-          packet_data[i] = c;
-        }
-  
-        if (radio.ACKRequested()) {
-          radio.sendACK();
-        }
-  
-        String data = packet_data;
-        int split_index = data.indexOf('|');
-        String control_data = data.substring(0, split_index);
-        String main_data = data.substring(split_index + 1);
-  
-        int packet_end_split_index = main_data.indexOf('_');
-        main_data = main_data.substring(0, packet_end_split_index);
-  
-        int str_len = main_data.length() + 1;
-        char char_array[str_len];
-        main_data.toCharArray(char_array, str_len);
-        char *token = strtok(char_array, ",");
-  
-        while (token != NULL)
-        {
-          String token_string = token;
-          int part_split_index = token_string.indexOf('=');
-  
-          String key_string = token_string.substring(0, part_split_index);
-          String value_string = token_string.substring(part_split_index + 1);
-  
-          if (key_string == "next") {
-            initial_delay = value_string.toInt();
-            Serial.println(initial_delay);
-          }
-  
-          token = strtok(NULL, ",");
-        }
-  
-        i = retries;
-        initialised = true;
-      }
-      if (initialised == false) {
-        delay(250);
-      }
-    }
-
-    radio.sleep();
-  
-    if (initialised == false) {
-      Serial.println("Waiting before attempting initialisation again");
-      long sleep_ms = initialisation_interval;
-      micro_sleep(sleep_ms);
-    } else {
-      Serial.println("Waiting before the first sensor reading");
-      long sleep_ms = initial_delay;
-      micro_sleep(sleep_ms);
-    }
+    Serial.println("Waiting before the first sensor reading");
+    long sleep_ms = send_interval;
+    micro_sleep(sleep_ms);
   }
 }
 
