@@ -18,7 +18,7 @@
 
 <script>
 // Helper imports
-import { HTTP } from './static/http-common'
+import { getAccount } from './static/api.js'
 import { getStoredAccessToken, getStoredRefreshToken } from './store/storage.js'
 
 // Component imports
@@ -44,9 +44,7 @@ export default {
       // If an access token exists then the user has previously logged in
       // so check if the access token is still valid
       if (accessToken) {
-        HTTP.get('account', {
-          headers: { Authorization: 'Bearer ' + accessToken }
-        })
+        getAccount(accessToken)
           .then(response => {
             const data = response.data
             // Access token is valid as the request was succesful so load the user data

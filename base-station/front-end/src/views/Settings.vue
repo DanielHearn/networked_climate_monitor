@@ -187,7 +187,7 @@
 import MainPanel from './../components/MainPanel/MainPanel.vue'
 import SidePanel from './../components/SidePanel/SidePanel.vue'
 import vButton from './../components/vButton/vButton.vue'
-import { HTTP } from './../static/http-common'
+import { getAccount, patchAccount } from './../static/api'
 
 export default {
   name: 'settings',
@@ -219,9 +219,7 @@ export default {
     loadSettings: function() {
       const accessToken = this.$store.state.user.access_token
       if (accessToken) {
-        HTTP.get('account', {
-          headers: { Authorization: 'Bearer ' + accessToken }
-        })
+        getAccount(accessToken)
           .then(response => {
             const data = response.data
             if (data.status && data.account) {
@@ -246,13 +244,7 @@ export default {
       const accessToken = this.$store.state.user.access_token
       const stringifiedSettings = JSON.stringify(this.settings)
 
-      HTTP.patch(
-        'account',
-        { settings: stringifiedSettings },
-        {
-          headers: { Authorization: 'Bearer ' + accessToken }
-        }
-      )
+      patchAccount(accessToken, { settings: stringifiedSettings })
         .then(response => {
           const data = response.data
           if (data.status) {

@@ -1,5 +1,5 @@
 import ErrorList from './../ErrorList/ErrorList.vue'
-import { HTTP } from './../../static/http-common'
+import { changePassword } from './../../static/api'
 import { processErrors } from './../../static/helpers'
 import vButton from './../vButton/vButton.vue'
 
@@ -53,10 +53,7 @@ export default {
     resetPassword: function(resetToken, password) {
       this.$toasted.show('Sending change request')
 
-      HTTP.post('accounts/actions/change-password', {
-        reset_token: resetToken,
-        password: password
-      })
+      changePassword(resetToken, password)
         .then(response => {
           const data = response.data
           if (data.status && data.new_reset_token) {

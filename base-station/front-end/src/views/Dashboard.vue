@@ -275,7 +275,13 @@ import MainPanel from './../components/MainPanel/MainPanel.vue'
 import SidePanel from './../components/SidePanel/SidePanel.vue'
 import vButton from './../components/vButton/vButton.vue'
 import RecentClimateData from './../components/RecentClimateData/RecentClimateData.vue'
-import { HTTP } from './../static/http-common'
+import {
+  patchSensor,
+  getClimateData,
+  deleteSensor,
+  deleteClimateData,
+  getSensors
+} from './../static/api'
 import {
   getBatteryStatusFromVoltage,
   formatClimateData,
@@ -429,14 +435,11 @@ export default {
     },
     changeSensorName: function(sensorID, sensorName) {
       const accessToken = this.$store.state.user.access_token
+      const patchData = {
+        name: sensorName
+      }
 
-      HTTP.patch(
-        `sensors/${sensorID}`,
-        {
-          name: sensorName
-        },
-        { headers: { Authorization: 'Bearer ' + accessToken } }
-      )
+      patchSensor(accessToken, sensorID, patchData)
         .then(response => {
           const data = response.data
           if (data.status) {
@@ -570,12 +573,7 @@ export default {
       const rangeStart = timePeriod.start.toISOString()
       const rangeEnd = timePeriod.end.toISOString()
 
-      HTTP.get(
-        `sensors/${sensorID}/climate-data?range_start=${rangeStart}&range_end=${rangeEnd}`,
-        {
-          headers: { Authorization: 'Bearer ' + accessToken }
-        }
-      )
+      getClimateData(accessToken, sensorID, 20, rangeStart, rangeEnd)
         .then(response => {
           const data = response.data
           if (data.climate_data) {
@@ -620,9 +618,7 @@ export default {
     },
     deleteSensor: function(sensorID, sensorName) {
       const accessToken = this.$store.state.user.access_token
-      HTTP.delete(`sensors/${sensorID}`, {
-        headers: { Authorization: 'Bearer ' + accessToken }
-      })
+      deleteSensor(accessToken, sensorID)
         .then(response => {
           const data = response.data
           if (data && data.status) {
@@ -644,9 +640,7 @@ export default {
     },
     deleteClimate: function(sensorID, sensorName) {
       const accessToken = this.$store.state.user.access_token
-      HTTP.delete(`sensors/${sensorID}/climate-data`, {
-        headers: { Authorization: 'Bearer ' + accessToken }
-      })
+      deleteClimateData(accessToken, sensorID)
         .then(response => {
           const data = response.data
           if (data && data.status) {
@@ -679,9 +673,7 @@ export default {
 
       const accessToken = this.$store.state.user.access_token
       if (accessToken) {
-        HTTP.get('sensors', {
-          headers: { Authorization: 'Bearer ' + accessToken }
-        })
+        getSensors(accessToken)
           .then(response => {
             const data = response.data
             if (data.sensors) {

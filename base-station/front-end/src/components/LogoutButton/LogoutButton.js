@@ -1,4 +1,4 @@
-import { HTTP } from '../../static/http-common'
+import { logoutAccessToken, logoutRefreshToken } from '../../static/api'
 import {
   setStoredAccessToken,
   setStoredRefreshToken
@@ -31,25 +31,13 @@ export default {
         this.$router.push('/')
       }
 
-      HTTP.post(
-        'logout/access',
-        {},
-        {
-          headers: { Authorization: 'Bearer ' + accessToken }
-        }
-      )
+      logoutAccessToken(accessToken)
         .then(() => {})
         .catch(e => {
           console.warn(e.response)
         })
 
-      HTTP.post(
-        'logout/refresh',
-        {},
-        {
-          headers: { Authorization: 'Bearer ' + refreshToken }
-        }
-      )
+      logoutRefreshToken(refreshToken)
         .then(() => {})
         .catch(e => {
           console.warn(e.response)

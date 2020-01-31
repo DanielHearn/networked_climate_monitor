@@ -1,5 +1,5 @@
 import ErrorList from './../ErrorList/ErrorList.vue'
-import { HTTP } from './../../static/http-common'
+import { register, getAccount } from './../../static/api'
 import { processErrors } from './../../static/helpers'
 import {
   setStoredAccessToken,
@@ -58,10 +58,7 @@ export default {
     register: function(email, password) {
       this.$toasted.show('Sending register request')
 
-      HTTP.post('account', {
-        email: email,
-        password: password
-      })
+      register(email, password)
         .then(response => {
           const data = response.data
           if (data.status && data.access_token && data.refresh_token) {
@@ -74,9 +71,7 @@ export default {
             setStoredAccessToken(data.access_token)
             setStoredRefreshToken(data.refresh_token)
 
-            HTTP.get('account', {
-              headers: { Authorization: 'Bearer ' + data.access_token }
-            })
+            getAccount(data.access_token)
               .then(response => {
                 const data = response.data
                 if (data.status && data.account) {
