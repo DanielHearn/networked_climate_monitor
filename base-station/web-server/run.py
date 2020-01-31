@@ -46,6 +46,12 @@ def create_tables():
     db.create_all()
 
 
+def drop_tables():
+    """
+    Deletes all database tables
+    """
+    db.drop_all()
+
 @jwt.token_in_blacklist_loader
 def check_if_token_in_blacklist(decrypted_token):
     """
@@ -311,9 +317,9 @@ class SensorModel(db.Model, SerializerMixin):
         try:
             num_rows_deleted = db.session.query(cls).delete()
             db.session.commit()
-            return {'message': '{} row(s) deleted'.format(num_rows_deleted)}
+            return {'status': '{} row(s) deleted'.format(num_rows_deleted)}
         except:
-            return {'message': 'Error during row deletion'}
+            return {'status': 'Error', 'errors': ['Error during row deletion']}
 
 
 class ClimateModel(db.Model, SerializerMixin):
@@ -465,7 +471,7 @@ class UserLogin(Resource):
         # Load request body data
         json_data = request.get_json()
         if not json_data:
-            return {'message': 'No input data provided'}, 400
+            return {'status': 'Error', 'errors': ['No input data provided']}, 400
 
         # Validate and deserialize input
         try:
@@ -604,7 +610,7 @@ class Users(Resource):
                        'status': 'Account was successfully created',
                        'access_token': access_token,
                        'refresh_token': refresh_token,
-                       'reset_key': reset_token
+                       'reset_token': reset_token
                    }, 200
         except:
             return {'status': 'Error', 'errors': ['Account creation failed']}, 500
