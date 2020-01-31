@@ -9,6 +9,7 @@
         v-model="email"
         placeholder="Email"
         tabindex="0"
+        autocomplete="email"
       />
     </div>
     <div class="input-box">
@@ -20,6 +21,7 @@
         v-model="password"
         placeholder="Password"
         tabindex="0"
+        autocomplete="password"
       />
     </div>
     <router-link to="/reset-password" class="link" tabindex="-1"
