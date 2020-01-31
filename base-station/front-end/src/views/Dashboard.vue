@@ -25,10 +25,9 @@
             style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
           >
             <template v-if="sensor">
-              <div style="display: flex; flex-direction: row;">
+              <div class="edit-box">
                 <p
                   class="heading"
-                  style="margin-right: 0.25em; display: flex; align-items: center;"
                   :class="{
                     underline: sensor.id === activeSensorID
                   }"
@@ -39,7 +38,6 @@
                 <p
                   v-else
                   class="heading"
-                  style="margin-right: 0.25em; display: flex; align-items: center;"
                   :class="{
                     underline: sensor.id === activeSensorID
                   }"
@@ -51,12 +49,13 @@
                   class="input--text input--small"
                   v-model="sensor.name"
                   v-on:change="changeSensorName(sensor.id, sensor.name)"
+                  :ref="`sensor_name_${sensor.id}`"
                   @blur="sensor.editing = false"
                   v-if="sensor.editing"
                 />
                 <v-button
                   @click.native="setSensorEditing(sensor.id)"
-                  :hierachyLevel="'tertiary'"
+                  :hierachyLevel="sensor.editing ? 'primary' : 'tertiary'"
                   :text="'edit'"
                   :isIcon="true"
                 />
@@ -434,6 +433,10 @@ export default {
       }
     },
     changeSensorName: function(sensorID, sensorName) {
+      this.sensors.forEach(sensor => {
+        sensor.editing = false
+      })
+
       const accessToken = this.$store.state.user.access_token
       const patchData = {
         name: sensorName
@@ -605,6 +608,13 @@ export default {
       })[0]
       if (selectedSensor) {
         selectedSensor.editing = !selectedSensor.editing
+
+        // Focus edit input
+        const ref = `sensor_name_${selectedSensor.id}`
+        const test = this
+        this.$nextTick().then(function() {
+          test.$refs[ref][0].focus()
+        })
       }
     },
     setActiveSensor: function(sensorID) {

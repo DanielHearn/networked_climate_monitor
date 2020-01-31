@@ -80,6 +80,26 @@ body {
   }
 }
 
+.edit-box {
+  display: flex;
+  flex-direction: row;
+  .heading {
+    margin-right: 0.25em;
+    display: flex;
+    align-items: center;
+  }
+  .input--text{
+    height: fit-content;
+    font-size: $m-size;
+  }
+  .button {
+    height: auto;
+  }
+  .button--active {
+    background-attachment: $accent;
+  }
+}
+
 .mobile {
   .historical-actions .input-box {
     width: 100%;
