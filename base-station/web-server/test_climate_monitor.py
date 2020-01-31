@@ -365,3 +365,109 @@ def test_login_endpoint(client):
     assert json_data['status'] == 'Successful login'
     assert type(json_data['access_token']) is str
     assert type(json_data['refresh_token']) is str
+
+
+def test_logout_access_endpoint(client):
+    '''
+    Missing auth
+    '''
+    rv = client.post('/api/logout/access')
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Missing Authorization Header']
+
+    '''
+    Success
+    '''
+    email = "email@email.com"
+    password = "password"
+
+    rv = client.post('/api/account', json={
+        'email': email,
+        'password': password
+    })
+    json_data = rv.get_json()
+    access_token = json_data['access_token']
+
+    rv = client.post('/api/logout/access', headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Access token has been revoked'
+
+    '''
+    Token has already been revoked
+    '''
+    rv = client.post('/api/logout/access', headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['The token is invalid as it has been revoked']
+
+
+def test_logout_refresh_endpoint(client):
+    '''
+    Missing auth
+    '''
+    rv = client.post('/api/logout/refresh')
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Missing Authorization Header']
+
+    '''
+    Success
+    '''
+    email = "email@email.com"
+    password = "password"
+
+    rv = client.post('/api/account', json={
+        'email': email,
+        'password': password
+    })
+    json_data = rv.get_json()
+    access_token = json_data['refresh_token']
+
+    rv = client.post('/api/logout/refresh', headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Refresh token has been revoked'
+
+    '''
+    Token has already been revoked
+    '''
+    rv = client.post('/api/logout/refresh', headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['The token is invalid as it has been revoked']
+
+
+def test_token_refresh_endpoint(client):
+    '''
+    Missing auth
+    '''
+    rv = client.post('/api/token/refresh')
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Missing Authorization Header']
+
+    '''
+    Success
+    '''
+    email = "email@email.com"
+    password = "password"
+
+    rv = client.post('/api/account', json={
+        'email': email,
+        'password': password
+    })
+    json_data = rv.get_json()
+    refresh_token = json_data['refresh_token']
+
+    rv = client.post('/api/token/refresh', headers={'Authorization': 'Bearer ' + refresh_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Successful refresh'
+    assert type(json_data['access_token']) is str

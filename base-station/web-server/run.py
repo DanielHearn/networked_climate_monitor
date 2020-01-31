@@ -562,7 +562,7 @@ class TokenRefresh(Resource):
         try:
             # Generate new access stoken
             access_token = create_access_token(identity=current_user)
-            return {'access_token': access_token}
+            return {'status': 'Successful refresh', 'access_token': access_token}
         except:
             return {'status': 'Error', 'errors': [
                 'Error in refreshing access token'
