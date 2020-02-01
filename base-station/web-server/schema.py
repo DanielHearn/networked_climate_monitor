@@ -61,5 +61,5 @@ class ChangePasswordSchema(Schema):
     """
     Schema representing the post data of the change password endpoint
     """
-    reset_token = fields.Str(required=True, validate=validate.Length(equal=40))
+    reset_token = fields.Str(required=True, validate=validate.Length(equal=20))
     password = fields.Str(required=True, validate=validate.Length(min=8, max=40))

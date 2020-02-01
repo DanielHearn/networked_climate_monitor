@@ -1,11 +1,12 @@
 import pytest
-
+import json
 from datetime import datetime
 
 from run import app, create_tables, drop_tables, UserModel, SensorModel, RevokedTokenModel, ClimateModel, \
     SensorDataModel
 from helpers import create_settings
 
+api_key = 'xgLxTX7Nkem5qc9jllg2'
 
 @pytest.fixture
 def client():
@@ -471,3 +472,688 @@ def test_token_refresh_endpoint(client):
 
     assert json_data['status'] == 'Successful refresh'
     assert type(json_data['access_token']) is str
+
+
+def test_get_account_endpoint(client):
+    '''
+    Missing auth
+    '''
+    rv = client.get('/api/account')
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Missing Authorization Header']
+
+    '''
+    Success
+    '''
+    email = "email@email.com"
+    password = "password"
+
+    rv = client.post('/api/account', json={
+        'email': email,
+        'password': password
+    })
+    json_data = rv.get_json()
+    access_token = json_data['access_token']
+
+    rv = client.get('/api/account', headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Account successfully retrieved'
+    assert type(json_data['account']) is dict
+    assert json_data['account']['id'] == 1
+    assert json_data['account']['email'] == 'email@email.com'
+    assert json_data['account']['settings'] == "{'temperature_unit': 'c'}"
+    assert type(json_data['account']['reset_token']) is str
+
+    '''
+    User doesn't exist
+    '''
+    UserModel.query.first().delete()
+
+    rv = client.get('/api/account', headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['The account has not been created']
+
+    '''
+    Invalid token
+    '''
+    rv = client.post('/api/logout/access', headers={'Authorization': 'Bearer ' + access_token})
+
+    rv = client.get('/api/account', headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['The token is invalid as it has been revoked']
+
+
+def test_patch_account_endpoint(client):
+    # Create account
+    email = "email@email.com"
+    password = "password"
+
+    rv = client.post('/api/account', json={
+        'email': email,
+        'password': password
+    })
+    json_data = rv.get_json()
+    access_token = json_data['access_token']
+
+    '''
+    Missing auth
+    '''
+    rv = client.patch('/api/account', json={
+        'email': email,
+        'password': password
+    })
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Missing Authorization Header']
+
+    '''
+    No JSON data error
+    '''
+    rv = client.patch('/api/account', json={
+    }, headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['No input data provided']
+
+    '''
+    Email isn’t a string
+    '''
+    email = 5
+
+    rv = client.patch('/api/account', json={
+        'email': email,
+    }, headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {"email": [
+        "Not a valid email address."
+    ]}
+
+    '''
+    Password isn’t a string
+    '''
+    password = False
+
+    rv = client.patch('/api/account', json={
+        'password': password
+    }, headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {"password": [
+        "Not a valid string."
+    ]}
+
+    '''
+    Password isn’t between 8 to 40 characters long
+    '''
+    email = "email@email.com"
+    password = "12345"
+
+    rv = client.patch('/api/account', json={
+        'email': email,
+        'password': password
+    }, headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {"password": [
+        "Length must be between 8 and 40."
+    ]}
+
+    '''
+    Settings isn’t a string
+    '''
+    settings = 5
+
+    rv = client.patch('/api/account', json={
+        'settings': settings
+    }, headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {"settings": [
+        "Not a valid string."
+    ]}
+
+    '''
+    Success
+    '''
+    email = "newemail@email.com"
+    password = "newpassword"
+    settings = create_settings()
+    settings['test'] = False
+
+    rv = client.patch('/api/account', json={
+        'email': email,
+        'password': password,
+        'settings': str(settings),
+    }, headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Account successfully updated'
+
+    db_user = UserModel.query.first()
+    assert len(UserModel.query.all()) == 1
+    assert db_user.email == 'newemail@email.com'
+    assert db_user.verify_hash('newpassword', db_user.password)
+    assert db_user.settings == str(settings)
+    assert type(db_user.reset_token) is str
+
+    '''
+    User doesn't exist
+    '''
+    UserModel.query.first().delete()
+
+    rv = client.patch('/api/account', json={
+        'email': email,
+        'password': password
+    }, headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['The account has not been created']
+
+    '''
+    Invalid token
+    '''
+    rv = client.post('/api/logout/access', headers={'Authorization': 'Bearer ' + access_token})
+
+    rv = client.patch('/api/account', json={
+        'email': email,
+        'password': password
+    }, headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['The token is invalid as it has been revoked']
+
+
+def test_change_password_endpoint(client):
+    password = 'password'
+    settings = str(create_settings())
+    reset_token = 'ABCDEFGHIKLMNOPQRSTV'
+
+    '''
+    User doesn't exist
+    '''
+    rv = client.post('/api/accounts/actions/change-password', json={
+        'password': password,
+        'reset_token': reset_token
+    })
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['The account has not been created']
+
+
+    # Create account
+    user = UserModel(
+        email='email@email.com',
+        password=password,
+        settings=settings,
+        reset_token=reset_token
+    )
+    user.save()
+
+    '''
+    No JSON data error
+    '''
+    rv = client.post('/api/accounts/actions/change-password', json={
+    })
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['No input data provided']
+
+    '''
+    Missing password
+    '''
+    rv = client.post('/api/accounts/actions/change-password', json={
+        'reset_token': reset_token
+    })
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {"password": [
+        "Missing data for required field."
+    ]}
+
+    '''
+    Missing reset_token
+    '''
+    rv = client.post('/api/accounts/actions/change-password', json={
+        'password': password
+    })
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {"reset_token": [
+        "Missing data for required field."
+    ]}
+
+    '''
+    Wrong reset_token length
+    '''
+    rv = client.post('/api/accounts/actions/change-password', json={
+        'password': password,
+        'reset_token': 'ABCDEFG'
+    })
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {"reset_token": [
+        "Length must be 20."
+    ]}
+
+    '''
+    Invalid reset_token
+    '''
+    rv = client.post('/api/accounts/actions/change-password', json={
+        'password': password,
+        'reset_token': '1BCDEFGHIKLMNOPQRSTV'
+    })
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == [
+        "Invalid password reset token"
+    ]
+
+    '''
+    Password isn’t a string
+    '''
+    password = False
+
+    rv = client.post('/api/accounts/actions/change-password', json={
+        'password': password,
+        'reset_token': reset_token
+    })
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {"password": [
+        "Not a valid string."
+    ]}
+
+    '''
+    Password isn’t between 8 to 40 characters long
+    '''
+    password = "12345"
+
+    rv = client.post('/api/accounts/actions/change-password', json={
+        'password': password,
+        'reset_token': reset_token
+    })
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {"password": [
+        "Length must be between 8 and 40."
+    ]}
+
+    '''
+    Success
+    '''
+    password = "newpassword"
+
+    rv = client.post('/api/accounts/actions/change-password', json={
+        'password': password,
+        'reset_token': reset_token
+    })
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Successfully reset password'
+
+    db_user = UserModel.query.first()
+    assert len(UserModel.query.all()) == 1
+    assert db_user.verify_hash('newpassword', db_user.password)
+    assert type(json_data['new_reset_token']) is str
+    assert len(json_data['new_reset_token']) is 20
+
+def test_post_sensors_endpoint(client):
+    name = 'sensor_1'
+    user_id = 1
+    sensor_id = 1
+
+    '''
+    No JSON data error
+    '''
+    rv = client.post('/api/sensors?api_key='+api_key, json={
+    })
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['No input data provided']
+    assert len(SensorModel.query.all()) == 0
+
+    '''
+    Missing api_key
+    '''
+    rv = client.post('/api/sensors', json={
+        "sensor_id": sensor_id,
+        "user_id": user_id,
+        "name": name
+    })
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Invalid api key']
+    assert len(SensorModel.query.all()) == 0
+
+    '''
+    Invalid api_key
+    '''
+    rv = client.post('/api/sensors?api_key=invalid_key', json={
+        "sensor_id": sensor_id,
+        "user_id": user_id,
+        "name": name
+    })
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Invalid api key']
+    assert len(SensorModel.query.all()) == 0
+
+    '''
+    Missing name
+    '''
+    rv = client.post('/api/sensors?api_key=' + api_key, json={
+        "sensor_id": sensor_id,
+        "user_id": user_id,
+    })
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {"name": [
+        "Missing data for required field."
+    ]}
+    assert len(SensorModel.query.all()) == 0
+
+    '''
+    Name isn't string
+    '''
+    rv = client.post('/api/sensors?api_key=' + api_key, json={
+        "sensor_id": sensor_id,
+        "user_id": user_id,
+        "name": 5
+    })
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {"name": [
+        "Not a valid string."
+    ]}
+    assert len(SensorModel.query.all()) == 0
+
+    '''
+    Name is too long
+    '''
+    rv = client.post('/api/sensors?api_key=' + api_key, json={
+        "sensor_id": sensor_id,
+        "user_id": user_id,
+        "name": "DTERDIRDNGFIDUFDNGFLDOIJRTYNDFJKLGLDFIUGERNJLTRUTGV"
+    })
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {"name": [
+        "Length must be between 0 and 40."
+    ]}
+    assert len(SensorModel.query.all()) == 0
+
+    '''
+    Missing sensor_id
+    '''
+    rv = client.post('/api/sensors?api_key=' + api_key, json={
+        "user_id": user_id,
+        "name": name
+    })
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {"sensor_id": [
+        "Missing data for required field."
+    ]}
+    assert len(SensorModel.query.all()) == 0
+
+    '''
+    sensor_id isn't string
+    '''
+    rv = client.post('/api/sensors?api_key=' + api_key, json={
+        "sensor_id": "invalid",
+        "user_id": user_id,
+        "name": name
+    })
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {"sensor_id": [
+        "Not a valid integer."
+    ]}
+    assert len(SensorModel.query.all()) == 0
+
+    '''
+    Missing user_id
+    '''
+    rv = client.post('/api/sensors?api_key=' + api_key, json={
+        "sensor_id": sensor_id,
+        "name": name
+    })
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {"user_id": [
+        "Missing data for required field."
+    ]}
+    assert len(SensorModel.query.all()) == 0
+
+    '''
+    user_id isn't string
+    '''
+    rv = client.post('/api/sensors?api_key=' + api_key, json={
+        "sensor_id": sensor_id,
+        "user_id": "invalid",
+        "name": name
+    })
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {"user_id": [
+        "Not a valid integer."
+    ]}
+    assert len(SensorModel.query.all()) == 0
+
+    '''
+    Success
+    '''
+    rv = client.post('/api/sensors?api_key=' + api_key, json={
+        "sensor_id": sensor_id,
+        "user_id": user_id,
+        "name": name
+    })
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Sensor successfully created.'
+    assert len(SensorModel.query.all()) == 1
+    new_sensor = SensorModel.query.filter_by(id=sensor_id).first()
+    assert new_sensor.name == name
+    assert new_sensor.id == sensor_id
+    assert new_sensor.user_id == user_id
+
+    '''
+    Duplicate ID
+    '''
+    rv = client.post('/api/sensors?api_key=' + api_key, json={
+        "sensor_id": sensor_id,
+        "user_id": user_id,
+        "name": name
+    })
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['A sensor with that id already exists']
+    assert len(SensorModel.query.all()) == 1
+    new_sensor = SensorModel.query.filter_by(id=sensor_id).first()
+    assert new_sensor.name == name
+    assert new_sensor.id == sensor_id
+    assert new_sensor.user_id == user_id
+
+def test_get_sensors_endpoint(client):
+    # Create account
+    email = "email@email.com"
+    password = "password"
+
+    rv = client.post('/api/account', json={
+        'email': email,
+        'password': password
+    })
+    json_data = rv.get_json()
+    access_token = json_data['access_token']
+
+    '''
+    Missing auth
+    '''
+    rv = client.get('/api/sensors')
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Missing Authorization Header']
+
+    '''
+    No sensors
+    '''
+    rv = client.get('/api/sensors', headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Sensors successfully retrieved'
+    assert json_data['sensors'] == []
+    assert len(SensorModel.query.all()) == 0
+
+    '''
+    Success no climate data
+    '''
+    sensor_1 = SensorModel(name='Sensor 1', id=1, user_id=1)
+    sensor_2 = SensorModel(name='Sensor 2', id=2, user_id=1)
+    sensor_1.save()
+    sensor_2.save()
+
+    rv = client.get('/api/sensors', headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Sensors successfully retrieved'
+    assert json_data['sensors'] == [{'id': 1, 'user_id': 1, 'name': 'Sensor 1'}, {'id': 2, 'user_id': 1, 'name': 'Sensor 2'}]
+    assert len(SensorModel.query.all()) == 2
+
+    '''
+    Success no climate data
+    '''
+    climate_data_1 = ClimateModel(sensor_id=1, battery_voltage=4.22, date=datetime(2020, 1, 31, 16, 30, 33, 619535))
+    sensor_data_1 = SensorDataModel(climate_id=1, value=23.45, type='Temperature', unit='c')
+    climate_data_1.save()
+    sensor_data_1.save()
+
+    climate_data_2 = ClimateModel(sensor_id=2, battery_voltage=4.16, date=datetime(2020, 1, 31, 16, 30, 35, 619535))
+    sensor_data_2 = SensorDataModel(climate_id=2, value=21.52, type='Humidity', unit='%')
+    climate_data_2.save()
+    sensor_data_2.save()
+
+    rv = client.get('/api/sensors', headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Sensors successfully retrieved'
+    assert json_data['sensors'] == [
+        {
+        'name': 'Sensor 1',
+        'id': 1, 'user_id': 1,
+        'recent_climate_data': {
+            'sensor_id': 1,
+            'date': '2020-01-31 16:30',
+            'battery_voltage': 4.22,
+            'id': 1,
+            'climate_data': [
+                {'climate_id': 1, 'value': 23.45, 'id': 1, 'type': 'Temperature', 'unit': 'c'}
+            ]
+        }
+        },
+        {'name': 'Sensor 2',
+         'id': 2,
+         'user_id': 1,
+         'recent_climate_data': {
+             'sensor_id': 2,
+             'date': '2020-01-31 16:30',
+             'battery_voltage': 4.16,
+             'id': 2,
+             'climate_data': [
+                 {'climate_id': 2, 'value': 21.52, 'id': 2, 'type': 'Humidity', 'unit': '%'}
+             ]
+         }
+         }
+    ]
+    assert len(SensorModel.query.all()) == 2
+
+    '''
+    Invalid token
+    '''
+    rv = client.post('/api/logout/access', headers={'Authorization': 'Bearer ' + access_token})
+
+    rv = client.get('/api/sensors', headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['The token is invalid as it has been revoked']
+
+def test_delete_sensors_endpoint(client):
+    # Create account
+    email = "email@email.com"
+    password = "password"
+
+    rv = client.post('/api/account', json={
+        'email': email,
+        'password': password
+    })
+    json_data = rv.get_json()
+    access_token = json_data['access_token']
+
+    '''
+    Missing auth
+    '''
+    rv = client.delete('/api/sensors')
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Missing Authorization Header']
+
+    '''
+    No sensors
+    '''
+    rv = client.delete('/api/sensors', headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Sensors successfully deleted'
+    assert len(SensorModel.query.all()) == 0
+
+    '''
+    Success
+    '''
+    sensor_1 = SensorModel(name='Sensor 1', id=1, user_id=1)
+    sensor_2 = SensorModel(name='Sensor 2', id=2, user_id=1)
+    sensor_1.save()
+    sensor_2.save()
+    assert len(SensorModel.query.all()) == 2
+
+    rv = client.delete('/api/sensors', headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Sensors successfully deleted'
+    assert len(SensorModel.query.all()) == 0

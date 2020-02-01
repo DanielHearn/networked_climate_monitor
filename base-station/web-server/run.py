@@ -158,6 +158,14 @@ class UserModel(db.Model, SerializerMixin):
         db.session.add(self)
         db.session.commit()
 
+    def delete(self):
+        """
+        Deletes an instance of user from the database
+        """
+        db.session.delete(self)
+        db.session.commit()
+
+
     @classmethod
     def find_by_email(cls, email):
         """
@@ -635,13 +643,10 @@ class Users(Resource):
         # Update user data if it exists in the request body
         user_patch_data = {}
         if 'email' in json_data:
-            user.email = json_data['email']
             user_patch_data['email'] = json_data['email']
         if 'password' in json_data:
-            user.password = UserModel.generate_hash(json_data['password'])
             user_patch_data['password'] = json_data['password']
         if 'settings' in json_data:
-            user.settings = json_data['settings']
             user_patch_data['settings'] = json_data['settings']
 
         # Validate and deserialize request body data
@@ -649,6 +654,13 @@ class Users(Resource):
             user_patch_schema.load(user_patch_data)
         except ValidationError as err:
             return {'status': 'Error', 'errors': err.messages}, 422
+
+        if 'email' in json_data:
+            user.email = json_data['email']
+        if 'password' in json_data:
+            user.password = UserModel.generate_hash(json_data['password'])
+        if 'settings' in json_data:
+            user.settings = json_data['settings']
 
         # Update user
         db.session.commit()
@@ -868,10 +880,8 @@ class Sensor(Resource):
             # Update sensor data if it exists in the request body
             sensor_patch_data = {}
             if 'name' in json_data:
-                sensor.name = json_data['name']
                 sensor_patch_data['name'] = json_data['name']
             if 'sensor_id' in json_data:
-                sensor.id = json_data['sensor_id']
                 sensor_patch_data['sensor_id'] = json_data['sensor_id']
 
             # Validate and deserialize request body data
@@ -879,6 +889,11 @@ class Sensor(Resource):
                 sensor_patch_schema.load(sensor_patch_data)
             except ValidationError as err:
                 return {'status': 'Error', 'errors': err.messages}, 422
+
+            if 'name' in json_data:
+                sensor.name = json_data['name']
+            if 'sensor_id' in json_data:
+                sensor.id = json_data['sensor_id']
 
             # Update sensor
             db.session.commit()
@@ -956,7 +971,7 @@ class Sensors(Resource):
             # Load request body data
             json_data = request.get_json(force=True)
             if not json_data:
-                return {'status': 'Error', 'errors': ['No body json data provided']}, 422
+                return {'status': 'Error', 'errors': ['No input data provided']}, 422
 
             # Validate and deserialize json data for sensor
             try:
@@ -1024,7 +1039,7 @@ class Sensors(Resource):
 
         try:
             SensorModel.delete_all()
-            return {'status': 'Sensors successfully deleted.'}, 200
+            return {'status': 'Sensors successfully deleted'}, 200
         except:
             return {'status': 'Error', 'errors': ['Error while deleting all sensors from database']}, 500
 
@@ -1038,7 +1053,7 @@ class ChangePassword(Resource):
         # Load request body data
         json_data = request.get_json(force=True)
         if not json_data:
-            return {'status': 'Error', 'errors': ['No body json data provided']}, 422
+            return {'status': 'Error', 'errors': ['No input data provided']}, 422
 
         # Validate and deserialize json data for sensor
         try:
@@ -1049,7 +1064,7 @@ class ChangePassword(Resource):
         # Retrieve first user in database
         user = UserModel.return_first()
         if not user:
-            return {'status': 'Error', 'errors': ['An account doesn\'t exist']}, 500
+            return {'status': 'Error', 'errors': ['The account has not been created']}, 500
 
         # Change password if the input reset token matches the stored reset token
         if user.reset_token == data['reset_token']:
