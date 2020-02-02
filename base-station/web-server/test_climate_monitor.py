@@ -31,6 +31,18 @@ def test_nonexistant_endpoint(client):
     }
     assert json_data == endpoint_error
 
+def test_serve_static(client):
+    '''
+    Test html page at root
+    '''
+    rv = client.get('/')
+    assert rv.status_code == 200
+    assert rv.content_type == 'text/html; charset=utf-8'
+    data = rv.data.decode("utf-8")
+
+    assert '<!DOCTYPE html><html lang=en>' in data
+    assert '</html>' in data
+
 
 @pytest.fixture(scope='module')
 def new_user():
