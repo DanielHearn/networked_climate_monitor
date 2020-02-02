@@ -52,6 +52,7 @@ def drop_tables():
     """
     db.drop_all()
 
+
 @jwt.token_in_blacklist_loader
 def check_if_token_in_blacklist(decrypted_token):
     """
@@ -165,7 +166,6 @@ class UserModel(db.Model, SerializerMixin):
         db.session.delete(self)
         db.session.commit()
 
-
     @classmethod
     def find_by_email(cls, email):
         """
@@ -252,6 +252,13 @@ class RevokedTokenModel(db.Model):
         Saves or updates an instance of revoked token to the database
         """
         db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        """
+        Deletes an instance of revoked token from the database
+        """
+        db.session.delete(self)
         db.session.commit()
 
     @classmethod
