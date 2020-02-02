@@ -8,6 +8,7 @@ from helpers import create_settings
 
 api_key = 'xgLxTX7Nkem5qc9jllg2'
 
+
 @pytest.fixture
 def client():
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
@@ -696,7 +697,6 @@ def test_change_password_endpoint(client):
     assert json_data['status'] == 'Error'
     assert json_data['errors'] == ['The account has not been created']
 
-
     # Create account
     user = UserModel(
         email='email@email.com',
@@ -821,6 +821,7 @@ def test_change_password_endpoint(client):
     assert type(json_data['new_reset_token']) is str
     assert len(json_data['new_reset_token']) is 20
 
+
 def test_post_sensors_endpoint(client):
     name = 'sensor_1'
     user_id = 1
@@ -829,7 +830,7 @@ def test_post_sensors_endpoint(client):
     '''
     No JSON data error
     '''
-    rv = client.post('/api/sensors?api_key='+api_key, json={
+    rv = client.post('/api/sensors?api_key=' + api_key, json={
     })
     json_data = rv.get_json()
 
@@ -1009,6 +1010,7 @@ def test_post_sensors_endpoint(client):
     assert new_sensor.id == sensor_id
     assert new_sensor.user_id == user_id
 
+
 def test_get_sensors_endpoint(client):
     # Create account
     email = "email@email.com"
@@ -1052,7 +1054,8 @@ def test_get_sensors_endpoint(client):
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Sensors successfully retrieved'
-    assert json_data['sensors'] == [{'id': 1, 'user_id': 1, 'name': 'Sensor 1'}, {'id': 2, 'user_id': 1, 'name': 'Sensor 2'}]
+    assert json_data['sensors'] == [{'id': 1, 'user_id': 1, 'name': 'Sensor 1'},
+                                    {'id': 2, 'user_id': 1, 'name': 'Sensor 2'}]
     assert len(SensorModel.query.all()) == 2
 
     '''
@@ -1074,17 +1077,17 @@ def test_get_sensors_endpoint(client):
     assert json_data['status'] == 'Sensors successfully retrieved'
     assert json_data['sensors'] == [
         {
-        'name': 'Sensor 1',
-        'id': 1, 'user_id': 1,
-        'recent_climate_data': {
-            'sensor_id': 1,
-            'date': '2020-01-31 16:30',
-            'battery_voltage': 4.22,
-            'id': 1,
-            'climate_data': [
-                {'climate_id': 1, 'value': 23.45, 'id': 1, 'type': 'Temperature', 'unit': 'c'}
-            ]
-        }
+            'name': 'Sensor 1',
+            'id': 1, 'user_id': 1,
+            'recent_climate_data': {
+                'sensor_id': 1,
+                'date': '2020-01-31 16:30',
+                'battery_voltage': 4.22,
+                'id': 1,
+                'climate_data': [
+                    {'climate_id': 1, 'value': 23.45, 'id': 1, 'type': 'Temperature', 'unit': 'c'}
+                ]
+            }
         },
         {'name': 'Sensor 2',
          'id': 2,
@@ -1112,6 +1115,7 @@ def test_get_sensors_endpoint(client):
 
     assert json_data['status'] == 'Error'
     assert json_data['errors'] == ['The token is invalid as it has been revoked']
+
 
 def test_delete_sensors_endpoint(client):
     # Create account
@@ -1157,3 +1161,301 @@ def test_delete_sensors_endpoint(client):
 
     assert json_data['status'] == 'Sensors successfully deleted'
     assert len(SensorModel.query.all()) == 0
+
+
+def test_next_available_id_endpoint(client):
+    '''
+    Missing api_key
+    '''
+    rv = client.get('/api/sensors/actions/next-available-sensor-id')
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Invalid API key']
+
+    '''
+    Invalid api_key
+    '''
+    rv = client.get('/api/sensors/actions/next-available-sensor-id?api_key=invalid_key')
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Invalid API key']
+
+    '''
+    Success no sensors
+    '''
+    rv = client.get('/api/sensors/actions/next-available-sensor-id?api_key=' + api_key)
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Next available ID found'
+    assert json_data['ID'] == 1
+
+    '''
+    Success multiple sensors
+    '''
+    sensor_1 = SensorModel(name='Sensor 1', id=1, user_id=1)
+    sensor_2 = SensorModel(name='Sensor 2', id=2, user_id=1)
+    sensor_1.save()
+    sensor_2.save()
+    assert len(SensorModel.query.all()) == 2
+
+    rv = client.get('/api/sensors/actions/next-available-sensor-id?api_key=' + api_key)
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Next available ID found'
+    assert json_data['ID'] == 3
+
+
+def test_get_sensor_endpoint(client):
+    # Create account
+    email = "email@email.com"
+    password = "password"
+
+    rv = client.post('/api/account', json={
+        'email': email,
+        'password': password
+    })
+    json_data = rv.get_json()
+    access_token = json_data['access_token']
+
+    '''
+    Sensor doesn't exist
+    '''
+    rv = client.get('/api/sensors/1', headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 0
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Sensor doesn\'t exist']
+
+    '''
+    Missing auth
+    '''
+    sensor_1 = SensorModel(name='Sensor 1', id=1, user_id=1)
+    climate_data_1 = ClimateModel(sensor_id=1, battery_voltage=4.22, date=datetime(2020, 1, 31, 16, 30, 33, 619535))
+    sensor_data_1 = SensorDataModel(climate_id=1, value=23.45, type='Temperature', unit='c')
+    sensor_1.save()
+    climate_data_1.save()
+    sensor_data_1.save()
+
+    rv = client.get('/api/sensors/1')
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Missing Authorization Header']
+
+    '''
+    Success
+    '''
+    rv = client.get('/api/sensors/1', headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 1
+    assert json_data['status'] == 'Sensor successfully retrieved'
+    assert json_data['sensor'] == {
+        'name': 'Sensor 1',
+        'id': 1, 'user_id': 1,
+        'recent_climate_data': {
+            'sensor_id': 1,
+            'date': '2020-01-31 16:30',
+            'battery_voltage': 4.22,
+            'id': 1,
+            'climate_data': [
+                {'climate_id': 1, 'value': 23.45, 'id': 1, 'type': 'Temperature', 'unit': 'c'}
+            ]
+        }
+    }
+
+
+def test_delete_sensor_endpoint(client):
+    # Create account
+    email = "email@email.com"
+    password = "password"
+
+    rv = client.post('/api/account', json={
+        'email': email,
+        'password': password
+    })
+    json_data = rv.get_json()
+    access_token = json_data['access_token']
+
+    '''
+    Sensor doesn't exist
+    '''
+    rv = client.delete('/api/sensors/1', headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 0
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Sensor doesn\'t exist']
+
+    '''
+    Missing auth
+    '''
+    sensor_1 = SensorModel(name='Sensor 1', id=1, user_id=1)
+    climate_data_1 = ClimateModel(sensor_id=1, battery_voltage=4.22, date=datetime(2020, 1, 31, 16, 30, 33, 619535))
+    sensor_data_1 = SensorDataModel(climate_id=1, value=23.45, type='Temperature', unit='c')
+    sensor_1.save()
+    climate_data_1.save()
+    sensor_data_1.save()
+
+    rv = client.delete('/api/sensors/1')
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Missing Authorization Header']
+
+    '''
+    Success
+    '''
+    assert len(SensorModel.query.all()) == 1
+
+    rv = client.delete('/api/sensors/1', headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 0
+    assert len(ClimateModel.query.all()) == 0
+    assert len(SensorDataModel.query.all()) == 0
+    assert json_data['status'] == 'Sensor successfully deleted'
+
+    '''
+    Invalid token
+    '''
+    rv = client.post('/api/logout/access', headers={'Authorization': 'Bearer ' + access_token})
+
+    rv = client.delete('/api/sensors/1', headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['The token is invalid as it has been revoked']
+
+
+
+def test_patch_sensor_endpoint(client):
+    # Create account
+    email = "email@email.com"
+    password = "password"
+
+    rv = client.post('/api/account', json={
+        'email': email,
+        'password': password
+    })
+    json_data = rv.get_json()
+    access_token = json_data['access_token']
+
+    '''
+    Sensor doesn't exist
+    '''
+    rv = client.patch('/api/sensors/1', json={
+    }, headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 0
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Sensor doesn\'t exist']
+
+
+    '''
+    No JSON data error
+    '''
+    sensor_1 = SensorModel(name='Sensor 1', id=1, user_id=1)
+    sensor_1.save()
+
+    rv = client.patch('/api/sensors/1', json={
+    }, headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['No input data provided']
+    assert len(SensorModel.query.all()) == 1
+
+    '''
+    Missing auth
+    '''
+    rv = client.patch('/api/sensors/1', json={
+        'name': 'Greenhouse sensor',
+        'sensor_id': 5
+    })
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Missing Authorization Header']
+    assert len(SensorModel.query.all()) == 1
+
+
+    '''
+    Name isn’t a string
+    '''
+    rv = client.patch('/api/sensors/1', json={
+        'name': 5,
+        'sensor_id': 5
+    }, headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {"name": [
+        "Not a valid string."
+    ]}
+    assert len(SensorModel.query.all()) == 1
+
+    '''
+    sensor_id isn’t a integer
+    '''
+    rv = client.patch('/api/sensors/1', json={
+        'name': 'Greenhouse sensor',
+        'sensor_id': False
+    }, headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {"sensor_id": [
+        "Not a valid integer."
+    ]}
+    assert len(SensorModel.query.all()) == 1
+
+    '''
+    Name is too long
+    '''
+    rv = client.patch('/api/sensors/1', json={
+        "sensor_id": 5,
+        "name": "DTERDIRDNGFIDUFDNGFLDOIJRTYNDFJKLGLDFIUGERNJLTRUTGV"
+    }, headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {"name": [
+        "Length must be between 0 and 40."
+    ]}
+    assert len(SensorModel.query.all()) == 1
+
+
+    '''
+    Success
+    '''
+    rv = client.patch('/api/sensors/1', json={
+        'name': 'Greenhouse sensor',
+        'sensor_id': 5
+    }, headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Sensor successfully updated'
+    assert len(SensorModel.query.all()) == 1
+    updated_sensor = SensorModel.query.first()
+    assert updated_sensor.name == 'Greenhouse sensor'
+    assert updated_sensor.id == 5
+    assert updated_sensor.user_id == 1
+
+    '''
+    Invalid token
+    '''
+    rv = client.post('/api/logout/access', headers={'Authorization': 'Bearer ' + access_token})
+
+    rv = client.patch('/api/sensors/1', json={
+        "sensor_id": 5,
+        "name": "Greenhouse sensor"
+    }, headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['The token is invalid as it has been revoked']

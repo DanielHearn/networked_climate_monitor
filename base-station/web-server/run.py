@@ -1112,8 +1112,8 @@ class NextAvailableSensorID(Resource):
                 for i, sensor in enumerate(sorted_sensor_list, start=1):
                     if i != sensor['id']:
                         next_sensor_id = i
-                return {'ID': next_sensor_id}, 200
-            return {'ID': 1}, 200
+                return {'status': 'Next available ID found', 'ID': next_sensor_id}, 200
+            return {'status': 'Next available ID found', 'ID': 1}, 200
         return {'status': 'Error', 'errors': ['Invalid API key']}, 401
 
 
