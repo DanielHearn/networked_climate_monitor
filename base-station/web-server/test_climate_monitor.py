@@ -23,6 +23,8 @@ def client():
 
 def test_nonexistant_endpoint(client):
     rv = client.get('/api/endpoint')
+    assert rv.status_code == 500
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     endpoint_error = {
@@ -30,6 +32,7 @@ def test_nonexistant_endpoint(client):
         "status": "Error"
     }
     assert json_data == endpoint_error
+
 
 def test_serve_static(client):
     '''
@@ -277,8 +280,9 @@ def test_register_endpoint(client):
     '''
     No JSON data error
     '''
-    rv = client.post('/api/account', json={
-    })
+    rv = client.post('/api/account', json={})
+    assert rv.status_code == 400
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -293,6 +297,8 @@ def test_register_endpoint(client):
     rv = client.post('/api/account', json={
         'email': email
     })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -311,6 +317,8 @@ def test_register_endpoint(client):
     rv = client.post('/api/account', json={
         'email': email
     })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -331,6 +339,8 @@ def test_register_endpoint(client):
         'email': email,
         'password': password
     })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -349,6 +359,8 @@ def test_register_endpoint(client):
         'email': email,
         'password': password
     })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -367,6 +379,8 @@ def test_register_endpoint(client):
         'email': email,
         'password': password
     })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -385,6 +399,8 @@ def test_register_endpoint(client):
         'email': email,
         'password': password
     })
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Account was successfully created'
@@ -406,6 +422,8 @@ def test_login_endpoint(client):
     '''
     rv = client.post('/api/login', json={
     })
+    assert rv.status_code == 400
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -420,6 +438,8 @@ def test_login_endpoint(client):
     rv = client.post('/api/login', json={
         'password': password
     })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -438,6 +458,8 @@ def test_login_endpoint(client):
     rv = client.post('/api/login', json={
         'email': email
     })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -458,6 +480,8 @@ def test_login_endpoint(client):
         'email': email,
         'password': password
     })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -476,6 +500,8 @@ def test_login_endpoint(client):
         'email': email,
         'password': password
     })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -485,7 +511,7 @@ def test_login_endpoint(client):
     assert len(UserModel.query.all()) == 0
 
     '''
-    Use doesn't exist
+    User doesn't exist
     '''
     email = "email@email.com"
     password = "password"
@@ -494,6 +520,8 @@ def test_login_endpoint(client):
         'email': email,
         'password': password
     })
+    assert rv.status_code == 500
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -520,6 +548,8 @@ def test_login_endpoint(client):
         'email': email,
         'password': password
     })
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -535,6 +565,8 @@ def test_login_endpoint(client):
         'email': email,
         'password': password
     })
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Successful login'
@@ -547,6 +579,8 @@ def test_logout_access_endpoint(client):
     Missing auth
     '''
     rv = client.post('/api/logout/access')
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -562,10 +596,14 @@ def test_logout_access_endpoint(client):
         'email': email,
         'password': password
     })
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
     access_token = json_data['access_token']
 
     rv = client.post('/api/logout/access', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Access token has been revoked'
@@ -574,6 +612,8 @@ def test_logout_access_endpoint(client):
     Token has already been revoked
     '''
     rv = client.post('/api/logout/access', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -585,6 +625,8 @@ def test_logout_refresh_endpoint(client):
     Missing auth
     '''
     rv = client.post('/api/logout/refresh')
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -600,10 +642,14 @@ def test_logout_refresh_endpoint(client):
         'email': email,
         'password': password
     })
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
     access_token = json_data['refresh_token']
 
     rv = client.post('/api/logout/refresh', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Refresh token has been revoked'
@@ -612,6 +658,8 @@ def test_logout_refresh_endpoint(client):
     Token has already been revoked
     '''
     rv = client.post('/api/logout/refresh', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -623,6 +671,8 @@ def test_token_refresh_endpoint(client):
     Missing auth
     '''
     rv = client.post('/api/token/refresh')
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -638,10 +688,14 @@ def test_token_refresh_endpoint(client):
         'email': email,
         'password': password
     })
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
     refresh_token = json_data['refresh_token']
 
     rv = client.post('/api/token/refresh', headers={'Authorization': 'Bearer ' + refresh_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Successful refresh'
@@ -653,6 +707,8 @@ def test_get_account_endpoint(client):
     Missing auth
     '''
     rv = client.get('/api/account')
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -668,10 +724,14 @@ def test_get_account_endpoint(client):
         'email': email,
         'password': password
     })
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
     access_token = json_data['access_token']
 
     rv = client.get('/api/account', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Account successfully retrieved'
@@ -687,6 +747,8 @@ def test_get_account_endpoint(client):
     UserModel.query.first().delete()
 
     rv = client.get('/api/account', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 500
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -696,8 +758,12 @@ def test_get_account_endpoint(client):
     Invalid token
     '''
     rv = client.post('/api/logout/access', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
 
     rv = client.get('/api/account', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -713,6 +779,8 @@ def test_patch_account_endpoint(client):
         'email': email,
         'password': password
     })
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
     access_token = json_data['access_token']
 
@@ -723,6 +791,8 @@ def test_patch_account_endpoint(client):
         'email': email,
         'password': password
     })
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -733,6 +803,8 @@ def test_patch_account_endpoint(client):
     '''
     rv = client.patch('/api/account', json={
     }, headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 400
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -746,6 +818,8 @@ def test_patch_account_endpoint(client):
     rv = client.patch('/api/account', json={
         'email': email,
     }, headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -761,6 +835,8 @@ def test_patch_account_endpoint(client):
     rv = client.patch('/api/account', json={
         'password': password
     }, headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -778,6 +854,8 @@ def test_patch_account_endpoint(client):
         'email': email,
         'password': password
     }, headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -793,6 +871,8 @@ def test_patch_account_endpoint(client):
     rv = client.patch('/api/account', json={
         'settings': settings
     }, headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -813,6 +893,8 @@ def test_patch_account_endpoint(client):
         'password': password,
         'settings': str(settings),
     }, headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Account successfully updated'
@@ -833,6 +915,8 @@ def test_patch_account_endpoint(client):
         'email': email,
         'password': password
     }, headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 500
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -842,11 +926,15 @@ def test_patch_account_endpoint(client):
     Invalid token
     '''
     rv = client.post('/api/logout/access', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
 
     rv = client.patch('/api/account', json={
         'email': email,
         'password': password
     }, headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -865,6 +953,8 @@ def test_change_password_endpoint(client):
         'password': password,
         'reset_token': reset_token
     })
+    assert rv.status_code == 500
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -884,6 +974,8 @@ def test_change_password_endpoint(client):
     '''
     rv = client.post('/api/accounts/actions/change-password', json={
     })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -895,6 +987,8 @@ def test_change_password_endpoint(client):
     rv = client.post('/api/accounts/actions/change-password', json={
         'reset_token': reset_token
     })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -908,6 +1002,8 @@ def test_change_password_endpoint(client):
     rv = client.post('/api/accounts/actions/change-password', json={
         'password': password
     })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -922,6 +1018,8 @@ def test_change_password_endpoint(client):
         'password': password,
         'reset_token': 'ABCDEFG'
     })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -936,6 +1034,8 @@ def test_change_password_endpoint(client):
         'password': password,
         'reset_token': '1BCDEFGHIKLMNOPQRSTV'
     })
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -952,6 +1052,8 @@ def test_change_password_endpoint(client):
         'password': password,
         'reset_token': reset_token
     })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -968,6 +1070,8 @@ def test_change_password_endpoint(client):
         'password': password,
         'reset_token': reset_token
     })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -984,6 +1088,8 @@ def test_change_password_endpoint(client):
         'password': password,
         'reset_token': reset_token
     })
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Successfully reset password'
@@ -1003,8 +1109,9 @@ def test_post_sensors_endpoint(client):
     '''
     No JSON data error
     '''
-    rv = client.post('/api/sensors?api_key=' + api_key, json={
-    })
+    rv = client.post('/api/sensors?api_key=' + api_key, json={})
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -1019,6 +1126,8 @@ def test_post_sensors_endpoint(client):
         "user_id": user_id,
         "name": name
     })
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -1033,6 +1142,8 @@ def test_post_sensors_endpoint(client):
         "user_id": user_id,
         "name": name
     })
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -1046,6 +1157,8 @@ def test_post_sensors_endpoint(client):
         "sensor_id": sensor_id,
         "user_id": user_id,
     })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -1062,6 +1175,8 @@ def test_post_sensors_endpoint(client):
         "user_id": user_id,
         "name": 5
     })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -1078,6 +1193,8 @@ def test_post_sensors_endpoint(client):
         "user_id": user_id,
         "name": "DTERDIRDNGFIDUFDNGFLDOIJRTYNDFJKLGLDFIUGERNJLTRUTGV"
     })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -1093,6 +1210,8 @@ def test_post_sensors_endpoint(client):
         "user_id": user_id,
         "name": name
     })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -1109,6 +1228,8 @@ def test_post_sensors_endpoint(client):
         "user_id": user_id,
         "name": name
     })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -1124,6 +1245,8 @@ def test_post_sensors_endpoint(client):
         "sensor_id": sensor_id,
         "name": name
     })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -1140,6 +1263,8 @@ def test_post_sensors_endpoint(client):
         "user_id": "invalid",
         "name": name
     })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -1156,6 +1281,8 @@ def test_post_sensors_endpoint(client):
         "user_id": user_id,
         "name": name
     })
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Sensor successfully created.'
@@ -1173,6 +1300,8 @@ def test_post_sensors_endpoint(client):
         "user_id": user_id,
         "name": name
     })
+    assert rv.status_code == 500
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -1193,6 +1322,8 @@ def test_get_sensors_endpoint(client):
         'email': email,
         'password': password
     })
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
     access_token = json_data['access_token']
 
@@ -1200,6 +1331,8 @@ def test_get_sensors_endpoint(client):
     Missing auth
     '''
     rv = client.get('/api/sensors')
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -1209,6 +1342,8 @@ def test_get_sensors_endpoint(client):
     No sensors
     '''
     rv = client.get('/api/sensors', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Sensors successfully retrieved'
@@ -1224,6 +1359,8 @@ def test_get_sensors_endpoint(client):
     sensor_2.save()
 
     rv = client.get('/api/sensors', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Sensors successfully retrieved'
@@ -1245,6 +1382,8 @@ def test_get_sensors_endpoint(client):
     sensor_data_2.save()
 
     rv = client.get('/api/sensors', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Sensors successfully retrieved'
@@ -1282,8 +1421,12 @@ def test_get_sensors_endpoint(client):
     Invalid token
     '''
     rv = client.post('/api/logout/access', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
 
     rv = client.get('/api/sensors', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -1299,6 +1442,8 @@ def test_delete_sensors_endpoint(client):
         'email': email,
         'password': password
     })
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
     access_token = json_data['access_token']
 
@@ -1306,6 +1451,8 @@ def test_delete_sensors_endpoint(client):
     Missing auth
     '''
     rv = client.delete('/api/sensors')
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -1315,6 +1462,8 @@ def test_delete_sensors_endpoint(client):
     No sensors
     '''
     rv = client.delete('/api/sensors', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Sensors successfully deleted'
@@ -1330,6 +1479,8 @@ def test_delete_sensors_endpoint(client):
     assert len(SensorModel.query.all()) == 2
 
     rv = client.delete('/api/sensors', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Sensors successfully deleted'
@@ -1341,6 +1492,8 @@ def test_next_available_id_endpoint(client):
     Missing api_key
     '''
     rv = client.get('/api/sensors/actions/next-available-sensor-id')
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -1350,6 +1503,8 @@ def test_next_available_id_endpoint(client):
     Invalid api_key
     '''
     rv = client.get('/api/sensors/actions/next-available-sensor-id?api_key=invalid_key')
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -1359,6 +1514,8 @@ def test_next_available_id_endpoint(client):
     Success no sensors
     '''
     rv = client.get('/api/sensors/actions/next-available-sensor-id?api_key=' + api_key)
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Next available ID found'
@@ -1374,6 +1531,8 @@ def test_next_available_id_endpoint(client):
     assert len(SensorModel.query.all()) == 2
 
     rv = client.get('/api/sensors/actions/next-available-sensor-id?api_key=' + api_key)
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Next available ID found'
@@ -1389,6 +1548,8 @@ def test_get_sensor_endpoint(client):
         'email': email,
         'password': password
     })
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
     access_token = json_data['access_token']
 
@@ -1396,6 +1557,8 @@ def test_get_sensor_endpoint(client):
     Sensor doesn't exist
     '''
     rv = client.get('/api/sensors/1', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 500
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert len(SensorModel.query.all()) == 0
@@ -1413,6 +1576,8 @@ def test_get_sensor_endpoint(client):
     sensor_data_1.save()
 
     rv = client.get('/api/sensors/1')
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -1422,6 +1587,8 @@ def test_get_sensor_endpoint(client):
     Success
     '''
     rv = client.get('/api/sensors/1', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert len(SensorModel.query.all()) == 1
@@ -1450,6 +1617,8 @@ def test_delete_sensor_endpoint(client):
         'email': email,
         'password': password
     })
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
     access_token = json_data['access_token']
 
@@ -1457,6 +1626,8 @@ def test_delete_sensor_endpoint(client):
     Sensor doesn't exist
     '''
     rv = client.delete('/api/sensors/1', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 500
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert len(SensorModel.query.all()) == 0
@@ -1474,6 +1645,8 @@ def test_delete_sensor_endpoint(client):
     sensor_data_1.save()
 
     rv = client.delete('/api/sensors/1')
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -1485,6 +1658,8 @@ def test_delete_sensor_endpoint(client):
     assert len(SensorModel.query.all()) == 1
 
     rv = client.delete('/api/sensors/1', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert len(SensorModel.query.all()) == 0
@@ -1496,8 +1671,12 @@ def test_delete_sensor_endpoint(client):
     Invalid token
     '''
     rv = client.post('/api/logout/access', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
 
     rv = client.delete('/api/sensors/1', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -1513,6 +1692,8 @@ def test_patch_sensor_endpoint(client):
         'email': email,
         'password': password
     })
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
     access_token = json_data['access_token']
 
@@ -1521,6 +1702,8 @@ def test_patch_sensor_endpoint(client):
     '''
     rv = client.patch('/api/sensors/1', json={
     }, headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 500
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert len(SensorModel.query.all()) == 0
@@ -1535,6 +1718,8 @@ def test_patch_sensor_endpoint(client):
 
     rv = client.patch('/api/sensors/1', json={
     }, headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 400
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -1548,6 +1733,8 @@ def test_patch_sensor_endpoint(client):
         'name': 'Greenhouse sensor',
         'sensor_id': 5
     })
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -1561,6 +1748,8 @@ def test_patch_sensor_endpoint(client):
         'name': 5,
         'sensor_id': 5
     }, headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -1576,6 +1765,8 @@ def test_patch_sensor_endpoint(client):
         'name': 'Greenhouse sensor',
         'sensor_id': False
     }, headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -1591,6 +1782,8 @@ def test_patch_sensor_endpoint(client):
         "sensor_id": 5,
         "name": "DTERDIRDNGFIDUFDNGFLDOIJRTYNDFJKLGLDFIUGERNJLTRUTGV"
     }, headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
@@ -1606,6 +1799,8 @@ def test_patch_sensor_endpoint(client):
         'name': 'Greenhouse sensor',
         'sensor_id': 5
     }, headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Sensor successfully updated'
@@ -1619,11 +1814,15 @@ def test_patch_sensor_endpoint(client):
     Invalid token
     '''
     rv = client.post('/api/logout/access', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
 
     rv = client.patch('/api/sensors/1', json={
         "sensor_id": 5,
         "name": "Greenhouse sensor"
     }, headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
