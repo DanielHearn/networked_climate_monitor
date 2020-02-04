@@ -362,6 +362,17 @@ input.vc-text-base.vc-border {
   }
 }
 
+.toasted-container .toasted {
+  font-size: $xs-size !important;
+  font-weight: $regular-weight;
+  .action {
+    background: $accent !important;
+    color: $white !important;
+    border-radius: 0 !important;
+    padding: 8px 12px !important;
+  }
+}
+
 *::-webkit-scrollbar {
   width: 16px;
 }
