@@ -2,11 +2,18 @@ import pytest
 import json
 from datetime import datetime
 
-from run import app, create_tables, drop_tables, UserModel, SensorModel, RevokedTokenModel, ClimateModel, \
-    SensorDataModel
+from run import app, db, create_tables, drop_tables, UserModel, SensorModel, RevokedTokenModel, ClimateModel, \
+    SensorDataModel, remove_old_climate_data
 from helpers import create_settings
 
 api_key = 'xgLxTX7Nkem5qc9jllg2'
+
+
+@pytest.fixture(scope='function')
+def init_database():
+    db.create_all()
+    yield db
+    db.drop_all()
 
 
 @pytest.fixture
@@ -60,7 +67,7 @@ def new_user():
     return user
 
 
-def test_new_user(new_user):
+def test_new_user(new_user, init_database):
     '''
     Create
     '''
@@ -122,7 +129,7 @@ def new_sensor():
     return sensor
 
 
-def test_new_sensor(new_sensor):
+def test_new_sensor(new_sensor, init_database):
     '''
     Create
     '''
@@ -165,7 +172,7 @@ def new_revoked_token():
     return revoked_token
 
 
-def test_new_revoked_token(new_revoked_token):
+def test_new_revoked_token(new_revoked_token, init_database):
     '''
     Create
     '''
@@ -204,7 +211,7 @@ def new_climate_data():
     return sensor
 
 
-def test_new_climate_data(new_climate_data):
+def test_new_climate_data(new_climate_data, init_database):
     '''
     Create
     '''
@@ -248,7 +255,7 @@ def new_sensor_data():
     return sensor
 
 
-def test_new_sensor_data(new_sensor_data):
+def test_new_sensor_data(new_sensor_data, init_database):
     '''
     Create
     '''
@@ -271,12 +278,8 @@ def test_new_sensor_data(new_sensor_data):
     new_sensor_data.delete()
     assert SensorDataModel.query.count() == 0
 
-    '''
-    delete_all
-    '''
 
-
-def test_register_endpoint(client):
+def test_register_endpoint(client, init_database):
     '''
     No JSON data error
     '''
@@ -416,7 +419,7 @@ def test_register_endpoint(client):
     assert type(db_user.reset_token) is str
 
 
-def test_login_endpoint(client):
+def test_login_endpoint(client, init_database):
     '''
     No JSON data error
     '''
@@ -574,7 +577,7 @@ def test_login_endpoint(client):
     assert type(json_data['refresh_token']) is str
 
 
-def test_logout_access_endpoint(client):
+def test_logout_access_endpoint(client, init_database):
     '''
     Missing auth
     '''
@@ -620,7 +623,7 @@ def test_logout_access_endpoint(client):
     assert json_data['errors'] == ['The token is invalid as it has been revoked']
 
 
-def test_logout_refresh_endpoint(client):
+def test_logout_refresh_endpoint(client, init_database):
     '''
     Missing auth
     '''
@@ -666,7 +669,7 @@ def test_logout_refresh_endpoint(client):
     assert json_data['errors'] == ['The token is invalid as it has been revoked']
 
 
-def test_token_refresh_endpoint(client):
+def test_token_refresh_endpoint(client, init_database):
     '''
     Missing auth
     '''
@@ -702,7 +705,7 @@ def test_token_refresh_endpoint(client):
     assert type(json_data['access_token']) is str
 
 
-def test_get_account_endpoint(client):
+def test_get_account_endpoint(client, init_database):
     '''
     Missing auth
     '''
@@ -770,7 +773,7 @@ def test_get_account_endpoint(client):
     assert json_data['errors'] == ['The token is invalid as it has been revoked']
 
 
-def test_patch_account_endpoint(client):
+def test_patch_account_endpoint(client, init_database):
     # Create account
     email = "email@email.com"
     password = "password"
@@ -941,7 +944,7 @@ def test_patch_account_endpoint(client):
     assert json_data['errors'] == ['The token is invalid as it has been revoked']
 
 
-def test_change_password_endpoint(client):
+def test_change_password_endpoint(client, init_database):
     password = 'password'
     settings = str(create_settings())
     reset_token = 'ABCDEFGHIKLMNOPQRSTV'
@@ -1101,7 +1104,7 @@ def test_change_password_endpoint(client):
     assert len(json_data['new_reset_token']) is 20
 
 
-def test_post_sensors_endpoint(client):
+def test_post_sensors_endpoint(client, init_database):
     name = 'sensor_1'
     user_id = 1
     sensor_id = 1
@@ -1131,7 +1134,7 @@ def test_post_sensors_endpoint(client):
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
-    assert json_data['errors'] == ['Invalid api key']
+    assert json_data['errors'] == ['Invalid API key']
     assert len(SensorModel.query.all()) == 0
 
     '''
@@ -1147,7 +1150,7 @@ def test_post_sensors_endpoint(client):
     json_data = rv.get_json()
 
     assert json_data['status'] == 'Error'
-    assert json_data['errors'] == ['Invalid api key']
+    assert json_data['errors'] == ['Invalid API key']
     assert len(SensorModel.query.all()) == 0
 
     '''
@@ -1313,7 +1316,7 @@ def test_post_sensors_endpoint(client):
     assert new_sensor.user_id == user_id
 
 
-def test_get_sensors_endpoint(client):
+def test_get_sensors_endpoint(client, init_database):
     # Create account
     email = "email@email.com"
     password = "password"
@@ -1433,7 +1436,7 @@ def test_get_sensors_endpoint(client):
     assert json_data['errors'] == ['The token is invalid as it has been revoked']
 
 
-def test_delete_sensors_endpoint(client):
+def test_delete_sensors_endpoint(client, init_database):
     # Create account
     email = "email@email.com"
     password = "password"
@@ -1487,7 +1490,7 @@ def test_delete_sensors_endpoint(client):
     assert len(SensorModel.query.all()) == 0
 
 
-def test_next_available_id_endpoint(client):
+def test_next_available_id_endpoint(client, init_database):
     '''
     Missing api_key
     '''
@@ -1539,7 +1542,7 @@ def test_next_available_id_endpoint(client):
     assert json_data['ID'] == 3
 
 
-def test_get_sensor_endpoint(client):
+def test_get_sensor_endpoint(client, init_database):
     # Create account
     email = "email@email.com"
     password = "password"
@@ -1608,7 +1611,7 @@ def test_get_sensor_endpoint(client):
     }
 
 
-def test_delete_sensor_endpoint(client):
+def test_delete_sensor_endpoint(client, init_database):
     # Create account
     email = "email@email.com"
     password = "password"
@@ -1683,7 +1686,7 @@ def test_delete_sensor_endpoint(client):
     assert json_data['errors'] == ['The token is invalid as it has been revoked']
 
 
-def test_patch_sensor_endpoint(client):
+def test_patch_sensor_endpoint(client, init_database):
     # Create account
     email = "email@email.com"
     password = "password"
@@ -1827,3 +1830,826 @@ def test_patch_sensor_endpoint(client):
 
     assert json_data['status'] == 'Error'
     assert json_data['errors'] == ['The token is invalid as it has been revoked']
+
+
+def test_get_climate_data_endpoint(client, init_database):
+    # Create account
+    email = "email@email.com"
+    password = "password"
+
+    rv = client.post('/api/account', json={
+        'email': email,
+        'password': password
+    })
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+    access_token = json_data['access_token']
+
+    '''
+    Sensor doesn't exist
+    '''
+    rv = client.get('/api/sensors/1/climate-data', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 500
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 0
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Sensor doesn\'t exist']
+
+    '''
+    Missing auth
+    '''
+    sensor_1 = SensorModel(name='Sensor 1', id=1, user_id=1)
+    sensor_1.save()
+    climate_data_list = [
+        {
+            'id': 1, 'sensor_id': 1, 'battery_voltage': 4.22, 'date': datetime(2019, 11, 10, 16, 30, 33, 619535),
+            'climate_data': [{'id': 1, 'climate_id': 1, 'value': 23.45, 'type': 'Temperature', 'unit': 'c'}]
+        },
+        {
+            'id': 2, 'sensor_id': 1, 'battery_voltage': 4.21, 'date': datetime(2019, 11, 20, 16, 30, 33, 619535),
+            'climate_data': [{'id': 2, 'climate_id': 2, 'value': 23.44, 'type': 'Temperature', 'unit': 'c'}]
+        },
+        {
+            'id': 3, 'sensor_id': 1, 'battery_voltage': 4.2, 'date': datetime(2019, 12, 10, 16, 30, 33, 619535),
+            'climate_data': [{'id': 3, 'climate_id': 3, 'value': 23.43, 'type': 'Temperature', 'unit': 'c'}]
+        },
+        {
+            'id': 4, 'sensor_id': 1, 'battery_voltage': 4.19, 'date': datetime(2019, 12, 20, 16, 30, 33, 619535),
+            'climate_data': [{'id': 4, 'climate_id': 4, 'value': 23.42, 'type': 'Temperature', 'unit': 'c'}]
+        },
+        {
+            'id': 5, 'sensor_id': 1, 'battery_voltage': 4.18, 'date': datetime(2020, 1, 1, 16, 30, 33, 619535),
+            'climate_data': [{'id': 5, 'climate_id': 5, 'value': 23.41, 'type': 'Temperature', 'unit': 'c'}]
+        },
+        {
+            'id': 6, 'sensor_id': 1, 'battery_voltage': 4.17, 'date': datetime(2020, 1, 2, 16, 30, 33, 619535),
+            'climate_data': [{'id': 6, 'climate_id': 6, 'value': 23.40, 'type': 'Temperature', 'unit': 'c'}]
+        },
+        {
+            'id': 7, 'sensor_id': 1, 'battery_voltage': 4.16, 'date': datetime(2020, 1, 3, 16, 30, 33, 619535),
+            'climate_data': [{'id': 7, 'climate_id': 7, 'value': 23.39, 'type': 'Temperature', 'unit': 'c'}]
+        },
+        {
+            'id': 8, 'sensor_id': 1, 'battery_voltage': 4.15, 'date': datetime(2020, 1, 4, 16, 30, 33, 619535),
+            'climate_data': [{'id': 8, 'climate_id': 8, 'value': 23.38, 'type': 'Temperature', 'unit': 'c'}]
+        },
+        {
+            'id': 9, 'sensor_id': 1, 'battery_voltage': 4.14, 'date': datetime(2020, 1, 5, 16, 30, 33, 619535),
+            'climate_data': [{'id': 9, 'climate_id': 9, 'value': 23.37, 'type': 'Temperature', 'unit': 'c'}]
+        },
+        {
+            'id': 10, 'sensor_id': 1, 'battery_voltage': 4.13, 'date': datetime(2020, 1, 6, 16, 30, 33, 619535),
+            'climate_data': [{'id': 10, 'climate_id': 10, 'value': 23.36, 'type': 'Temperature', 'unit': 'c'}]
+        },
+        {
+            'id': 11, 'sensor_id': 1, 'battery_voltage': 4.12, 'date': datetime(2020, 1, 7, 16, 30, 33, 619535),
+            'climate_data': [{'id': 11, 'climate_id': 11, 'value': 23.35, 'type': 'Temperature', 'unit': 'c'}]
+        },
+        {
+            'id': 12, 'sensor_id': 1, 'battery_voltage': 4.11, 'date': datetime(2020, 1, 8, 16, 30, 33, 619535),
+            'climate_data': [{'id': 12, 'climate_id': 12, 'value': 23.34, 'type': 'Temperature', 'unit': 'c'}]
+        },
+        {
+            'id': 13, 'sensor_id': 1, 'battery_voltage': 4.1, 'date': datetime(2020, 1, 8, 16, 30, 33, 619535),
+            'climate_data': [{'id': 13, 'climate_id': 13, 'value': 23.33, 'type': 'Temperature', 'unit': 'c'}]
+        },
+        {
+            'id': 14, 'sensor_id': 1, 'battery_voltage': 4.09, 'date': datetime(2020, 1, 9, 16, 30, 33, 619535),
+            'climate_data': [{'id': 14, 'climate_id': 14, 'value': 23.32, 'type': 'Temperature', 'unit': 'c'}]
+        },
+        {
+            'id': 15, 'sensor_id': 1, 'battery_voltage': 4.08, 'date': datetime(2020, 1, 10, 16, 30, 33, 619535),
+            'climate_data': [{'id': 15, 'climate_id': 15, 'value': 23.31, 'type': 'Temperature', 'unit': 'c'}]
+        },
+        {
+            'id': 16, 'sensor_id': 1, 'battery_voltage': 4.07, 'date': datetime(2020, 1, 11, 16, 30, 33, 619535),
+            'climate_data': [{'id': 16, 'climate_id': 16, 'value': 23.30, 'type': 'Temperature', 'unit': 'c'}]
+        },
+        {
+            'id': 17, 'sensor_id': 1, 'battery_voltage': 4.06, 'date': datetime(2020, 1, 12, 16, 30, 33, 619535),
+            'climate_data': [{'id': 17, 'climate_id': 17, 'value': 23.29, 'type': 'Temperature', 'unit': 'c'}]
+        },
+        {
+            'id': 18, 'sensor_id': 1, 'battery_voltage': 4.05, 'date': datetime(2020, 1, 13, 16, 30, 33, 619535),
+            'climate_data': [{'id': 18, 'climate_id': 18, 'value': 23.28, 'type': 'Temperature', 'unit': 'c'}]
+        },
+        {
+            'id': 19, 'sensor_id': 1, 'battery_voltage': 4.04, 'date': datetime(2020, 1, 14, 16, 30, 33, 619535),
+            'climate_data': [{'id': 19, 'climate_id': 19, 'value': 23.27, 'type': 'Temperature', 'unit': 'c'}]
+        },
+        {
+            'id': 20, 'sensor_id': 1, 'battery_voltage': 4.03, 'date': datetime(2020, 1, 15, 16, 30, 33, 619535),
+            'climate_data': [{'id': 20, 'climate_id': 20, 'value': 23.26, 'type': 'Temperature', 'unit': 'c'}]
+        },
+        {
+            'id': 21, 'sensor_id': 1, 'battery_voltage': 4.02, 'date': datetime(2020, 1, 16, 16, 30, 33, 619535),
+            'climate_data': [{'id': 21, 'climate_id': 21, 'value': 23.25, 'type': 'Temperature', 'unit': 'c'}]
+        },
+        {
+            'id': 22, 'sensor_id': 1, 'battery_voltage': 4.01, 'date': datetime(2020, 1, 17, 16, 30, 33, 619535),
+            'climate_data': [{'id': 22, 'climate_id': 22, 'value': 23.24, 'type': 'Temperature', 'unit': 'c'}]
+        }
+    ]
+    for climate_data in climate_data_list:
+        ClimateModel(sensor_id=climate_data['sensor_id'], battery_voltage=climate_data['battery_voltage'],
+                     date=climate_data['date']).save()
+        sensor_data_list = climate_data['climate_data']
+        for sensor_data in sensor_data_list:
+            SensorDataModel(climate_id=sensor_data['climate_id'], value=sensor_data['value'], type=sensor_data['type'],
+                            unit=sensor_data['unit']).save()
+    sorted_data = sorted(climate_data_list, key=lambda x: x['id'], reverse=True)
+    for data in sorted_data:
+        data['date'] = data['date'].strftime("%Y-%m-%d %H:%M")
+
+    rv = client.get('/api/sensors/1/climate-data')
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Missing Authorization Header']
+
+    '''
+    Success default quantity
+    '''
+    rv = client.get('/api/sensors/1/climate-data', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 1
+    assert len(ClimateModel.query.all()) == len(climate_data_list)
+    assert len(SensorDataModel.query.all()) == len(sorted_data)
+    assert json_data['status'] == 'Climate data successfully retrieved'
+    expected_data = sorted_data[0:len(sorted_data)]
+
+    assert len(json_data['climate_data']) == len(sorted_data)
+    assert json_data['climate_data'] == expected_data
+
+    '''
+    Success default quantity
+    '''
+    rv = client.get('/api/sensors/1/climate-data?quantity=20', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 1
+    assert len(ClimateModel.query.all()) == len(climate_data_list)
+    assert len(SensorDataModel.query.all()) == len(climate_data_list)
+    assert json_data['status'] == 'Climate data successfully retrieved'
+    expected_data = sorted_data[0:20]
+    assert len(json_data['climate_data']) == 20
+    assert json_data['climate_data'] == expected_data
+
+    '''
+    Success 1 day range
+    '''
+    rv = client.get('/api/sensors/1/climate-data?range_start=2020-01-17&range_end=2020-01-18',
+                    headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 1
+    assert len(ClimateModel.query.all()) == len(climate_data_list)
+    assert len(SensorDataModel.query.all()) == len(climate_data_list)
+    assert json_data['status'] == 'Climate data successfully retrieved'
+    expected_data = sorted_data[0:1]
+    assert len(json_data['climate_data']) == 1
+    assert json_data['climate_data'] == expected_data
+
+    '''
+    Success 7 day range
+    '''
+    rv = client.get('/api/sensors/1/climate-data?range_start=2020-01-11&range_end=2020-01-18',
+                    headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 1
+    assert len(ClimateModel.query.all()) == len(climate_data_list)
+    assert len(SensorDataModel.query.all()) == len(climate_data_list)
+    assert json_data['status'] == 'Climate data successfully retrieved'
+    expected_data = sorted_data[0:7]
+    assert len(json_data['climate_data']) == 7
+    assert json_data['climate_data'] == expected_data
+
+    '''
+    Success 1 month range
+    '''
+    rv = client.get('/api/sensors/1/climate-data?range_start=2019-12-18&range_end=2020-01-18',
+                    headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 1
+    assert len(ClimateModel.query.all()) == len(climate_data_list)
+    assert len(SensorDataModel.query.all()) == len(climate_data_list)
+    assert json_data['status'] == 'Climate data successfully retrieved'
+    expected_data = sorted_data[0:19]
+    assert len(json_data['climate_data']) == 19
+    assert json_data['climate_data'] == expected_data
+
+    '''
+    Invalid date range
+    '''
+    rv = client.get('/api/sensors/1/climate-data?range_start=false&range_end=test',
+                    headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 1
+    assert len(ClimateModel.query.all()) == len(climate_data_list)
+    assert len(SensorDataModel.query.all()) == len(climate_data_list)
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Invalid date range']
+
+    '''
+    Quantity isn't integer
+    '''
+    rv = client.get('/api/sensors/1/climate-data?quantity=false',
+                    headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 1
+    assert len(ClimateModel.query.all()) == len(climate_data_list)
+    assert len(SensorDataModel.query.all()) == len(climate_data_list)
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Quantity must be an integer']
+
+    '''
+    Quantity is too large
+    '''
+    rv = client.get('/api/sensors/1/climate-data?quantity=55',
+                    headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 1
+    assert len(ClimateModel.query.all()) == len(climate_data_list)
+    assert len(SensorDataModel.query.all()) == len(climate_data_list)
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Quantity must be below or equal to 50 and greater than 0']
+
+    '''
+    Quantity is too small
+    '''
+    rv = client.get('/api/sensors/1/climate-data?quantity=-5',
+                    headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 1
+    assert len(ClimateModel.query.all()) == len(climate_data_list)
+    assert len(SensorDataModel.query.all()) == len(climate_data_list)
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Quantity must be below or equal to 50 and greater than 0']
+
+    '''
+    Invalid token
+    '''
+    rv = client.post('/api/logout/access', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
+
+    rv = client.get('/api/sensors/1/climate-data?quantity=20', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['The token is invalid as it has been revoked']
+
+
+def test_delete_climate_data_endpoint(client, init_database):
+    # Create account
+    email = "email@email.com"
+    password = "password"
+
+    rv = client.post('/api/account', json={
+        'email': email,
+        'password': password
+    })
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+    access_token = json_data['access_token']
+
+    '''
+    Sensor doesn't exist
+    '''
+    rv = client.delete('/api/sensors/1/climate-data', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 500
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 0
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Sensor doesn\'t exist']
+
+    '''
+    Missing auth
+    '''
+    rv = client.delete('/api/sensors/1/climate-data')
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Missing Authorization Header']
+
+    '''
+    Success
+    '''
+    sensor_1 = SensorModel(name='Sensor 1', id=1, user_id=1)
+    climate_data_1 = ClimateModel(sensor_id=1, battery_voltage=4.22, date=datetime(2020, 1, 27, 16, 30, 33, 619535))
+    sensor_data_1 = SensorDataModel(climate_id=1, value=23.45, type='Temperature', unit='c')
+    climate_data_2 = ClimateModel(sensor_id=1, battery_voltage=4.20, date=datetime(2020, 1, 31, 16, 30, 33, 619535))
+    sensor_data_2 = SensorDataModel(climate_id=2, value=23.43, type='Temperature', unit='c')
+    sensor_1.save()
+    climate_data_1.save()
+    sensor_data_1.save()
+    climate_data_2.save()
+    sensor_data_2.save()
+
+    assert len(SensorModel.query.all()) == 1
+    assert len(ClimateModel.query.all()) == 2
+    assert len(SensorDataModel.query.all()) == 2
+    rv = client.delete('/api/sensors/1/climate-data', headers={'Authorization': 'Bearer ' + access_token})
+    json_data = rv.get_json()
+    print(json_data)
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
+    assert json_data['status'] == 'Sensor climate data successfully deleted'
+    assert len(SensorModel.query.all()) == 1
+    assert len(ClimateModel.query.all()) == 0
+    assert len(SensorDataModel.query.all()) == 0
+
+    '''
+    Invalid token
+    '''
+    rv = client.post('/api/logout/access', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
+
+    rv = client.delete('/api/sensors/1/climate-data', headers={'Authorization': 'Bearer ' + access_token})
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['The token is invalid as it has been revoked']
+
+def test_post_climate_data_endpoint(client, init_database):
+    climate_data = {
+        "battery_voltage": 4.3,
+        "date": "2020-01-26 19:00",
+        "climate_data": [{
+            "unit": "c",
+            "value": 23.11,
+            "type": "Temperature"
+        },{
+            "unit": "%",
+            "value": 30,
+            "type": "Humidity"
+        }]
+    }
+
+    '''
+    No JSON data error
+    '''
+    rv = client.post('/api/sensors/1/climate-data?api_key=' + api_key, json={})
+    assert rv.status_code == 400
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['No input data provided']
+    assert len(SensorModel.query.all()) == 0
+    assert len(ClimateModel.query.all()) == 0
+    assert len(SensorDataModel.query.all()) == 0
+
+    '''
+    Missing api_key
+    '''
+    rv = client.post('/api/sensors/1/climate-data', json=climate_data)
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Invalid API key']
+    assert len(SensorModel.query.all()) == 0
+    assert len(ClimateModel.query.all()) == 0
+    assert len(SensorDataModel.query.all()) == 0
+
+    '''
+    Invalid api_key
+    '''
+    rv = client.post('/api/sensors/1/climate-data?api_key=invalid_key', json=climate_data)
+    assert rv.status_code == 401
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Invalid API key']
+    assert len(SensorModel.query.all()) == 0
+    assert len(ClimateModel.query.all()) == 0
+    assert len(SensorDataModel.query.all()) == 0
+
+    '''
+    Sensor doesn't exist
+    '''
+    rv = client.post('/api/sensors/1/climate-data?api_key=' + api_key, json=climate_data)
+    assert rv.status_code == 500
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 0
+    assert len(ClimateModel.query.all()) == 0
+    assert len(SensorDataModel.query.all()) == 0
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == ['Sensor doesn\'t exist']
+
+    '''
+    Missing climate_data
+    '''
+    rv = client.post('/api/sensors/1/climate-data?api_key=' + api_key, json={
+        "battery_voltage": 4.3,
+        "date": "2020-01-26 19:00",
+    })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 0
+    assert len(ClimateModel.query.all()) == 0
+    assert len(SensorDataModel.query.all()) == 0
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {
+        'climate_data': [
+            'Missing data for required field.'
+        ]
+    }
+
+    '''
+    climate_data isn't a list
+    '''
+    rv = client.post('/api/sensors/1/climate-data?api_key=' + api_key, json={
+        "battery_voltage": 4.3,
+        "date": "2020-01-26 19:00",
+        "climate_data": True
+    })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 0
+    assert len(ClimateModel.query.all()) == 0
+    assert len(SensorDataModel.query.all()) == 0
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {
+        'climate_data': [
+            'Not a valid list.'
+        ]
+    }
+
+    '''
+    Missing battery_voltage
+    '''
+    rv = client.post('/api/sensors/1/climate-data?api_key=' + api_key, json={
+        "date": "2020-01-26 19:00",
+        "climate_data": []
+    })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 0
+    assert len(ClimateModel.query.all()) == 0
+    assert len(SensorDataModel.query.all()) == 0
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {
+        'battery_voltage': [
+            'Missing data for required field.'
+        ]
+    }
+
+    '''
+    Battery_voltage isn’t a float number
+    '''
+    rv = client.post('/api/sensors/1/climate-data?api_key=' + api_key, json={
+        "date": "2020-01-26 19:00",
+        "climate_data": [],
+        "battery_voltage": False
+    })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 0
+    assert len(ClimateModel.query.all()) == 0
+    assert len(SensorDataModel.query.all()) == 0
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {
+        'battery_voltage': [
+            'Not a valid number.'
+        ]
+    }
+
+    '''
+    Missing date
+    '''
+    rv = client.post('/api/sensors/1/climate-data?api_key=' + api_key, json={
+        "battery_voltage": 4.3,
+        "climate_data": []
+    })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 0
+    assert len(ClimateModel.query.all()) == 0
+    assert len(SensorDataModel.query.all()) == 0
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {
+        'date': [
+            'Missing data for required field.'
+        ]
+    }
+
+    '''
+    Invalid date
+    '''
+    rv = client.post('/api/sensors/1/climate-data?api_key=' + api_key, json={
+        "battery_voltage": 4.3,
+        "climate_data": [],
+        "date": False
+    })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 0
+    assert len(ClimateModel.query.all()) == 0
+    assert len(SensorDataModel.query.all()) == 0
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {
+        'date': [
+            'Not a valid datetime.'
+        ]
+    }
+
+
+    '''
+    Missing unit
+    '''
+    rv = client.post('/api/sensors/1/climate-data?api_key=' + api_key, json={
+        "battery_voltage": 4.3,
+        "date": "2020-01-26 19:00",
+        "climate_data": [{
+            "value": 23.11,
+            "type": "Temperature"
+        }]
+    })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 0
+    assert len(ClimateModel.query.all()) == 0
+    assert len(SensorDataModel.query.all()) == 0
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {
+        "climate_data": {
+            "0": {
+                "unit": [
+                    "Missing data for required field."
+                ]
+            }
+        }
+    }
+
+    '''
+    Missing value
+    '''
+    rv = client.post('/api/sensors/1/climate-data?api_key=' + api_key, json={
+        "battery_voltage": 4.3,
+        "date": "2020-01-26 19:00",
+        "climate_data": [{
+            "unit": 'c',
+            "type": "Temperature"
+        }]
+    })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 0
+    assert len(ClimateModel.query.all()) == 0
+    assert len(SensorDataModel.query.all()) == 0
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {
+        "climate_data": {
+            "0": {
+                "value": [
+                    "Missing data for required field."
+                ]
+            }
+        }
+    }
+
+    '''
+    Missing type
+    '''
+    rv = client.post('/api/sensors/1/climate-data?api_key=' + api_key, json={
+        "battery_voltage": 4.3,
+        "date": "2020-01-26 19:00",
+        "climate_data": [{
+            "unit": 'c',
+            "value": 23.45
+        }]
+    })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 0
+    assert len(ClimateModel.query.all()) == 0
+    assert len(SensorDataModel.query.all()) == 0
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {
+        "climate_data": {
+            "0": {
+                "type": [
+                    "Missing data for required field."
+                ]
+            }
+        }
+    }
+
+    '''
+    Unit field in climate_data isn’t a string
+    '''
+    rv = client.post('/api/sensors/1/climate-data?api_key=' + api_key, json={
+        "battery_voltage": 4.3,
+        "date": "2020-01-26 19:00",
+        "climate_data": [{
+            "unit": True,
+            "value": 23.45,
+            "type": 'Temperature'
+        }]
+    })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 0
+    assert len(ClimateModel.query.all()) == 0
+    assert len(SensorDataModel.query.all()) == 0
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {
+        "climate_data": {
+            "0": {
+                "unit": [
+                    'Not a valid string.'
+                ]
+            }
+        }
+    }
+
+
+    '''
+    Value field in climate_data isn’t a string
+    '''
+    rv = client.post('/api/sensors/1/climate-data?api_key=' + api_key, json={
+        "battery_voltage": 4.3,
+        "date": "2020-01-26 19:00",
+        "climate_data": [{
+            "unit": 'c',
+            "value": False,
+            "type": 'Temperature'
+        }]
+    })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 0
+    assert len(ClimateModel.query.all()) == 0
+    assert len(SensorDataModel.query.all()) == 0
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {
+        "climate_data": {
+            "0": {
+                "value": [
+                    'Not a valid number.'
+                ]
+            }
+        }
+    }
+
+    '''
+    Type  field in climate_data isn’t a string
+    '''
+    rv = client.post('/api/sensors/1/climate-data?api_key=' + api_key, json={
+        "battery_voltage": 4.3,
+        "date": "2020-01-26 19:00",
+        "climate_data": [{
+            "unit": 'c',
+            "value": 23.45,
+            "type": False
+        }]
+    })
+    assert rv.status_code == 422
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert len(SensorModel.query.all()) == 0
+    assert len(ClimateModel.query.all()) == 0
+    assert len(SensorDataModel.query.all()) == 0
+    assert json_data['status'] == 'Error'
+    assert json_data['errors'] == {
+        "climate_data": {
+            "0": {
+                "type": [
+                    'Not a valid string.'
+                ]
+            }
+        }
+    }
+
+    '''
+    Success
+    '''
+    sensor_1 = SensorModel(name='Sensor 1', id=1, user_id=1)
+    sensor_1.save()
+
+    rv = client.post('/api/sensors/1/climate-data?api_key=' + api_key, json=climate_data)
+    assert rv.status_code == 200
+    assert rv.content_type == 'application/json'
+    json_data = rv.get_json()
+
+    assert json_data['status'] =='Sensor data successfully created.'
+    assert len(SensorModel.query.all()) == 1
+    assert len(ClimateModel.query.all()) == 1
+    assert len(SensorDataModel.query.all()) == 2
+    assert ClimateModel.query.first().to_dict() == {
+        "id": 1,
+        "sensor_id": 1,
+        "battery_voltage": 4.3,
+        "date": "2020-01-26 19:00"
+    }
+    sensor_data = SensorDataModel.query.all()
+    assert sensor_data[0].to_dict() == {
+        "id": 1,
+        "climate_id": 1,
+        "unit": "c",
+        "value": 23.11,
+        "type": "Temperature"
+    }
+    assert sensor_data[1].to_dict() == {
+        "id": 2,
+        "climate_id": 1,
+        "unit": "%",
+        "value": 30,
+        "type": "Humidity"
+    }
+
+def test_remove_old_climate_data(init_database):
+    current_date = datetime.now()
+    sensor_1 = SensorModel(name='Sensor 1', id=1, user_id=1)
+    climate_data_1 = ClimateModel(sensor_id=1, battery_voltage=4.22, date=datetime(2018, 1, 12, 16, 30, 33, 619535))
+    sensor_data_1 = SensorDataModel(climate_id=1, value=23.45, type='Temperature', unit='c')
+    climate_data_2 = ClimateModel(sensor_id=1, battery_voltage=4.20, date=current_date)
+    sensor_data_2 = SensorDataModel(climate_id=2, value=23.43, type='Temperature', unit='c')
+    sensor_1.save()
+    climate_data_1.save()
+    sensor_data_1.save()
+    climate_data_2.save()
+    sensor_data_2.save()
+    assert len(SensorModel.query.all()) == 1
+    assert len(ClimateModel.query.all()) == 2
+    assert len(SensorDataModel.query.all()) == 2
+
+    remove_old_climate_data()
+    assert len(SensorModel.query.all()) == 1
+    assert len(ClimateModel.query.all()) == 1
+    assert len(SensorDataModel.query.all()) == 1
+    assert ClimateModel.query.first().to_dict() == {
+        'id': 2,
+        'sensor_id': 1,
+        'battery_voltage': 4.20,
+        'date': current_date.strftime("%Y-%m-%d %H:%M")
+    }

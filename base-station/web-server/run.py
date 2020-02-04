@@ -839,7 +839,7 @@ class ClimateData(Resource):
                 climate_dict['climate_data'] = sensor_dict_list
                 climate_dict_list.append(climate_dict)
 
-            return {'status': 'Climate data succesfully retrieved', 'climate_data': climate_dict_list}, 200
+            return {'status': 'Climate data successfully retrieved', 'climate_data': climate_dict_list}, 200
         return {'status': 'Error', 'errors': ['Sensor doesn\'t exist']}, 500
 
     @jwt_required
@@ -865,7 +865,7 @@ class ClimateData(Resource):
                     sensor.delete()
                 climate.delete()
 
-            return {'status': ['Sensor climate data successfully deleted']}, 200
+            return {'status': 'Sensor climate data successfully deleted'}, 200
         return {'status': 'Error', 'errors': ['Sensor doesn\'t exist']}, 500
 
 
@@ -1002,7 +1002,7 @@ class Sensors(Resource):
             except:
                 return {'status': 'Error', 'errors': ['Error while adding sensor to database']}, 500
         else:
-            return {'status': 'Error', 'errors': ['Invalid api key']}, 401
+            return {'status': 'Error', 'errors': ['Invalid API key']}, 401
 
     @jwt_required
     def get(self):
