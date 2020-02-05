@@ -1,8 +1,8 @@
 <template>
   <div class="error-list">
     <p v-if="title" class="title">{{ title }}</p>
-    <ul>
-      <li v-for="(error, index) in errors" :key="index">
+    <ul class="errors">
+      <li class="error" v-for="(error, index) in errors" :key="index">
         <p>{{ error }}</p>
       </li>
     </ul>
