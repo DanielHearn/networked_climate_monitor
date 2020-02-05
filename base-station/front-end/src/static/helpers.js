@@ -25,9 +25,7 @@ export const formatClimateData = (type, value, unit) => {
 export const processErrors = errors => {
   const outputErrors = []
   if (Array.isArray(errors)) {
-    for (let error of errors) {
-      outputErrors.push(error)
-    }
+    return errors
   } else if (typeof errors === 'object') {
     for (let errorField in errors) {
       const errorsForType = errors[errorField]
