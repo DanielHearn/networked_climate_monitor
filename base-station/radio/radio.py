@@ -9,7 +9,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 # Config variables
 base_station_id = 255
 network_id = 100
-api_root = 'http://0.0.0.0:5000/api/'
+api_root = 'http://100.89.161.91/api/'
 api_key = 'xgLxTX7Nkem5qc9jllg2'
 encrypt_key = 'pnOvzy105sF5g8Ot'
 number_of_time_periods = 10

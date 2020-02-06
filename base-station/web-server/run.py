@@ -30,6 +30,7 @@ app.config['SECRET_KEY'] = 'a060dc4d401ffdb1b91bf5db8430f88d'
 app.config['JWT_SECRET_KEY'] = '13071ce246c22add4f57eeb916f4d46d'
 app.config['JWT_BLACKLIST_ENABLED'] = True
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
+app.config['PROPAGATE_EXCEPTIONS'] = True
 
 # API key for use by the radio program
 api_key = 'xgLxTX7Nkem5qc9jllg2'
@@ -494,7 +495,7 @@ class UserLogin(Resource):
         except ValidationError as err:
             return {'status': 'Error', 'errors': err.messages}, 422
 
-        current_user = UserModel.find_by_email(data['email'])
+        current_user = UserModel.return_first()
 
         # Cannot login if a user hasn't been registered
         if not current_user:
