@@ -5,6 +5,20 @@ import { setStoredAccessToken, setStoredRefreshToken } from './storage.js'
 
 Vue.use(Vuex)
 
+export const mutations = {
+  setMobile(state, value) {
+    state.mobile = value
+  },
+  setMobileMenu(state, value) {
+    state.mobileMenu = value
+  },
+  setUser(state, value) {
+    state.user = value
+    setStoredAccessToken(value.access_token)
+    setStoredRefreshToken(value.refresh_token)
+  }
+}
+
 export default new Vuex.Store({
   state: {
     mobile: false,
@@ -17,19 +31,5 @@ export default new Vuex.Store({
       settings: {}
     }
   },
-  mutations: {
-    setMobile(state, value) {
-      state.mobile = value
-    },
-    setMobileMenu(state, value) {
-      state.mobileMenu = value
-    },
-    setUser(state, value) {
-      state.user = value
-      setStoredAccessToken(value.access_token)
-      setStoredRefreshToken(value.refresh_token)
-    }
-  },
-  actions: {},
-  modules: {}
+  mutations: mutations
 })

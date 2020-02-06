@@ -1,9 +1,9 @@
-const fields = {
+export const fields = {
   access_token: 'access_token',
   refresh_token: 'refresh_token'
 }
 
-const localStorage = window.localStorage
+export const localStorage = window.localStorage
 
 // Getters
 export const getStoredAccessToken = function() {
