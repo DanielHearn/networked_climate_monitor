@@ -1,6 +1,6 @@
 // For authoring Nightwatch tests, see
 // https://nightwatchjs.org/guide
-const baseUrl = 'http://100.89.161.91'
+const baseUrl = 'http://127.0.0.1:5000'
 const email = 'email@email.com'
 const password = 'newpassword'
 
@@ -17,6 +17,22 @@ module.exports = {
       .url(`${baseUrl}/register`)
       .waitForElementVisible('body')
       .assert.title('Register - Climate Monitor')
+      .end()
+  },
+  'register user': browser => {
+    browser
+      .url(`${baseUrl}/register`)
+      .waitForElementVisible('body')
+      .waitForElementPresent('#register', 5000)
+      .setValue('#register [name="email"]', email)
+      .setValue('#register [name="password"]', password)
+      .setValue('#register [name="confirmPassword"]', password)
+      .click('#register [type="submit"]')
+      .waitForElementPresent('.register-success', 5000)
+      .assert.containsText(
+        '.register-success',
+        'The account has been successfully registered'
+      )
       .end()
   },
   'login loads': browser => {

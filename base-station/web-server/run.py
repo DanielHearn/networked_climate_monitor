@@ -1199,7 +1199,10 @@ def init():
 
     print('Starting server')
     # Run API on local network IP
-    app.run(debug=True, host='0.0.0.0')
+    if app.config['TEST_SERVER']:
+        app.run(debug=True, host='127.0.0.1')
+    else:
+        app.run(debug=True, host='0.0.0.0')
 
     # Shutdown any scheduler jobs
     old_climate_job.remove()

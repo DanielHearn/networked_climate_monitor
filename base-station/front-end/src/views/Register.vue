@@ -14,7 +14,7 @@
           >
         </template>
         <template v-else>
-          <p class="text bold">
+          <p class="text bold register-success">
             The account has been successfully registered
           </p>
           <p class="text">
