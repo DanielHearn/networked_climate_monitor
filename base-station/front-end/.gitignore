@@ -1,6 +1,8 @@
 .DS_Store
 node_modules
 /dist
+/web-server/static
+/web-server/templates
 
 /tests/e2e/reports/
 selenium-debug.log
