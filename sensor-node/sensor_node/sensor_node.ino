@@ -355,8 +355,13 @@ void processPacket() {
           i = retries;
           packet_received = true;
         }
+        
+        if(packet_type == "RI") {
+          Serial.println("Re-initialisation request received");
+          initialised = false;
+        }
 
-        control_tokenken = strtok(NULL, ",");
+        control_token = strtok(NULL, ",");
       }
 
       // 
@@ -388,11 +393,8 @@ void processPacket() {
           if(initialised == false) {
             initialised = true;
           }
-        } else if(packet_type == "RI") {
-          Serial.println("Re-initialisation request received");
-          initialised = false;
         }
-
+        
         main_token = strtok(NULL, ",");
       }
       
