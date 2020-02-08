@@ -861,11 +861,14 @@ class ClimateData(Resource):
                 climate_id = climate_dict['id']
 
                 # Delete all sensor data for the climate data
-                sensor_data = SensorDataModel.query.filter_by(climate_id=climate_id)
-                for sensor in sensor_data:
-                    sensor.delete()
-                climate.delete()
+                sensor_data = SensorDataModel.__table__.delete().where(SensorDataModel.climate_id == climate_id)
+                db.session.execute(sensor_data)
+                db.session.commit()
 
+            # Delete climate data
+            climate_data = ClimateModel.__table__.delete().where(ClimateModel.sensor_id == sensor_id)
+            db.session.execute(climate_data)
+            db.session.commit()
             return {'status': 'Sensor climate data successfully deleted'}, 200
         return {'status': 'Error', 'errors': ['Sensor doesn\'t exist']}, 500
 
@@ -929,12 +932,14 @@ class Sensor(Resource):
                 climate_id = climate_dict['id']
 
                 # Delete all sensor data for the climate data
-                sensor_data = SensorDataModel.query.filter_by(climate_id=climate_id)
-                for sensor in sensor_data:
-                    sensor.delete()
+                sensor_data = SensorDataModel.__table__.delete().where(SensorDataModel.climate_id == climate_id)
+                db.session.execute(sensor_data)
+                db.session.commit()
 
-                # Delete climate data
-                climate.delete()
+            # Delete climate data
+            climate_data = ClimateModel.__table__.delete().where(ClimateModel.sensor_id==sensor_id)
+            db.session.execute(climate_data)
+            db.session.commit()
             return {'status': 'Sensor successfully deleted'}, 200
         return {'status': 'Error', 'errors': ['Sensor doesn\'t exist']}, 500
 
@@ -1182,10 +1187,14 @@ def remove_old_climate_data():
             climate_id = climate_dict['id']
 
             # Delete all sensor data for the climate data
-            sensor_data = SensorDataModel.query.filter_by(climate_id=climate_id)
-            for sensor_d in sensor_data:
-                sensor_d.delete()
-            climate.delete()
+            sensor_data = SensorDataModel.__table__.delete().where(SensorDataModel.climate_id == climate_id)
+            db.session.execute(sensor_data)
+            db.session.commit()
+
+        # Delete climate data
+        climate_data = ClimateModel.__table__.delete().where(ClimateModel.sensor_id == sensor_id).where(ClimateModel.date <= old_time)
+        db.session.execute(climate_data)
+        db.session.commit()
 
 
 def init():
