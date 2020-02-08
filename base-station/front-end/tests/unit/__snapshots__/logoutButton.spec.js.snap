@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LogoutButton has the expected html structure 1`] = `
+<v-button-stub
+  hierachylevel="secondary"
+  isicon="true"
+  text="person"
+/>
+`;
+
+exports[`LogoutButton has the expected html structure 2`] = `
+<v-button-stub
+  hierachylevel="secondary"
+  isicon="true"
+  text="person"
+/>
+`;

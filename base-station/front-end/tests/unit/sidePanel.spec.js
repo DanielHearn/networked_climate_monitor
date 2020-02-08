@@ -2,9 +2,15 @@ import { mount } from '@vue/test-utils'
 import SidePanel from './../../src/components/SidePanel/SidePanel.vue'
 
 describe('SidePanel.vue', () => {
+  let wrapper
+
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
   it('Header Slot', () => {
     const content = '<p>Header Content</p>'
-    const wrapper = mount(SidePanel, {
+    wrapper = mount(SidePanel, {
       slots: {
         header: content
       }
@@ -15,7 +21,7 @@ describe('SidePanel.vue', () => {
 
   it('Main Slot', () => {
     const content = '<p>Main Content</p>'
-    const wrapper = mount(SidePanel, {
+    wrapper = mount(SidePanel, {
       slots: {
         content: content
       }
@@ -27,7 +33,7 @@ describe('SidePanel.vue', () => {
   it('Main and Content Slots', () => {
     const mainContent = '<p>Main Content</p>'
     const headerContent = '<p>Header Content</p>'
-    const wrapper = mount(SidePanel, {
+    wrapper = mount(SidePanel, {
       slots: {
         content: mainContent,
         header: headerContent
@@ -36,5 +42,9 @@ describe('SidePanel.vue', () => {
 
     expect(wrapper.html()).toContain(mainContent)
     expect(wrapper.html()).toContain(headerContent)
+  })
+
+  it('has the expected html structure', () => {
+    expect(wrapper.element).toMatchSnapshot()
   })
 })

@@ -2,9 +2,15 @@ import { mount } from '@vue/test-utils'
 import MainPanel from './../../src/components/MainPanel/MainPanel.vue'
 
 describe('MainPanel.vue', () => {
+  let wrapper
+
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
   it('Header Slot', () => {
     const content = '<p>Header Content</p>'
-    const wrapper = mount(MainPanel, {
+    wrapper = mount(MainPanel, {
       slots: {
         header: content
       }
@@ -15,7 +21,7 @@ describe('MainPanel.vue', () => {
 
   it('Main Slot', () => {
     const content = '<p>Main Content</p>'
-    const wrapper = mount(MainPanel, {
+    wrapper = mount(MainPanel, {
       slots: {
         content: content
       }
@@ -27,7 +33,7 @@ describe('MainPanel.vue', () => {
   it('Main and Content Slots', () => {
     const mainContent = '<p>Main Content</p>'
     const headerContent = '<p>Header Content</p>'
-    const wrapper = mount(MainPanel, {
+    wrapper = mount(MainPanel, {
       slots: {
         content: mainContent,
         header: headerContent
@@ -36,5 +42,9 @@ describe('MainPanel.vue', () => {
 
     expect(wrapper.html()).toContain(mainContent)
     expect(wrapper.html()).toContain(headerContent)
+  })
+
+  it('has the expected html structure', () => {
+    expect(wrapper.element).toMatchSnapshot()
   })
 })

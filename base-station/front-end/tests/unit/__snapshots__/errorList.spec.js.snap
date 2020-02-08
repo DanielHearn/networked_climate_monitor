@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ErrorList.vue has the expected html structure 1`] = `
+<div
+  class="error-list"
+>
+  <p
+    class="title"
+  >
+    Errors:
+  </p>
+   
+  <ul
+    class="errors"
+  >
+    <li
+      class="error"
+    >
+      <p>
+        Error 1
+      </p>
+    </li>
+    <li
+      class="error"
+    >
+      <p>
+        Error 2
+      </p>
+    </li>
+    <li
+      class="error"
+    >
+      <p>
+        Error 3
+      </p>
+    </li>
+  </ul>
+</div>
+`;

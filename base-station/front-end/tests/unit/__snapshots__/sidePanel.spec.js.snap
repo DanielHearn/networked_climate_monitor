@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SidePanel.vue has the expected html structure 1`] = `
+<div
+  class="side-panel"
+>
+  <div
+    class="side-panel-header"
+  >
+    <p>
+      Header Content
+    </p>
+  </div>
+   
+  <div
+    class="side-panel-content"
+  >
+    <p>
+      Main Content
+    </p>
+  </div>
+</div>
+`;

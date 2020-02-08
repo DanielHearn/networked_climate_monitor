@@ -2,8 +2,10 @@ import { mount } from '@vue/test-utils'
 import Chart from './../../src/components/Chart/Chart.js'
 
 describe('Chart.vue', () => {
-  it('props', () => {
-    const wrapper = mount(Chart, {
+  let wrapper
+
+  beforeEach(() => {
+    wrapper = mount(Chart, {
       propsData: {
         chartData: {
           labels: ['January', 'February'],
@@ -21,6 +23,17 @@ describe('Chart.vue', () => {
         }
       }
     })
+  })
+
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('props', () => {
     expect(wrapper.find('#line-chart').exists()).toBe(true)
+  })
+
+  it('has the expected html structure', () => {
+    expect(wrapper.element).toMatchSnapshot()
   })
 })

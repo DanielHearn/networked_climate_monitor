@@ -2,14 +2,22 @@ import { mount } from '@vue/test-utils'
 import ErrorList from './../../src/components/ErrorList/ErrorList.vue'
 
 describe('ErrorList.vue', () => {
-  it('props', () => {
-    const wrapper = mount(ErrorList, {
+  let wrapper
+
+  beforeEach(() => {
+    wrapper = mount(ErrorList, {
       propsData: {
         title: 'Errors:',
         errors: ['Error 1', 'Error 2', 'Error 3']
       }
     })
+  })
 
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('props', () => {
     expect(wrapper.find('.title').exists()).toBe(true)
     expect(wrapper.find('.title').text()).toBe('Errors:')
     const errors = wrapper.findAll('.errors .error')
@@ -18,5 +26,9 @@ describe('ErrorList.vue', () => {
       const element = errors.at(i)
       expect(element.text()).toBe(`Error ${i + 1}`)
     }
+  })
+
+  it('has the expected html structure', () => {
+    expect(wrapper.element).toMatchSnapshot()
   })
 })
