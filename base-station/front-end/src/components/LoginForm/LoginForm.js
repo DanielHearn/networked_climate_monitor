@@ -54,8 +54,6 @@ export default {
               })
 
             this.$store.commit('setUser', user)
-            this.$toasted.show('Logged in')
-
             this.$router.push('/dashboard')
           }
         })

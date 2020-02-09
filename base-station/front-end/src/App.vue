@@ -18,14 +18,17 @@
 
 <script>
 // Helper imports
-import { getAccount } from './static/api.js'
+import {
+  getAccount,
+  logoutAccessToken,
+  logoutRefreshToken
+} from './static/api.js'
 import {
   getStoredAccessToken,
   getStoredRefreshToken,
   setStoredAccessToken,
   setStoredRefreshToken
 } from './store/storage.js'
-import { logoutAccessToken, logoutRefreshToken } from '../static/api'
 
 // Component imports
 import vNav from './components/Nav/Nav.vue'
@@ -71,8 +74,6 @@ export default {
               )
 
               this.$store.commit('setUser', user)
-
-              this.$toasted.show('Logged in')
             }
           })
           .catch(e => {
@@ -94,41 +95,38 @@ export default {
 
     // Assign an event listener to check screen size on resize if the user resizes the window
     window.addEventListener('resize', this.checkScreenSize)
-
-    this.$store.watch(
-      (state, getters) => getters.user,
-      (newValue, oldValue) => {
-        console.log(`Updating from ${oldValue} to ${newValue}`)
-
-        if (newValue !== oldValue) {
-          if (newValue.logged_in) {
-            this.$toasted.show('Logged in')
-            setStoredAccessToken(newValue.access_token)
-            setStoredRefreshToken(newValue.refresh_token)
-          } else {
-            this.$toasted.show('Logged out')
-            if (this.$route.name !== 'home') {
-              this.$router.push('/')
-            }
-
-            setStoredAccessToken('')
-            setStoredRefreshToken('')
-
-            logoutAccessToken(oldValue.accessToken)
-              .then(() => {})
-              .catch(e => {
-                console.warn(e.response)
-              })
-
-            logoutRefreshToken(oldValue.refreshToken)
-              .then(() => {})
-              .catch(e => {
-                console.warn(e.response)
-              })
+    this.$store.subscribe((mutation, state) => {
+      if (mutation.type === 'setUser') {
+        if (state.user.logged_in) {
+          this.$toasted.show('Logged in')
+          setStoredAccessToken(state.user.access_token)
+          setStoredRefreshToken(state.user.refresh_token)
+        } else {
+          this.$toasted.show('Logged out')
+          if (this.$route.name !== 'home') {
+            this.$router.push('/')
           }
+
+          const accessToken = getStoredAccessToken()
+          const refreshToken = getStoredRefreshToken()
+
+          logoutAccessToken(accessToken)
+            .then(() => {})
+            .catch(e => {
+              console.warn(e.response)
+            })
+
+          logoutRefreshToken(refreshToken)
+            .then(() => {})
+            .catch(e => {
+              console.warn(e.response)
+            })
+
+          setStoredAccessToken('')
+          setStoredRefreshToken('')
         }
       }
-    )
+    })
   }
 }
 </script>
