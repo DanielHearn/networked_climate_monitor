@@ -1,21 +1,35 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import { setStoredAccessToken, setStoredRefreshToken } from './storage.js'
-
 Vue.use(Vuex)
 
 export const mutations = {
   setMobile(state, value) {
-    state.mobile = value
+    Vue.set(state, 'mobile', value)
   },
   setMobileMenu(state, value) {
-    state.mobileMenu = value
+    Vue.set(state, 'mobileMenu', value)
   },
   setUser(state, value) {
-    state.user = value
-    setStoredAccessToken(value.access_token)
-    setStoredRefreshToken(value.refresh_token)
+    Vue.set(state, 'user', value)
+  }
+}
+
+export const getters = {
+  mobile: state => state.mobile,
+  mobileMenu: state => state.mobileMenu,
+  user: state => state.user
+}
+
+export const actions = {
+  logout({ commit, state }) {
+    const user = state.user
+
+    user.logged_in = false
+    user.access_token = ''
+    user.refresh_token = ''
+    user.email = ''
+    commit('setUser', user)
   }
 }
 
@@ -31,7 +45,9 @@ export const storeConfig = {
       settings: {}
     }
   },
-  mutations: mutations
+  getters,
+  mutations,
+  actions
 }
 
 export default new Vuex.Store(storeConfig)

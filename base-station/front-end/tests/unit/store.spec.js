@@ -1,8 +1,8 @@
-import { mutations } from './../../src/store/index.js'
+import { mutations, actions } from './../../src/store/index.js'
 import cloneDeep from 'lodash'
-import { fields, localStorage } from './../../src/store/storage.js'
 
 const { setMobile, setMobileMenu, setUser } = mutations
+const { logout } = actions
 const defaultState = {
   mobile: false,
   mobileMenu: false,
@@ -12,6 +12,39 @@ const defaultState = {
     logged_in: false,
     email: '',
     settings: {}
+  }
+}
+
+// helper for testing action with expected mutations
+const testAction = (action, payload, state, expectedMutations, done) => {
+  let count = 0
+
+  // mock commit
+  const commit = (type, payload) => {
+    const mutation = expectedMutations[count]
+
+    try {
+      expect(type).toBe(mutation.type)
+      if (payload) {
+        expect(payload).toEqual(mutation.payload)
+      }
+    } catch (error) {
+      done(error)
+    }
+
+    count++
+    if (count >= expectedMutations.length) {
+      done()
+    }
+  }
+
+  // call the action with mocked store and arguments
+  action({ commit, state }, payload)
+
+  // check if no mutations should have been dispatched
+  if (expectedMutations.length === 0) {
+    expect(count).toBe(0)
+    done()
   }
 }
 
@@ -63,11 +96,31 @@ describe('store', () => {
     setUser(state, user)
 
     expect(state.user).toEqual(user)
-    expect(JSON.parse(localStorage.getItem(fields.access_token))).toBe(
-      user.access_token
-    )
-    expect(JSON.parse(localStorage.getItem(fields.refresh_token))).toBe(
-      user.refresh_token
-    )
+  })
+
+  it('logout', done => {
+    const state = cloneDeep(defaultState)
+    const user = {
+      access_token: 'access1234',
+      refresh_token: 'refresh1234',
+      logged_in: true,
+      email: 'email@email.com',
+      settings: {
+        temperature_unit: 'c'
+      }
+    }
+
+    setUser(state, user)
+    expect(state.user).toEqual(user)
+    testAction(logout, null, state, [{ type: 'setUser', payload: user }], done)
+    expect(state.user).toEqual({
+      access_token: '',
+      refresh_token: '',
+      logged_in: false,
+      email: '',
+      settings: {
+        temperature_unit: 'c'
+      }
+    })
   })
 })

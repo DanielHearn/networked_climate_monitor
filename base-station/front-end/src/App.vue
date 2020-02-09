@@ -19,11 +19,18 @@
 <script>
 // Helper imports
 import { getAccount } from './static/api.js'
-import { getStoredAccessToken, getStoredRefreshToken } from './store/storage.js'
+import {
+  getStoredAccessToken,
+  getStoredRefreshToken,
+  setStoredAccessToken,
+  setStoredRefreshToken
+} from './store/storage.js'
+import { logoutAccessToken, logoutRefreshToken } from '../static/api'
 
 // Component imports
 import vNav from './components/Nav/Nav.vue'
 import MobileMenu from './components/MobileMenu/MobileMenu.vue'
+import { mapState } from 'vuex'
 
 export default {
   name: 'app',
@@ -31,6 +38,7 @@ export default {
     vNav,
     MobileMenu
   },
+  computed: mapState(['user']),
   methods: {
     checkScreenSize: function() {
       // Update mobile state if the browser's window with is below threshold
@@ -86,6 +94,41 @@ export default {
 
     // Assign an event listener to check screen size on resize if the user resizes the window
     window.addEventListener('resize', this.checkScreenSize)
+
+    this.$store.watch(
+      (state, getters) => getters.user,
+      (newValue, oldValue) => {
+        console.log(`Updating from ${oldValue} to ${newValue}`)
+
+        if (newValue !== oldValue) {
+          if (newValue.logged_in) {
+            this.$toasted.show('Logged in')
+            setStoredAccessToken(newValue.access_token)
+            setStoredRefreshToken(newValue.refresh_token)
+          } else {
+            this.$toasted.show('Logged out')
+            if (this.$route.name !== 'home') {
+              this.$router.push('/')
+            }
+
+            setStoredAccessToken('')
+            setStoredRefreshToken('')
+
+            logoutAccessToken(oldValue.accessToken)
+              .then(() => {})
+              .catch(e => {
+                console.warn(e.response)
+              })
+
+            logoutRefreshToken(oldValue.refreshToken)
+              .then(() => {})
+              .catch(e => {
+                console.warn(e.response)
+              })
+          }
+        }
+      }
+    )
   }
 }
 </script>
