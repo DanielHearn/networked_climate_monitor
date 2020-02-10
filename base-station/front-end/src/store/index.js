@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { getAccount } from './../static/api'
 
 Vue.use(Vuex)
 
@@ -22,6 +23,16 @@ export const getters = {
 }
 
 export const actions = {
+  login({ commit, state, dispatch }, data) {
+    const user = state.user
+    user.logged_in = true
+    user.access_token = data.access_token
+    user.refresh_token = data.refresh_token
+    user.email = data.email
+
+    commit('setUser', user)
+    dispatch('retrieveAccount', data.access_token)
+  },
   logout({ commit, state }) {
     const user = state.user
 
@@ -30,6 +41,21 @@ export const actions = {
     user.refresh_token = ''
     user.email = ''
     commit('setUser', user)
+  },
+  retrieveAccount({ commit, state }, accessToken) {
+    getAccount(accessToken)
+      .then(response => {
+        const data = response.data
+        if (data.status && data.account) {
+          const user = state.user
+          user.settings = JSON.parse(data.account.settings.replace(/'/g, '"'))
+
+          commit('setUser', user)
+        }
+      })
+      .catch(e => {
+        console.warn(e)
+      })
   }
 }
 

@@ -1,0 +1,72 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LoginForm.vue has the expected html structure 1`] = `
+<form
+  class="form"
+  id="login"
+  method="post"
+>
+  <div
+    class="input-box"
+  >
+    <p
+      class="text"
+    >
+      Email
+    </p>
+     
+    <input
+      autocomplete="email"
+      class="input--text"
+      name="email"
+      placeholder="Email"
+      tabindex="0"
+      type="email"
+    />
+  </div>
+   
+  <div
+    class="input-box"
+  >
+    <p
+      class="text"
+    >
+      Password
+    </p>
+     
+    <input
+      autocomplete="password"
+      class="input--text"
+      name="password"
+      placeholder="Password"
+      tabindex="0"
+      type="password"
+    />
+  </div>
+   
+  <router-link-stub
+    class="link"
+    tabindex="-1"
+    to="/reset-password"
+  >
+    Forgotten your password? Click here
+  </router-link-stub>
+   
+  <!---->
+   
+  <v-button-stub
+    hierachylevel="primary"
+    tabindex="0"
+    text="Login"
+    type="submit"
+    value="Submit"
+  />
+   
+  <router-link-stub
+    class="link"
+    to="/register"
+  >
+    Not registered? Click here to register
+  </router-link-stub>
+</form>
+`;

@@ -1,10 +1,6 @@
 import ErrorList from './../ErrorList/ErrorList.vue'
-import { getAccount, login } from './../../static/api'
+import { login } from './../../static/api'
 import { processErrors } from './../../static/helpers'
-import {
-  setStoredAccessToken,
-  setStoredRefreshToken
-} from './../../store/storage.js'
 import vButton from './../vButton/vButton.vue'
 
 export default {
@@ -28,33 +24,8 @@ export default {
         .then(response => {
           const data = response.data
           if (data.status && data.access_token && data.refresh_token) {
-            const user = this.$store.state.user
-            user.logged_in = true
-            user.access_token = data.access_token
-            user.refresh_token = data.refresh_token
-            user.email = email
-
-            setStoredAccessToken(data.access_token)
-            setStoredRefreshToken(data.refresh_token)
-
-            getAccount(data.access_token)
-              .then(response => {
-                const data = response.data
-                if (data.status && data.account) {
-                  const user = this.$store.state.user
-                  user.settings = JSON.parse(
-                    data.account.settings.replace(/'/g, '"')
-                  )
-
-                  this.$store.commit('setUser', user)
-                }
-              })
-              .catch(e => {
-                console.warn(e)
-              })
-
-            this.$store.commit('setUser', user)
-            this.$router.push('/dashboard')
+            data.email = email
+            this.$store.dispatch('login', data)
           }
         })
         .catch(e => {
@@ -74,7 +45,7 @@ export default {
       let valid = true
 
       if (email === '') {
-        this.errors.push('Enter a email.')
+        this.errors.push('Enter an email.')
         valid = false
       } else if (email.indexOf('@') === -1) {
         this.errors.push('Enter a valid email.')

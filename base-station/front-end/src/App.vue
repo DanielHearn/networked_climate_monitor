@@ -68,12 +68,7 @@ export default {
               user.email = data.account.email
               user.reset_token = data.account.reset_token
 
-              // Parse the settings json data from a string
-              user.settings = JSON.parse(
-                data.account.settings.replace(/'/g, '"')
-              )
-
-              this.$store.commit('setUser', user)
+              this.$store.dispatch('login', user)
             }
           })
           .catch(e => {
@@ -95,28 +90,30 @@ export default {
 
     // Assign an event listener to check screen size on resize if the user resizes the window
     window.addEventListener('resize', this.checkScreenSize)
-    this.$store.subscribe((mutation, state) => {
-      if (mutation.type === 'setUser') {
-        if (state.user.logged_in) {
+
+    this.$store.subscribeAction(action => {
+      switch (action.type) {
+        case 'login':
           this.$toasted.show('Logged in')
-          setStoredAccessToken(state.user.access_token)
-          setStoredRefreshToken(state.user.refresh_token)
-        } else {
+          setStoredAccessToken(action.payload.access_token)
+          setStoredRefreshToken(action.payload.refresh_token)
+          if (this.$route.name !== 'dashboard') {
+            this.$router.push('/dashboard')
+          }
+          break
+        case 'logout':
           this.$toasted.show('Logged out')
           if (this.$route.name !== 'home') {
             this.$router.push('/')
           }
 
-          const accessToken = getStoredAccessToken()
-          const refreshToken = getStoredRefreshToken()
-
-          logoutAccessToken(accessToken)
+          logoutAccessToken(getStoredAccessToken())
             .then(() => {})
             .catch(e => {
               console.warn(e.response)
             })
 
-          logoutRefreshToken(refreshToken)
+          logoutRefreshToken(getStoredRefreshToken())
             .then(() => {})
             .catch(e => {
               console.warn(e.response)
@@ -124,7 +121,7 @@ export default {
 
           setStoredAccessToken('')
           setStoredRefreshToken('')
-        }
+          break
       }
     })
   }
