@@ -67,8 +67,12 @@ export default {
               user.refresh_token = refreshToken
               user.email = data.account.email
               user.reset_token = data.account.reset_token
+              user.settings = JSON.parse(
+                data.account.settings.replace(/'/g, '"')
+              )
+              console.log(data.account.settings.replace(/'/g, '"'))
 
-              this.$store.dispatch('login', user)
+              this.$store.dispatch('login', user, false)
             }
           })
           .catch(e => {
@@ -97,14 +101,15 @@ export default {
           this.$toasted.show('Logged in')
           setStoredAccessToken(action.payload.access_token)
           setStoredRefreshToken(action.payload.refresh_token)
-          if (this.$route.name !== 'dashboard') {
-            this.$router.push('/dashboard')
+
+          if (this.$route.name === 'login' || this.$route.name === null) {
+            this.$router.push({ name: 'dashboard' })
           }
           break
         case 'logout':
           this.$toasted.show('Logged out')
-          if (this.$route.name !== 'home') {
-            this.$router.push('/')
+          if (this.$route.name !== 'home' || this.$route.name === null) {
+            this.$router.push({ name: 'home' })
           }
 
           logoutAccessToken(getStoredAccessToken())

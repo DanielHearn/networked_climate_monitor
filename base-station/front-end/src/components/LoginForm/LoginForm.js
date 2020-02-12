@@ -25,7 +25,8 @@ export default {
           const data = response.data
           if (data.status && data.access_token && data.refresh_token) {
             data.email = email
-            this.$store.dispatch('login', data)
+            this.$store.dispatch('login', data, true)
+            this.$router.push({ name: 'dashboard' })
           }
         })
         .catch(e => {

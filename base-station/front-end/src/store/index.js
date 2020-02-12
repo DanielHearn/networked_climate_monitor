@@ -23,15 +23,12 @@ export const getters = {
 }
 
 export const actions = {
-  login({ commit, state, dispatch }, data) {
-    const user = state.user
-    user.logged_in = true
-    user.access_token = data.access_token
-    user.refresh_token = data.refresh_token
-    user.email = data.email
+  login({ commit, dispatch }, data, doRetrieveAcc) {
+    commit('setUser', data)
 
-    commit('setUser', user)
-    dispatch('retrieveAccount', data.access_token)
+    if (doRetrieveAcc) {
+      dispatch('retrieveAccount', data.access_token)
+    }
   },
   logout({ commit, state }) {
     const user = state.user
@@ -40,6 +37,7 @@ export const actions = {
     user.access_token = ''
     user.refresh_token = ''
     user.email = ''
+
     commit('setUser', user)
   },
   retrieveAccount({ commit, state }, accessToken) {
@@ -48,6 +46,10 @@ export const actions = {
         const data = response.data
         if (data.status && data.account) {
           const user = state.user
+          user.email = data.account.email
+          user.access_token = data.account.access_token
+          user.refresh_token = data.account.refresh_token
+          user.reset_token = data.account.reset_token
           user.settings = JSON.parse(data.account.settings.replace(/'/g, '"'))
 
           commit('setUser', user)
