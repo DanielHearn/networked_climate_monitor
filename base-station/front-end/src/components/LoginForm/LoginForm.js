@@ -19,14 +19,13 @@ export default {
   methods: {
     login: function(email, password) {
       this.$toasted.show('Sending login request')
-
       login(email, password)
         .then(response => {
           const data = response.data
           if (data.status && data.access_token && data.refresh_token) {
             data.email = email
+            data.logged_in = true
             this.$store.dispatch('login', data, true)
-            this.$router.push({ name: 'dashboard' })
           }
         })
         .catch(e => {
@@ -40,7 +39,6 @@ export default {
     checkLogin: function(e) {
       e.preventDefault()
       this.errors = []
-
       const email = this.email
       const password = this.password
       let valid = true

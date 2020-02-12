@@ -97,6 +97,10 @@ export default {
 
     this.$store.subscribeAction(action => {
       switch (action.type) {
+        case 'register':
+          setStoredAccessToken(action.payload.access_token)
+          setStoredRefreshToken(action.payload.refresh_token)
+          break
         case 'login':
           this.$toasted.show('Logged in')
           setStoredAccessToken(action.payload.access_token)

@@ -30,6 +30,10 @@ export const actions = {
       dispatch('retrieveAccount', data.access_token)
     }
   },
+  register({ commit, dispatch }, data) {
+    commit('setUser', data)
+    dispatch('retrieveAccount', data.access_token)
+  },
   logout({ commit, state }) {
     const user = state.user
 
