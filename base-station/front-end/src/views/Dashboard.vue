@@ -470,7 +470,7 @@ export default {
         yAxes: [
           {
             ticks: {
-              beginAtZero: true,
+              beginAtZero: false,
               callback: function(value) {
                 return `${value}v`
               }
