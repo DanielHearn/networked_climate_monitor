@@ -1,28 +1,33 @@
 import Vuex from 'vuex'
 import { createLocalVue, shallowMount } from '@vue/test-utils'
-import RegisterForm from './../../src/components/RegisterForm/RegisterForm.vue'
-import { register } from './../../src/static/api.js'
+import ResetPasswordForm from './../../src/components/ResetPasswordForm/ResetPasswordForm.vue'
+import { changePassword } from './../../src/static/api.js'
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
 jest.mock('./../../src/static/api.js')
 
 const actions = {
-  register: jest.fn()
+  updateResetToken: jest.fn()
 }
 
-describe('RegisterForm.vue', () => {
+const $toasted = {
+  show: jest.fn()
+}
+
+describe('ResetPasswordForm.vue', () => {
   let wrapper
   let store
 
   beforeEach(() => {
     store = new Vuex.Store({ actions })
-    wrapper = shallowMount(RegisterForm, {
+    wrapper = shallowMount(ResetPasswordForm, {
+      propsData: {
+        currentResetToken: ''
+      },
       mocks: {
-        $toasted: {
-          show: jest.fn()
-        },
-        register: jest.fn()
+        $toasted,
+        changePassword: jest.fn()
       },
       stubs: ['router-link'],
       store,
@@ -39,21 +44,20 @@ describe('RegisterForm.vue', () => {
     const response = {
       data: {
         status: 'Success',
-        access_token: '1234',
-        refresh_token: '1234'
+        new_reset_token: '12345'
       }
     }
-    register.mockResolvedValueOnce(response)
+    changePassword.mockResolvedValueOnce(response)
 
-    const email = 'email@email.com'
+    const token = '1234'
     const password = 'password'
     const confirmPassword = password
 
-    const emailInput = wrapper.find('input[name="email"]')
-    emailInput.element.value = email
-    emailInput.trigger('input')
+    const tokenInput = wrapper.find('input[name="resetToken"]')
+    tokenInput.element.value = token
+    tokenInput.trigger('input')
 
-    const passwordInput = wrapper.find('input[name="password"]')
+    const passwordInput = wrapper.find('input[name="newPassword"]')
     passwordInput.element.value = password
     passwordInput.trigger('input')
 
@@ -61,150 +65,126 @@ describe('RegisterForm.vue', () => {
     confirmPasswordInput.element.value = confirmPassword
     confirmPasswordInput.trigger('input')
 
-    expect(wrapper.vm.email).toBe(email)
-    expect(wrapper.vm.password).toBe(password)
+    expect(wrapper.vm.resetToken).toBe(token)
+    expect(wrapper.vm.newPassword).toBe(password)
+    expect(wrapper.vm.confirmPassword).toBe(confirmPassword)
+
+    wrapper.trigger('submit')
+    expect($toasted.show).toHaveBeenCalledWith('Sending change request')
+    await wrapper.vm.$nextTick()
+
+    expect($toasted.show).toHaveBeenCalledWith('Password changed')
+    expect(actions.updateResetToken).toHaveBeenCalledTimes(1)
+    expect(wrapper.vm.errors).toEqual([])
+    expect(wrapper.vm.newResetToken).toBe('12345')
+  })
+
+  it('Missing reset token', async () => {
+    const password = 'password'
+    const confirmPassword = password
+
+    const passwordInput = wrapper.find('input[name="newPassword"]')
+    passwordInput.element.value = password
+    passwordInput.trigger('input')
+
+    const confirmPasswordInput = wrapper.find('input[name="confirmPassword"]')
+    confirmPasswordInput.element.value = confirmPassword
+    confirmPasswordInput.trigger('input')
+
+    expect(wrapper.vm.resetToken).toBe('')
+    expect(wrapper.vm.newPassword).toBe(password)
     expect(wrapper.vm.confirmPassword).toBe(confirmPassword)
 
     wrapper.trigger('submit')
 
     await wrapper.vm.$nextTick()
 
-    expect(actions.register).toHaveBeenCalledTimes(1)
-    expect(wrapper.vm.errors).toEqual([])
-  })
-
-  it('Missing email', async () => {
-    const password = 'password'
-    const confirmPassword = password
-
-    const passwordInput = wrapper.find('input[name="password"]')
-    passwordInput.element.value = password
-    passwordInput.trigger('input')
-
-    const confirmPasswordInput = wrapper.find('input[name="confirmPassword"]')
-    confirmPasswordInput.element.value = confirmPassword
-    confirmPasswordInput.trigger('input')
-
-    expect(wrapper.vm.email).toBe('')
-    expect(wrapper.vm.password).toBe(password)
-    expect(wrapper.vm.password).toBe(confirmPassword)
-
-    wrapper.trigger('submit')
-
-    await wrapper.vm.$nextTick()
-
-    expect(actions.register).toHaveBeenCalledTimes(0)
-    expect(wrapper.vm.errors).toEqual(['Enter an email.'])
+    expect(actions.updateResetToken).toHaveBeenCalledTimes(0)
+    expect(wrapper.vm.errors).toEqual(['Enter the reset token.'])
+    expect(wrapper.vm.newResetToken).toEqual('')
   })
 
   it('Missing password', async () => {
-    const email = 'email@email.com'
+    const token = '1234'
     const confirmPassword = '1234'
 
-    const emailInput = wrapper.find('input[name="email"]')
-    emailInput.element.value = email
-    emailInput.trigger('input')
+    const tokenInput = wrapper.find('input[name="resetToken"]')
+    tokenInput.element.value = token
+    tokenInput.trigger('input')
 
     const confirmPasswordInput = wrapper.find('input[name="confirmPassword"]')
     confirmPasswordInput.element.value = confirmPassword
     confirmPasswordInput.trigger('input')
 
-    expect(wrapper.vm.email).toBe(email)
-    expect(wrapper.vm.password).toBe('')
+    expect(wrapper.vm.resetToken).toBe(token)
+    expect(wrapper.vm.newPassword).toBe('')
     expect(wrapper.vm.confirmPassword).toBe(confirmPassword)
 
     wrapper.trigger('submit')
 
     await wrapper.vm.$nextTick()
 
-    expect(actions.register).toHaveBeenCalledTimes(0)
+    expect(actions.updateResetToken).toHaveBeenCalledTimes(0)
     expect(wrapper.vm.errors).toEqual([
       'Enter a password.',
       'Password and confirm password should be identical.'
     ])
+    expect(wrapper.vm.newResetToken).toEqual('')
   })
 
   it('Missing confirm password', async () => {
-    const email = 'email@email.com'
+    const token = '1234'
     const password = 'password'
 
-    const emailInput = wrapper.find('input[name="email"]')
-    emailInput.element.value = email
-    emailInput.trigger('input')
+    const tokenInput = wrapper.find('input[name="resetToken"]')
+    tokenInput.element.value = token
+    tokenInput.trigger('input')
 
-    const passwordInput = wrapper.find('input[name="password"]')
+    const passwordInput = wrapper.find('input[name="newPassword"]')
     passwordInput.element.value = password
     passwordInput.trigger('input')
 
-    expect(wrapper.vm.email).toBe(email)
-    expect(wrapper.vm.password).toBe(password)
+    expect(wrapper.vm.resetToken).toBe(token)
+    expect(wrapper.vm.newPassword).toBe(password)
     expect(wrapper.vm.confirmPassword).toBe('')
 
     wrapper.trigger('submit')
 
     await wrapper.vm.$nextTick()
 
-    expect(actions.register).toHaveBeenCalledTimes(0)
+    expect(actions.updateResetToken).toHaveBeenCalledTimes(0)
     expect(wrapper.vm.errors).toEqual(['Enter the password again to confirm.'])
+    expect(wrapper.vm.newResetToken).toEqual('')
   })
 
-  it('Missing email, password and confirm password', async () => {
-    expect(wrapper.vm.email).toBe('')
-    expect(wrapper.vm.password).toBe('')
+  it('Missing token, password and confirm password', async () => {
+    expect(wrapper.vm.resetToken).toBe('')
+    expect(wrapper.vm.newPassword).toBe('')
     expect(wrapper.vm.confirmPassword).toBe('')
 
     wrapper.trigger('submit')
 
     await wrapper.vm.$nextTick()
 
-    expect(actions.register).toHaveBeenCalledTimes(0)
-    expect(actions.register).toHaveBeenCalledTimes(0)
+    expect(actions.updateResetToken).toHaveBeenCalledTimes(0)
     expect(wrapper.vm.errors).toEqual([
-      'Enter an email.',
+      'Enter the reset token.',
       'Enter a password.',
       'Enter the password again to confirm.'
     ])
-  })
-
-  it('Invalid email', async () => {
-    const email = 'email.com'
-    const password = 'password'
-    const confirmPassword = password
-
-    const emailInput = wrapper.find('input[name="email"]')
-    emailInput.element.value = email
-    emailInput.trigger('input')
-
-    const passwordInput = wrapper.find('input[name="password"]')
-    passwordInput.element.value = password
-    passwordInput.trigger('input')
-
-    const confirmPasswordInput = wrapper.find('input[name="confirmPassword"]')
-    confirmPasswordInput.element.value = confirmPassword
-    confirmPasswordInput.trigger('input')
-
-    expect(wrapper.vm.email).toBe(email)
-    expect(wrapper.vm.password).toBe(password)
-    expect(wrapper.vm.confirmPassword).toBe(confirmPassword)
-
-    wrapper.trigger('submit')
-
-    await wrapper.vm.$nextTick()
-
-    expect(actions.register).toHaveBeenCalledTimes(0)
-    expect(wrapper.vm.errors).toEqual(['Enter a valid email.'])
+    expect(wrapper.vm.newResetToken).toEqual('')
   })
 
   it('Invalid password', async () => {
-    const email = 'email@email.com'
+    const token = '1234'
     const password = 'pass'
     const confirmPassword = password
 
-    const emailInput = wrapper.find('input[name="email"]')
-    emailInput.element.value = email
-    emailInput.trigger('input')
+    const tokenInput = wrapper.find('input[name="resetToken"]')
+    tokenInput.element.value = token
+    tokenInput.trigger('input')
 
-    const passwordInput = wrapper.find('input[name="password"]')
+    const passwordInput = wrapper.find('input[name="newPassword"]')
     passwordInput.element.value = password
     passwordInput.trigger('input')
 
@@ -212,30 +192,31 @@ describe('RegisterForm.vue', () => {
     confirmPasswordInput.element.value = confirmPassword
     confirmPasswordInput.trigger('input')
 
-    expect(wrapper.vm.email).toBe(email)
-    expect(wrapper.vm.password).toBe(password)
+    expect(wrapper.vm.resetToken).toBe(token)
+    expect(wrapper.vm.newPassword).toBe(password)
     expect(wrapper.vm.confirmPassword).toBe(confirmPassword)
 
     wrapper.trigger('submit')
 
     await wrapper.vm.$nextTick()
 
-    expect(actions.register).toHaveBeenCalledTimes(0)
+    expect(actions.updateResetToken).toHaveBeenCalledTimes(0)
     expect(wrapper.vm.errors).toEqual([
       'Password must be between 8 and 40 characters long.'
     ])
+    expect(wrapper.vm.newResetToken).toEqual('')
   })
 
   it('Password mismatch', async () => {
-    const email = 'email@email.com'
+    const token = '1234'
     const password = 'password1'
     const confirmPassword = 'password2'
 
-    const emailInput = wrapper.find('input[name="email"]')
-    emailInput.element.value = email
-    emailInput.trigger('input')
+    const tokenInput = wrapper.find('input[name="resetToken"]')
+    tokenInput.element.value = token
+    tokenInput.trigger('input')
 
-    const passwordInput = wrapper.find('input[name="password"]')
+    const passwordInput = wrapper.find('input[name="newPassword"]')
     passwordInput.element.value = password
     passwordInput.trigger('input')
 
@@ -243,18 +224,19 @@ describe('RegisterForm.vue', () => {
     confirmPasswordInput.element.value = confirmPassword
     confirmPasswordInput.trigger('input')
 
-    expect(wrapper.vm.email).toBe(email)
-    expect(wrapper.vm.password).toBe(password)
+    expect(wrapper.vm.resetToken).toBe(token)
+    expect(wrapper.vm.newPassword).toBe(password)
     expect(wrapper.vm.confirmPassword).toBe(confirmPassword)
 
     wrapper.trigger('submit')
 
     await wrapper.vm.$nextTick()
 
-    expect(actions.register).toHaveBeenCalledTimes(0)
+    expect(actions.updateResetToken).toHaveBeenCalledTimes(0)
     expect(wrapper.vm.errors).toEqual([
       'Password and confirm password should be identical.'
     ])
+    expect(wrapper.vm.newResetToken).toEqual('')
   })
 
   it('has the expected html structure', () => {

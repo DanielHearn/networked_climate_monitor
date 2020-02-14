@@ -7,7 +7,9 @@
         <p class="text">
           Enter a reset token and new password to reset the account password.
         </p>
-        <reset-password-form />
+        <reset-password-form
+          :current-reset-token="$store.state.user.reset_token"
+        />
       </div>
     </template>
   </main-panel>

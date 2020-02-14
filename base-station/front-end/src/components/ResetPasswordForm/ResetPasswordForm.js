@@ -9,6 +9,13 @@ export default {
     ErrorList,
     vButton
   },
+  props: {
+    currentResetToken: {
+      type: String,
+      default: '',
+      required: false
+    }
+  },
   data: function() {
     return {
       resetToken: '',
@@ -25,29 +32,32 @@ export default {
       this.newResetToken = ''
 
       const resetToken = this.resetToken
-      const password = this.newPassword
-      const newPassword = this.confirmPassword
+      const newPassword = this.newPassword
+      const confirmPassword = this.confirmPassword
       let valid = true
 
       if (resetToken === '') {
-        this.errors.push('Enter a reset token.')
+        this.errors.push('Enter the reset token.')
         valid = false
       }
-      if (password === '') {
+      if (newPassword === '') {
         this.errors.push('Enter a password.')
         valid = false
-      } else if (password.length < 8 || password.length > 40) {
+      } else if (newPassword.length < 8 || newPassword.length > 40) {
         this.errors.push('Password must be between 8 and 40 characters long.')
         valid = false
       }
 
-      if (password !== newPassword) {
-        this.errors.push('Password and confirm password be identical.')
+      if (confirmPassword === '') {
+        this.errors.push('Enter the password again to confirm.')
+        valid = false
+      } else if (newPassword !== confirmPassword) {
+        this.errors.push('Password and confirm password should be identical.')
         valid = false
       }
 
       if (valid) {
-        this.resetPassword(resetToken, password)
+        this.resetPassword(resetToken, newPassword)
       }
     },
     resetPassword: function(resetToken, password) {
@@ -57,9 +67,8 @@ export default {
         .then(response => {
           const data = response.data
           if (data.status && data.new_reset_token) {
-            const user = this.$store.state.user
             this.newResetToken = data.new_reset_token
-            user.reset_token = data.new_reset_token
+            this.$store.dispatch('updateResetToken', data.new_reset_token)
 
             this.newPassword = ''
             this.confirmPassword = ''
@@ -78,8 +87,8 @@ export default {
     }
   },
   created: function() {
-    if (this.$store.state.user.reset_token) {
-      this.resetToken = this.$store.state.user.reset_token
+    if (this.currentResetToken) {
+      this.resetToken = this.currentResetToken
     }
   }
 }

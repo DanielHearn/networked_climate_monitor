@@ -23,6 +23,11 @@ export const getters = {
 }
 
 export const actions = {
+  updateResetToken({ commit, state }, resetToken) {
+    const user = state.user
+    user.reset_token = resetToken
+    commit('setUser', user)
+  },
   login({ commit, dispatch }, data, doRetrieveAcc) {
     commit('setUser', data)
 
