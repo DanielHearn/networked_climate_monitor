@@ -1,0 +1,38 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`RecentClimateData.vue has the expected html structure 1`] = `
+<ul
+  class="recent-data-list"
+>
+  <li>
+    <p
+      class="text"
+    >
+      Temperature
+    </p>
+     
+    <p
+      class="sub-heading"
+    >
+      
+      23.45°C
+    
+    </p>
+  </li>
+  <li>
+    <p
+      class="text"
+    >
+      Humidity
+    </p>
+     
+    <p
+      class="sub-heading"
+    >
+      
+      56.34%
+    
+    </p>
+  </li>
+</ul>
+`;
