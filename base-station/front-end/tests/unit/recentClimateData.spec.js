@@ -37,6 +37,12 @@ describe('RecentClimateData.vue', () => {
     expect(wrapper.findAll('li').length).toBe(2)
   })
 
+  it('temperatureUnit', async () => {
+    wrapper.setProps({ temperatureUnit: 'f' })
+    expect(wrapper.vm.climateData[0].formattedText).toBe('74.21°F')
+    expect(wrapper.vm.climateData[1].formattedText).toBe('56.34%')
+  })
+
   it('has the expected html structure', () => {
     expect(wrapper.element).toMatchSnapshot()
   })
