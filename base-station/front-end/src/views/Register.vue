@@ -28,7 +28,7 @@
                 text file or on paper. This token will be required to change or
                 reset the account's password.
               </p>
-              <span class="text bold"
+              <span class="text bold reset-token"
                 >Reset token: {{ $store.state.user.reset_token }}</span
               >
             </li>

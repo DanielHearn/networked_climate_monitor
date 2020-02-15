@@ -6,10 +6,10 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build && node moveDist.js",
     "test:unit": "vue-cli-service test:unit",
-    "update-snapshots": "jest -u",
+    "test:e2e": "npx cypress open",
+    "lint": "vue-cli-service lint",
     "clear-jest-cache": "jest --clearCache ",
-    "test:e2e": "vue-cli-service test:e2e",
-    "lint": "vue-cli-service lint"
+    "update-snapshots": "jest -u"
   },
   "dependencies": {
     "axios": "^0.19.1",
@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.1.2",
-    "@vue/cli-plugin-e2e-nightwatch": "^4.1.2",
+    "@vue/cli-plugin-e2e-cypress": "^4.2.2",
     "@vue/cli-plugin-eslint": "^4.1.2",
     "@vue/cli-plugin-router": "^4.1.2",
     "@vue/cli-plugin-unit-jest": "^4.1.2",
@@ -36,6 +36,7 @@
     "@vue/test-utils": "1.0.0-beta.29",
     "babel-eslint": "^10.0.3",
     "chromedriver": "79",
+    "cypress": "^4.0.2",
     "eslint": "^5.16.0",
     "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-vue": "^5.0.0",
