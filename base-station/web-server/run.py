@@ -1208,7 +1208,7 @@ def init():
 
     print('Starting server')
     # Run API on local network IP
-    if app.config['TEST_SERVER']:
+    if 'TEST_SERVER' in app.config and app.config['TEST_SERVER']:
         app.run(debug=True, host='127.0.0.1')
     else:
         app.run(debug=True, host='0.0.0.0')

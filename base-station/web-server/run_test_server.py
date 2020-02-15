@@ -19,6 +19,8 @@ if __name__ == '__main__':
         print('Clear table %s' % table)
         db.session.execute(table.delete())
     db.session.commit()
+    db.drop_all()
+    db.create_all()
 
     create_test_data()
 

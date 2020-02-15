@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build && node moveDist.js",
     "test:unit": "vue-cli-service test:unit",
     "update-snapshots": "jest -u",
     "clear-jest-cache": "jest --clearCache ",
@@ -39,6 +39,7 @@
     "eslint": "^5.16.0",
     "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-vue": "^5.0.0",
+    "fs-extra": "^8.1.0",
     "geckodriver": "^1.19.1",
     "jest-canvas-mock": "^2.2.0",
     "lodash": "^4.17.15",
