@@ -26,7 +26,9 @@ describe('Register.vue', () => {
 
   it('registered', () => {
     expect(wrapper.find('.register-success').exists()).toBe(false)
+    expect(wrapper.find('register-form-stub').exists()).toBe(true)
     store.state.user.email = 'email@email.com'
+    expect(wrapper.find('register-form-stub').exists()).toBe(false)
     expect(wrapper.find('.register-success').exists()).toBe(true)
     expect(wrapper.element).toMatchSnapshot()
   })
