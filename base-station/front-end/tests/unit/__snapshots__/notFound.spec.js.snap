@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`NotFound.vue has the expected html structure 1`] = `
+<div>
+  <p>
+    Error 404: Page not found
+  </p>
+   
+  <router-link-stub
+    class="link title--nav"
+    to="/"
+  >
+    Click here to go back to the home page
+  </router-link-stub>
+</div>
+`;

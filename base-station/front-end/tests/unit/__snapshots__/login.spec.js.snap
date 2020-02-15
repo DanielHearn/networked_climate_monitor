@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Login.vue has the expected html structure 1`] = `
+<main-panel-stub>
+  <template>
+    <div
+      class="content-column"
+    >
+      <h1
+        class="title"
+      >
+        Climate Monitor
+      </h1>
+       
+      <h2
+        class="heading"
+      >
+        Login
+      </h2>
+       
+      <p
+        class="text"
+      >
+        Enter an email and password to login.
+      </p>
+       
+      <login-form-stub />
+    </div>
+  </template>
+</main-panel-stub>
+`;

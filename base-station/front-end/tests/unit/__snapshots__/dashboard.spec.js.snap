@@ -1,0 +1,60 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Dashboard.vue has the expected html structure 1`] = `
+<div
+  class="content"
+>
+  <side-panel-stub>
+    <template>
+      <p
+        class="sub-heading"
+      >
+        Sensors
+      </p>
+       
+      <v-button-stub
+        hierachylevel="secondary"
+        isicon="true"
+        text="refresh"
+      />
+    </template>
+     
+    <template>
+      <ul
+        class="list"
+      >
+        <li
+          class="list-item"
+        >
+          <p
+            class="text"
+          >
+            
+            No sensors created. Connect a sensor node to the base station to
+            create a new sensor.
+          
+          </p>
+        </li>
+      </ul>
+    </template>
+  </side-panel-stub>
+   
+  <main-panel-stub>
+    <template>
+      <p
+        class="sub-heading"
+      >
+        Climate Data
+      </p>
+    </template>
+     
+    <template>
+      <p
+        class="heading"
+      >
+        No sensor selected
+      </p>
+    </template>
+  </main-panel-stub>
+</div>
+`;

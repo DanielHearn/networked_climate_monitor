@@ -1,0 +1,101 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Login.vue has the expected html structure 1`] = `
+<div
+  class="content"
+>
+  <side-panel-stub>
+    <template>
+      <p
+        class="sub-heading"
+      >
+        Settings Categories
+      </p>
+    </template>
+     
+    <template>
+      <ul
+        class="list"
+      >
+        <li
+          class="list-item active"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            style="display: flex; flex-direction: row;"
+          >
+            <p
+              class="heading underline"
+              style="margin-right: 0.25em; display: flex; align-items: center;"
+            >
+              
+                Measurement Settings
+              
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <v-button-stub
+              hierachylevel="primary"
+              text="Edit settings"
+            />
+          </div>
+        </li>
+         
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            style="display: flex; flex-direction: row;"
+          >
+            <p
+              class="heading"
+              style="margin-right: 0.25em; display: flex; align-items: center;"
+            >
+              
+                Account Management
+              
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <v-button-stub
+              hierachylevel="primary"
+              text="Manage account"
+            />
+          </div>
+        </li>
+      </ul>
+    </template>
+  </side-panel-stub>
+   
+  <main-panel-stub>
+    <template>
+      <p
+        class="sub-heading"
+      >
+        Measurement Settings
+      </p>
+    </template>
+     
+    <template>
+      <div
+        class="dashboard-content"
+      >
+        <!---->
+         
+        <p>
+          Please log in
+        </p>
+      </div>
+    </template>
+     
+    <!---->
+  </main-panel-stub>
+</div>
+`;

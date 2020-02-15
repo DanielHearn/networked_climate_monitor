@@ -1,0 +1,40 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Register.vue has the expected html structure 1`] = `
+<main-panel-stub>
+  <template>
+    <div
+      class="content-column"
+    >
+      <h1
+        class="title"
+      >
+        Climate Monitor
+      </h1>
+       
+      <h2
+        class="heading"
+      >
+        Account Registration
+      </h2>
+       
+      <p
+        class="text"
+      >
+        
+          Enter an email and password to register the account.
+        
+      </p>
+       
+      <register-form-stub />
+       
+      <router-link-stub
+        class="link"
+        to="/login"
+      >
+        Already registered? Click here to login
+      </router-link-stub>
+    </div>
+  </template>
+</main-panel-stub>
+`;
