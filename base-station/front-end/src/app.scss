@@ -261,6 +261,21 @@ body {
   }
 }
 
+.battery-status {
+  &--high {
+    color: $green;
+    font-weight: 500;
+  }
+  &--medium {
+    color: $orange;
+    font-weight: 500;
+  }
+  &--low {
+    color: $red;
+    font-weight: 500;
+  }
+}
+
 .dashboard-content {
   display: flex;
   flex-direction: column;

@@ -92,13 +92,27 @@
                 <p class="text">
                   Date received: {{ sensor.recent_climate_data.date }}
                 </p>
-                <p class="text">
+                <p
+                  class="text"
+                  style="display: flex;"
+                  :class="
+                    'battery-status--' +
+                      getBatteryStatusFromVoltage(
+                        sensor.recent_climate_data.battery_voltage
+                      ).toLowerCase()
+                  "
+                >
                   Battery level:
                   {{
                     getBatteryStatusFromVoltage(
                       sensor.recent_climate_data.battery_voltage
                     )
                   }}
+                  <i
+                    v-if="sensor.recent_climate_data.battery_voltage < 3.9"
+                    class="material-icons"
+                    >battery_alert</i
+                  >
                 </p>
               </div>
               <div v-else>
