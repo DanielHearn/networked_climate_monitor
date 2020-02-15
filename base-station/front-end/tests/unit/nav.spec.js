@@ -9,7 +9,7 @@ const mutations = {
   setMobileMenu: jest.fn()
 }
 
-describe('RegisterForm.vue', () => {
+describe('Nav.vue', () => {
   let wrapper
   let store
 

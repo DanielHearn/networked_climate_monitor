@@ -1,0 +1,63 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MobileMenu.vue Logged In 1`] = `
+<div
+  class="mobile-menu"
+>
+  <ul>
+    <router-link-stub
+      class="link"
+      to="/"
+    >
+      Home
+    </router-link-stub>
+     
+    <!---->
+     
+    <router-link-stub
+      class="link"
+      to="/dashboard"
+    >
+      Dashboard
+    </router-link-stub>
+     
+    <router-link-stub
+      class="link"
+      to="/settings"
+    >
+      Settings
+    </router-link-stub>
+  </ul>
+</div>
+`;
+
+exports[`MobileMenu.vue has the expected html structure 1`] = `
+<div
+  class="mobile-menu"
+>
+  <ul>
+    <router-link-stub
+      class="link"
+      to="/"
+    >
+      Home
+    </router-link-stub>
+     
+    <router-link-stub
+      class="link"
+      to="/login"
+    >
+      Login
+    </router-link-stub>
+     
+    <router-link-stub
+      class="link"
+      to="/register"
+    >
+      Register
+    </router-link-stub>
+     
+    <!---->
+  </ul>
+</div>
+`;

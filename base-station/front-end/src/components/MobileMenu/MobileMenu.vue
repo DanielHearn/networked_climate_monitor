@@ -2,21 +2,15 @@
   <div class="mobile-menu">
     <ul @click="toggleMenu">
       <router-link to="/" class="link">Home</router-link>
-      <template v-if="!$store.state.user.logged_in">
+      <template v-if="!loggedIn">
         <router-link to="/login" class="link">Login</router-link>
         <router-link to="/register" class="link">Register</router-link>
       </template>
-      <template v-if="$store.state.user.logged_in">
-        <router-link
-          to="/dashboard"
-          v-if="$store.state.user.logged_in"
-          class="link"
+      <template v-if="loggedIn">
+        <router-link to="/dashboard" v-if="loggedIn" class="link"
           >Dashboard</router-link
         >
-        <router-link
-          to="/settings"
-          v-if="$store.state.user.logged_in"
-          class="link"
+        <router-link to="/settings" v-if="loggedIn" class="link"
           >Settings</router-link
         >
       </template>

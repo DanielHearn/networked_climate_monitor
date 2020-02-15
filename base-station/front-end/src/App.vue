@@ -11,7 +11,10 @@
       :mobile-menu="$store.state.mobileMenu"
       :logged-in="$store.state.user.logged_in"
     ></v-nav>
-    <mobile-menu v-if="$store.state.mobileMenu" />
+    <mobile-menu
+      v-if="$store.state.mobileMenu"
+      :logged-in="$store.state.user.logged_in"
+    />
     <router-view :class="{ hidden: $store.state.mobileMenu }" />
   </div>
 </template>
