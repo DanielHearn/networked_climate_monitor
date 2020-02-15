@@ -6,6 +6,23 @@ export default {
   components: {
     vButton
   },
+  props: {
+    loggedIn: {
+      type: Boolean,
+      default: false,
+      required: true
+    },
+    mobile: {
+      type: Boolean,
+      default: false,
+      required: true
+    },
+    mobileMenu: {
+      type: Boolean,
+      default: false,
+      required: true
+    }
+  },
   methods: {
     ...mapActions(['logout']),
     toggleMenu: function() {

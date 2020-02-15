@@ -6,7 +6,11 @@
       mobile: $store.state.mobile
     }"
   >
-    <v-nav></v-nav>
+    <v-nav
+      :mobile="$store.state.mobile"
+      :mobile-menu="$store.state.mobileMenu"
+      :logged-in="$store.state.user.logged_in"
+    ></v-nav>
     <mobile-menu v-if="$store.state.mobileMenu" />
     <router-view :class="{ hidden: $store.state.mobileMenu }" />
   </div>

@@ -1,0 +1,55 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`RegisterForm.vue has the expected html structure 1`] = `
+<div
+  class="nav"
+>
+  <div
+    class="nav__side nav__left"
+  >
+    <router-link-stub
+      class="link title--nav"
+      to="/"
+    >
+      Climate Monitor
+    </router-link-stub>
+  </div>
+   
+  <div
+    class="nav__links"
+  >
+    <router-link-stub
+      class="link"
+      to="/"
+    >
+      Home
+    </router-link-stub>
+     
+    <router-link-stub
+      class="link"
+      to="/login"
+    >
+      Login
+    </router-link-stub>
+     
+    <router-link-stub
+      class="link"
+      to="/register"
+    >
+      Register
+    </router-link-stub>
+     
+    <!---->
+     
+    <!---->
+  </div>
+   
+  <div
+    class="nav__side nav__right"
+  >
+    <!---->
+     
+    <!---->
+  </div>
+</div>
+`;
