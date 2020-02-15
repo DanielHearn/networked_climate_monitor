@@ -1,5 +1,10 @@
 <template>
-  <form id="register" class="form" @submit="checkResetPassword" method="post">
+  <form
+    id="reset-password-form"
+    class="form"
+    @submit="checkResetPassword"
+    method="post"
+  >
     <div class="input-box">
       <p class="text">Reset Token</p>
       <input
@@ -41,7 +46,7 @@
       tabindex="0"
     />
     <div v-if="newResetToken">
-      <p class="text">
+      <p class="text new-reset-token">
         New reset token: <span class="bold">{{ newResetToken }}</span>
       </p>
       <p class="text italics">

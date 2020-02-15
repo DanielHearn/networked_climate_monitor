@@ -3,8 +3,33 @@
 const baseUrl = 'http://127.0.0.1:5000'
 const email = 'email@email.com'
 const password = 'newpassword'
+const newPassword = 'changedpassword'
 
 module.exports = {
+  'delete all data': browser => {
+    browser
+      .url(`${baseUrl}/api/delete-all`)
+      .waitForElementVisible('body')
+      .end()
+  },
+  'mobile version loads': browser => {
+    browser
+      .resizeWindow(600, 800)
+      .url(baseUrl)
+      .waitForElementVisible('body')
+      .assert.title('Home - Climate Monitor')
+      .waitForElementPresent('.mobile-menu-button', 5000)
+      .end()
+  },
+  'desktop version loads': browser => {
+    browser
+      .resizeWindow(1200, 1800)
+      .url(baseUrl)
+      .waitForElementVisible('body')
+      .assert.title('Home - Climate Monitor')
+      .waitForElementNotPresent('.mobile-menu-button', 5000)
+      .end()
+  },
   'home loads': browser => {
     browser
       .url(baseUrl)
@@ -72,6 +97,19 @@ module.exports = {
       .url(`${baseUrl}/reset-password`)
       .waitForElementVisible('body')
       .assert.title('Reset Password - Climate Monitor')
+      .end()
+  },
+  'change password': browser => {
+    browser
+      .url(`${baseUrl}/reset-password`)
+      .waitForElementVisible('body')
+      .assert.title('Reset Password - Climate Monitor')
+      .waitForElementPresent('#reset-password-form', 5000)
+      .setValue('#reset-password-form [name="newPassword"]', newPassword)
+      .setValue('#reset-password-form [name="confirmPassword"]', newPassword)
+      .click('#reset-password-form [type="submit"]')
+      .waitForElementPresent('.new-reset-token', 5000)
+      .assert.containsText('New reset token:')
       .end()
   }
 }
