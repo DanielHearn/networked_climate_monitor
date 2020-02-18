@@ -192,6 +192,7 @@
               @click.native="backToSensorList()"
               :hierachyLevel="'tertiary'"
               :text="'Back'"
+              class="back-button"
             />
             <template v-if="activeSensor && activeSensor.recent_climate_data">
               <h3 class="heading">Recent Climate Data</h3>
@@ -454,11 +455,9 @@ export default {
       const patchData = {
         name: sensorName
       }
-      console.log(patchData)
       patchSensor(accessToken, sensorID, patchData)
         .then(response => {
           const data = response.data
-          console.log(response)
           if (data.status) {
             this.$toasted.show('Sensor node name changed')
           }
@@ -754,7 +753,7 @@ export default {
         setTimeout(() => {
           this.loadDashboard(true)
           this.createDashboardReloadInterval()
-        }, 150)
+        }, 100)
       }
     },
     backToSensorList: function() {

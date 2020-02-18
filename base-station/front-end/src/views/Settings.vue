@@ -82,10 +82,11 @@
                 @click.native="activeCategoryID = -1"
                 :hierachyLevel="'tertiary'"
                 :text="'Back'"
+                class="back-button"
               />
               <p v-if="!$store.state.user.logged_in">Please log in</p>
               <template v-else-if="settings">
-                <div class="input-box">
+                <div class="input-box" v-if="settings.temperature_unit">
                   <p class="sub-heading">Temperature Unit:</p>
                   <div class="radio-container">
                     <div
@@ -188,6 +189,7 @@ import MainPanel from './../components/MainPanel/MainPanel.vue'
 import SidePanel from './../components/SidePanel/SidePanel.vue'
 import vButton from './../components/vButton/vButton.vue'
 import { getAccount, patchAccount } from './../static/api'
+import { cloneDeep } from 'lodash'
 
 export default {
   name: 'settings',
@@ -199,17 +201,21 @@ export default {
   data: function() {
     return {
       activeCategoryID: -1,
-      settings: {}
+      settings: {},
+      hasBeenEdited: false
     }
   },
   watch: {
     settings: {
-      handler: function(newSettings, oldSettings) {
-        if (Object.keys(oldSettings).length > 0) {
-          const user = this.$store.state.user
+      handler(newSettings) {
+        if (this.hasBeenEdited && Object.keys(newSettings).length) {
+          const user = cloneDeep(this.$store.state.user)
           user.settings = Object.assign({}, newSettings)
           this.$store.commit('setUser', user)
           this.updateSettings()
+        }
+        if (!this.hasBeenEdited) {
+          this.hasBeenEdited = true
         }
       },
       deep: true
@@ -223,11 +229,11 @@ export default {
           .then(response => {
             const data = response.data
             if (data.status && data.account) {
-              const user = this.$store.state.user
+              const user = cloneDeep(this.$store.state.user)
               user.settings = JSON.parse(
                 data.account.settings.replace(/'/g, '"')
               )
-              this.settings = Object.assign({}, this.$store.state.user.settings)
+              this.settings = user.settings
               this.$store.commit('setUser', user)
             }
           })
@@ -260,7 +266,13 @@ export default {
     if (!this.$store.state.mobile) {
       this.activeCategoryID = 0
     }
-    this.settings = this.$store.state.user.settings
+    if (Object.keys(this.$store.state.user.settings).length) {
+      this.settings = this.$store.state.user.settings
+    } else {
+      setTimeout(() => {
+        this.loadSettings()
+      }, 25)
+    }
   }
 }
 </script>

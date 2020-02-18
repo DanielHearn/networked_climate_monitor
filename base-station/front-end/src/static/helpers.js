@@ -30,7 +30,9 @@ export const processErrors = errors => {
     for (let errorField in errors) {
       const errorsForType = errors[errorField]
       for (let errorT in errorsForType) {
-        const errorText = `${capitalise(errorField)}: ${errorsForType[errorT]}`
+        const errorText = `${capitalise(errorField.replace(/_/g, ' '))}: ${
+          errorsForType[errorT]
+        }`
         outputErrors.push(errorText)
       }
     }

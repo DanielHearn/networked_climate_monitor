@@ -77,8 +77,6 @@ export default {
               user.settings = JSON.parse(
                 data.account.settings.replace(/'/g, '"')
               )
-              console.log(data.account.settings.replace(/'/g, '"'))
-
               this.$store.dispatch('login', user, false)
             }
           })
@@ -113,13 +111,17 @@ export default {
           setStoredAccessToken(action.payload.access_token)
           setStoredRefreshToken(action.payload.refresh_token)
 
-          if (this.$route.name === 'login' || this.$route.name === null) {
+          if (this.$route.name === 'login') {
             this.$router.push({ name: 'dashboard' })
           }
           break
         case 'logout':
           this.$toasted.show('Logged out')
-          if (this.$route.name !== 'home' || this.$route.name === null) {
+          if (
+            this.$route.name === 'dashboard' ||
+            this.$route.name === 'settings' ||
+            this.$route.name === 'login'
+          ) {
             this.$router.push({ name: 'home' })
           }
 

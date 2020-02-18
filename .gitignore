@@ -4,3 +4,4 @@ db.json
 /base-station/web-server/templates/**
 /base-station/web-server/static/**
 *.db
+base-station/web-server/templates/index.html

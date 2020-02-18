@@ -442,7 +442,6 @@ describe('Dashboard.vue', () => {
     const nameInput = wrapper.find('.list .list-item .edit-box .input--text')
     nameInput.trigger('focus')
     nameInput.setValue('Shed Sensor')
-    nameInput.trigger('blue')
     wrapper.find('.list .list-item .edit-box .button--primary').trigger('click')
     await wrapper.vm.$nextTick()
 
