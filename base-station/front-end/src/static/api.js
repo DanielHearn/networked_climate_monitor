@@ -1,5 +1,9 @@
 import { HTTP } from './http-common'
 
+/**
+ * Get account details from API
+ * @param {string} accessToken - User's access token
+ */
 export const getAccount = accessToken => {
   const promise = new Promise(function(resolve, reject) {
     HTTP.get('account', {
@@ -15,6 +19,11 @@ export const getAccount = accessToken => {
   return promise
 }
 
+/**
+ * Update account details in API
+ * @param {string} accessToken - User access token
+ * @param {object} data - Updated user data
+ */
 export const patchAccount = (accessToken, data) => {
   const promise = new Promise(function(resolve, reject) {
     HTTP.patch('account', data, {
@@ -30,6 +39,11 @@ export const patchAccount = (accessToken, data) => {
   return promise
 }
 
+/**
+ * Attempt user login with API
+ * @param {string} email - User's email
+ * @param {string} password - User's password
+ */
 export const login = (email, password) => {
   const promise = new Promise(function(resolve, reject) {
     HTTP.post('login', {
@@ -46,6 +60,11 @@ export const login = (email, password) => {
   return promise
 }
 
+/**
+ * Attempt user registration with API
+ * @param {string} email - User's email
+ * @param {string} password - User's password
+ */
 export const register = (email, password) => {
   const promise = new Promise(function(resolve, reject) {
     HTTP.post('account', {
@@ -62,6 +81,11 @@ export const register = (email, password) => {
   return promise
 }
 
+/**
+ * Change the user's password
+ * @param {string} resetToken - User's reset token
+ * @param {string} password - User's password
+ */
 export const changePassword = (resetToken, password) => {
   const promise = new Promise(function(resolve, reject) {
     HTTP.post('accounts/actions/change-password', {
@@ -78,6 +102,10 @@ export const changePassword = (resetToken, password) => {
   return promise
 }
 
+/**
+ * Blacklist the access token from future logins
+ * @param {string} accessToken - User's access token
+ */
 export const logoutAccessToken = accessToken => {
   const promise = new Promise(function(resolve, reject) {
     HTTP.post(
@@ -97,6 +125,10 @@ export const logoutAccessToken = accessToken => {
   return promise
 }
 
+/**
+ * Blacklist the refresh token from future logins
+ * @param {string} accessToken - User's access token
+ */
 export const logoutRefreshToken = accessToken => {
   const promise = new Promise(function(resolve, reject) {
     HTTP.post(
@@ -116,6 +148,12 @@ export const logoutRefreshToken = accessToken => {
   return promise
 }
 
+/**
+ * Update sensor details in API
+ * @param {string} accessToken - User's acess token
+ * @param {number} sensorID - Sensor ID
+ * @param {object} data - Updated sensor data
+ */
 export const patchSensor = (accessToken, sensorID, data) => {
   const promise = new Promise(function(resolve, reject) {
     HTTP.patch(`sensors/${sensorID}`, data, {
@@ -131,6 +169,14 @@ export const patchSensor = (accessToken, sensorID, data) => {
   return promise
 }
 
+/**
+ * Get climate data for a specified sensor ID from the API
+ * @param {string} accessToken - User's access token
+ * @param {number} sensorID - Sensor ID
+ * @param {number} quantity - Quantity of climate data points to be retrieved
+ * @param {date} rangeStart - Start date of the time period
+ * @param {date} rangeEnd - End date of the time period
+ */
 export const getClimateData = (
   accessToken,
   sensorID,
@@ -155,6 +201,11 @@ export const getClimateData = (
   return promise
 }
 
+/**
+ * Delete the specified sensor using its sensor ID
+ * @param {string} accessToken - User's access token
+ * @param {number} sensorID - Sensor ID
+ */
 export const deleteSensor = (accessToken, sensorID) => {
   const promise = new Promise(function(resolve, reject) {
     HTTP.delete(`sensors/${sensorID}`, {
@@ -170,6 +221,11 @@ export const deleteSensor = (accessToken, sensorID) => {
   return promise
 }
 
+/**
+ * Delete the climate data from the specified sensor using its sensor ID
+ * @param {string} accessToken - User's access token
+ * @param {number} sensorID - Sensor ID
+ */
 export const deleteClimateData = (accessToken, sensorID) => {
   const promise = new Promise(function(resolve, reject) {
     HTTP.delete(`sensors/${sensorID}/climate-data`, {
@@ -185,6 +241,10 @@ export const deleteClimateData = (accessToken, sensorID) => {
   return promise
 }
 
+/**
+ * Get all sensors from the API
+ * @param {string} accessToken - User's access token
+ */
 export const getSensors = accessToken => {
   const promise = new Promise(function(resolve, reject) {
     HTTP.get('sensors', {
