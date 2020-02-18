@@ -1,6 +1,6 @@
 const fs = require('fs-extra')
 
-// Async/Await:
+// Moves built website files to the webserver
 function copyFiles() {
   fs.remove('./../web-server/template/index.html')
     .then(() => {

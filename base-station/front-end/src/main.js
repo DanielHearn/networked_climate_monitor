@@ -8,9 +8,8 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 import VCalendar from 'v-calendar'
 
-// Use v-calendar & v-date-picker components
+// Load vue plugins
 Vue.use(VCalendar)
-
 Vue.use(VueAxios, axios)
 Vue.use(Toasted, {
   action: {

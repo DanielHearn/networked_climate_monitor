@@ -23,11 +23,20 @@ export const getters = {
 }
 
 export const actions = {
+  /**
+   * Update the user's reset token
+   * @param {string} resetToken - User's reset token
+   */
   updateResetToken({ commit, state }, resetToken) {
     const user = state.user
     user.reset_token = resetToken
     commit('setUser', user)
   },
+  /**
+   * Update the user details
+   * @param {object} data - User details
+   * @param {boolean} doRetrieveAcc - Whether user details should be retrieved from the API
+   */
   login({ commit, dispatch }, data, doRetrieveAcc) {
     commit('setUser', data)
 
@@ -35,10 +44,17 @@ export const actions = {
       dispatch('retrieveAccount', data.access_token)
     }
   },
+  /**
+   * Update the user details and retrieve user details from the API
+   * @param {object} data - User details
+   */
   register({ commit, dispatch }, data) {
     commit('setUser', data)
     dispatch('retrieveAccount', data.access_token)
   },
+  /**
+   * Clear user details
+   */
   logout({ commit, state }) {
     const user = state.user
 
@@ -49,6 +65,10 @@ export const actions = {
 
     commit('setUser', user)
   },
+  /**
+   * Retrieve user details from the API
+   * @param {string} accessToken - User's access token
+   */
   retrieveAccount({ commit, state }, accessToken) {
     getAccount(accessToken)
       .then(response => {

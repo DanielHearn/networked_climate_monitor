@@ -3,10 +3,12 @@ import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import process from 'process'
 
+// Use vue router for client side page navigation
 Vue.use(VueRouter)
 
 const titleEnd = ' - Climate Monitor'
 
+// Define routes with component views, custom titles, and chunked JS files
 const routes = [
   {
     path: '/',
@@ -95,6 +97,7 @@ const router = new VueRouter({
 
 export default router
 
+// Update page title on page change
 router.afterEach(to => {
   Vue.nextTick(() => {
     document.title = to.meta.title(to)
