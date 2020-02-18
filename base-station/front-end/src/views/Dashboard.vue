@@ -7,7 +7,7 @@
       "
     >
       <template slot="header">
-        <p class="sub-heading">Sensors</p>
+        <p class="sub-heading">Sensor Nodes</p>
         <v-button
           @click.native="refreshSensors"
           :hierachyLevel="'secondary'"
@@ -152,8 +152,8 @@
         <ul v-else class="list">
           <li class="list-item">
             <p class="text">
-              No sensors created. Connect a sensor node to the base station to
-              create a new sensor.
+              No sensor nodes created. Connect a sensor node to the base station
+              to create a new sensor.
             </p>
           </li>
         </ul>
@@ -176,8 +176,7 @@
       <main-panel v-else-if="activeSensor">
         <template slot="header">
           <p class="sub-heading">
-            Node {{ activeSensor.id }}:
-            {{ activeSensor.name }}
+            Node {{ activeSensor.id }}: {{ activeSensor.name }}
           </p>
           <v-button
             @click.native="refreshSensors"
@@ -455,12 +454,13 @@ export default {
       const patchData = {
         name: sensorName
       }
-
+      console.log(patchData)
       patchSensor(accessToken, sensorID, patchData)
         .then(response => {
           const data = response.data
+          console.log(response)
           if (data.status) {
-            this.$toasted.show('Sensor name changed')
+            this.$toasted.show('Sensor node name changed')
           }
         })
         .catch(e => {
@@ -646,7 +646,7 @@ export default {
         .then(response => {
           const data = response.data
           if (data && data.status) {
-            this.$toasted.show(`Deleted sensor ${sensorName}`)
+            this.$toasted.show(`Deleted sensor node: ${sensorName}`)
             this.sensors = this.sensors.filter(sensor => sensor.id !== sensorID)
 
             if (sensorID === this.activeSensorID && !this.$store.state.mobile) {
@@ -675,7 +675,7 @@ export default {
               sensor.climate_data = []
               sensor.recent_climate_data = null
               this.$toasted.show(
-                `Deleted climate data for sensor: ${sensorName}`
+                `Deleted climate data for sensor node: ${sensorName}`
               )
             }
           }
@@ -687,7 +687,7 @@ export default {
         })
     },
     refreshSensors: function() {
-      this.$toasted.show('Refreshing sensors')
+      this.$toasted.show('Refreshing sensor nodes')
       this.loadDashboard()
     },
     loadDashboard: function() {

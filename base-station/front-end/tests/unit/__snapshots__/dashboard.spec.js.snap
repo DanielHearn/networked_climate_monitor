@@ -1,25 +1,2294 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Dashboard.vue has the expected html structure 1`] = `
+exports[`Dashboard.vue change active sensor 1`] = `
 <div
   class="content"
 >
-  <side-panel-stub>
-    <template>
+  <div
+    class="side-panel"
+  >
+    <div
+      class="side-panel-header"
+    >
       <p
         class="sub-heading"
       >
-        Sensors
+        Sensor Nodes
       </p>
        
-      <v-button-stub
-        hierachylevel="secondary"
-        isicon="true"
-        text="refresh"
-      />
-    </template>
+      <button
+        class="button button--secondary"
+      >
+        <i
+          class="material-icons"
+        >
+          refresh
+        </i>
+      </button>
+    </div>
      
-    <template>
+    <div
+      class="side-panel-content"
+    >
+      <ul
+        class="list"
+      >
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            class="edit-box"
+          >
+            <p
+              class="heading"
+            >
+              
+                Node 1: Bedroom Sensor
+              
+            </p>
+             
+            <!---->
+             
+            <button
+              class="button button--tertiary"
+            >
+              <i
+                class="material-icons"
+              >
+                edit
+              </i>
+            </button>
+          </div>
+           
+          <div>
+            <ul
+              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
+            >
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Temperature:
+                      21.22°C
+                    
+                </p>
+                 
+                <!---->
+              </li>
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <!---->
+                 
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Humidity: 40.71%
+                    
+                </p>
+              </li>
+            </ul>
+             
+            <p
+              class="text"
+            >
+              
+                Date received: 2020-01-06 11:20
+              
+            </p>
+             
+            <p
+              class="text battery-status--medium"
+              style="display: flex;"
+            >
+              
+                Battery level:
+                Medium
+                
+              <!---->
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--secondary"
+            >
+              <i
+                class="material-icons"
+              >
+                settings
+              </i>
+            </button>
+             
+            <button
+              class="button button--primary"
+            >
+              View Climate
+            </button>
+          </div>
+           
+          <!---->
+        </li>
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            class="edit-box"
+          >
+            <p
+              class="heading"
+            >
+              
+                Node 2: Kitchen Sensor
+              
+            </p>
+             
+            <!---->
+             
+            <button
+              class="button button--tertiary"
+            >
+              <i
+                class="material-icons"
+              >
+                edit
+              </i>
+            </button>
+          </div>
+           
+          <div>
+            <ul
+              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
+            >
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Temperature:
+                      23.11°C
+                    
+                </p>
+                 
+                <!---->
+              </li>
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <!---->
+                 
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Humidity: 30%
+                    
+                </p>
+              </li>
+            </ul>
+             
+            <p
+              class="text"
+            >
+              
+                Date received: 2020-01-26 19:00
+              
+            </p>
+             
+            <p
+              class="text battery-status--low"
+              style="display: flex;"
+            >
+              
+                Battery level:
+                Low
+                
+              <i
+                class="material-icons"
+              >
+                battery_alert
+              </i>
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--secondary"
+            >
+              <i
+                class="material-icons"
+              >
+                settings
+              </i>
+            </button>
+             
+            <button
+              class="button button--primary"
+            >
+              View Climate
+            </button>
+          </div>
+           
+          <!---->
+        </li>
+        <li
+          class="list-item active"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            class="edit-box"
+          >
+            <p
+              class="heading underline"
+            >
+              
+                Node 3: Garden Sensor
+              
+            </p>
+             
+            <!---->
+             
+            <button
+              class="button button--tertiary"
+            >
+              <i
+                class="material-icons"
+              >
+                edit
+              </i>
+            </button>
+          </div>
+           
+          <div>
+            <ul
+              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
+            >
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Temperature:
+                      23.11°C
+                    
+                </p>
+                 
+                <!---->
+              </li>
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <!---->
+                 
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Humidity: 30%
+                    
+                </p>
+              </li>
+            </ul>
+             
+            <p
+              class="text"
+            >
+              
+                Date received: 2020-01-26 19:00
+              
+            </p>
+             
+            <p
+              class="text battery-status--high"
+              style="display: flex;"
+            >
+              
+                Battery level:
+                High
+                
+              <!---->
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--secondary"
+            >
+              <i
+                class="material-icons"
+              >
+                settings
+              </i>
+            </button>
+             
+            <button
+              class="button button--primary"
+            >
+              View Climate
+            </button>
+          </div>
+           
+          <!---->
+        </li>
+      </ul>
+    </div>
+  </div>
+   
+  <div
+    class="main-panel"
+  >
+    <div
+      class="main-panel-header"
+    >
+      <p
+        class="sub-heading"
+      >
+        
+          Node 3: Garden Sensor
+        
+      </p>
+       
+      <button
+        class="button button--secondary"
+      >
+        <i
+          class="material-icons"
+        >
+          refresh
+        </i>
+      </button>
+    </div>
+     
+    <div
+      class="main-panel-content"
+    >
+      <div
+        class="dashboard-content"
+      >
+        <!---->
+         
+        <h3
+          class="heading"
+        >
+          Recent Climate Data
+        </h3>
+         
+        <p
+          class="text"
+        >
+          
+              Date received:
+              2020-01-26 19:00
+            
+        </p>
+         
+        <ul
+          class="recent-data-list"
+        >
+          <li>
+            <p
+              class="text"
+            >
+              Temperature
+            </p>
+             
+            <p
+              class="sub-heading"
+            >
+              
+      23.11°C
+    
+            </p>
+          </li>
+          <li>
+            <p
+              class="text"
+            >
+              Humidity
+            </p>
+             
+            <p
+              class="sub-heading"
+            >
+              
+      30%
+    
+            </p>
+          </li>
+        </ul>
+         
+        <h3
+          class="heading"
+        >
+          Historical Climate Data
+        </h3>
+         
+        <div
+          class="historical-actions"
+        >
+          <div
+            class="input-box"
+          >
+            <p
+              class="text"
+            >
+              Historical Range
+            </p>
+             
+            <v-date-picker
+              class="date-picker"
+              color="purple"
+              is-dark=""
+              mode="range"
+            />
+          </div>
+           
+          <button
+            class="button button--secondary active"
+          >
+            1 Day
+          </button>
+           
+          <button
+            class="button button--secondary"
+          >
+            2 Days
+          </button>
+           
+          <button
+            class="button button--secondary"
+          >
+            1 Week
+          </button>
+           
+          <button
+            class="button button--secondary"
+          >
+            1 Month
+          </button>
+        </div>
+         
+        <p>
+          Historical data loading.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Dashboard.vue delete climate data 1`] = `
+<div
+  class="content"
+>
+  <div
+    class="side-panel"
+  >
+    <div
+      class="side-panel-header"
+    >
+      <p
+        class="sub-heading"
+      >
+        Sensor Nodes
+      </p>
+       
+      <button
+        class="button button--secondary"
+      >
+        <i
+          class="material-icons"
+        >
+          refresh
+        </i>
+      </button>
+    </div>
+     
+    <div
+      class="side-panel-content"
+    >
+      <ul
+        class="list"
+      >
+        <li
+          class="list-item active"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            class="edit-box"
+          >
+            <p
+              class="heading underline"
+            >
+              
+                Node 1: Bedroom Sensor
+              
+            </p>
+             
+            <!---->
+             
+            <button
+              class="button button--tertiary"
+            >
+              <i
+                class="material-icons"
+              >
+                edit
+              </i>
+            </button>
+          </div>
+           
+          <div>
+            <p
+              class="text"
+              style=""
+            >
+              No climate data for this sensor
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--secondary"
+            >
+              <i
+                class="material-icons"
+              >
+                close
+              </i>
+            </button>
+             
+            <button
+              class="button button--primary"
+            >
+              View Climate
+            </button>
+          </div>
+           
+          <div
+            class="actions actions--active"
+          >
+            <button
+              class="button button--tertiary"
+            >
+              Delete Sensor
+            </button>
+             
+            <button
+              class="button button--tertiary"
+            >
+              Delete Climate Data
+            </button>
+          </div>
+        </li>
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            class="edit-box"
+          >
+            <p
+              class="heading"
+            >
+              
+                Node 2: Kitchen Sensor
+              
+            </p>
+             
+            <!---->
+             
+            <button
+              class="button button--tertiary"
+            >
+              <i
+                class="material-icons"
+              >
+                edit
+              </i>
+            </button>
+          </div>
+           
+          <div>
+            <ul
+              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
+            >
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Temperature:
+                      23.11°C
+                    
+                </p>
+                 
+                <!---->
+              </li>
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <!---->
+                 
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Humidity: 30%
+                    
+                </p>
+              </li>
+            </ul>
+             
+            <p
+              class="text"
+            >
+              
+                Date received: 2020-01-26 19:00
+              
+            </p>
+             
+            <p
+              class="text battery-status--low"
+              style="display: flex;"
+            >
+              
+                Battery level:
+                Low
+                
+              <i
+                class="material-icons"
+              >
+                battery_alert
+              </i>
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--secondary"
+            >
+              <i
+                class="material-icons"
+              >
+                settings
+              </i>
+            </button>
+             
+            <button
+              class="button button--primary"
+            >
+              View Climate
+            </button>
+          </div>
+           
+          <!---->
+        </li>
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            class="edit-box"
+          >
+            <p
+              class="heading"
+            >
+              
+                Node 3: Garden Sensor
+              
+            </p>
+             
+            <!---->
+             
+            <button
+              class="button button--tertiary"
+            >
+              <i
+                class="material-icons"
+              >
+                edit
+              </i>
+            </button>
+          </div>
+           
+          <div>
+            <ul
+              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
+            >
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Temperature:
+                      23.11°C
+                    
+                </p>
+                 
+                <!---->
+              </li>
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <!---->
+                 
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Humidity: 30%
+                    
+                </p>
+              </li>
+            </ul>
+             
+            <p
+              class="text"
+            >
+              
+                Date received: 2020-01-26 19:00
+              
+            </p>
+             
+            <p
+              class="text battery-status--high"
+              style="display: flex;"
+            >
+              
+                Battery level:
+                High
+                
+              <!---->
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--secondary"
+            >
+              <i
+                class="material-icons"
+              >
+                settings
+              </i>
+            </button>
+             
+            <button
+              class="button button--primary"
+            >
+              View Climate
+            </button>
+          </div>
+           
+          <!---->
+        </li>
+      </ul>
+    </div>
+  </div>
+   
+  <div
+    class="main-panel"
+  >
+    <div
+      class="main-panel-header"
+    >
+      <p
+        class="sub-heading"
+      >
+        
+          Node 1: Bedroom Sensor
+        
+      </p>
+       
+      <button
+        class="button button--secondary"
+      >
+        <i
+          class="material-icons"
+        >
+          refresh
+        </i>
+      </button>
+    </div>
+     
+    <div
+      class="main-panel-content"
+    >
+      <div
+        class="dashboard-content"
+      >
+        <!---->
+         
+        <p
+          class="heading"
+        >
+          Sensor has no climate data.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Dashboard.vue delete sensor 1`] = `
+<div
+  class="content"
+>
+  <div
+    class="side-panel"
+  >
+    <div
+      class="side-panel-header"
+    >
+      <p
+        class="sub-heading"
+      >
+        Sensor Nodes
+      </p>
+       
+      <button
+        class="button button--secondary"
+      >
+        <i
+          class="material-icons"
+        >
+          refresh
+        </i>
+      </button>
+    </div>
+     
+    <div
+      class="side-panel-content"
+    >
+      <ul
+        class="list"
+      >
+        <li
+          class="list-item active"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            class="edit-box"
+          >
+            <p
+              class="heading underline"
+            >
+              
+                Node 2: Kitchen Sensor
+              
+            </p>
+             
+            <!---->
+             
+            <button
+              class="button button--tertiary"
+            >
+              <i
+                class="material-icons"
+              >
+                edit
+              </i>
+            </button>
+          </div>
+           
+          <div>
+            <ul
+              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
+            >
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Temperature:
+                      23.11°C
+                    
+                </p>
+                 
+                <!---->
+              </li>
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <!---->
+                 
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Humidity: 30%
+                    
+                </p>
+              </li>
+            </ul>
+             
+            <p
+              class="text"
+            >
+              
+                Date received: 2020-01-26 19:00
+              
+            </p>
+             
+            <p
+              class="text battery-status--low"
+              style="display: flex;"
+            >
+              
+                Battery level:
+                Low
+                
+              <i
+                class="material-icons"
+              >
+                battery_alert
+              </i>
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--secondary"
+            >
+              <i
+                class="material-icons"
+              >
+                settings
+              </i>
+            </button>
+             
+            <button
+              class="button button--primary"
+            >
+              View Climate
+            </button>
+          </div>
+           
+          <!---->
+        </li>
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            class="edit-box"
+          >
+            <p
+              class="heading"
+            >
+              
+                Node 3: Garden Sensor
+              
+            </p>
+             
+            <!---->
+             
+            <button
+              class="button button--tertiary"
+            >
+              <i
+                class="material-icons"
+              >
+                edit
+              </i>
+            </button>
+          </div>
+           
+          <div>
+            <ul
+              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
+            >
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Temperature:
+                      23.11°C
+                    
+                </p>
+                 
+                <!---->
+              </li>
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <!---->
+                 
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Humidity: 30%
+                    
+                </p>
+              </li>
+            </ul>
+             
+            <p
+              class="text"
+            >
+              
+                Date received: 2020-01-26 19:00
+              
+            </p>
+             
+            <p
+              class="text battery-status--high"
+              style="display: flex;"
+            >
+              
+                Battery level:
+                High
+                
+              <!---->
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--secondary"
+            >
+              <i
+                class="material-icons"
+              >
+                settings
+              </i>
+            </button>
+             
+            <button
+              class="button button--primary"
+            >
+              View Climate
+            </button>
+          </div>
+           
+          <!---->
+        </li>
+      </ul>
+    </div>
+  </div>
+   
+  <div
+    class="main-panel"
+  >
+    <div
+      class="main-panel-header"
+    >
+      <p
+        class="sub-heading"
+      >
+        
+          Node 2: Kitchen Sensor
+        
+      </p>
+       
+      <button
+        class="button button--secondary"
+      >
+        <i
+          class="material-icons"
+        >
+          refresh
+        </i>
+      </button>
+    </div>
+     
+    <div
+      class="main-panel-content"
+    >
+      <div
+        class="dashboard-content"
+      >
+        <!---->
+         
+        <h3
+          class="heading"
+        >
+          Recent Climate Data
+        </h3>
+         
+        <p
+          class="text"
+        >
+          
+              Date received:
+              2020-01-26 19:00
+            
+        </p>
+         
+        <ul
+          class="recent-data-list"
+        >
+          <li>
+            <p
+              class="text"
+            >
+              Temperature
+            </p>
+             
+            <p
+              class="sub-heading"
+            >
+              
+      23.11°C
+    
+            </p>
+          </li>
+          <li>
+            <p
+              class="text"
+            >
+              Humidity
+            </p>
+             
+            <p
+              class="sub-heading"
+            >
+              
+      30%
+    
+            </p>
+          </li>
+        </ul>
+         
+        <h3
+          class="heading"
+        >
+          Historical Climate Data
+        </h3>
+         
+        <div
+          class="historical-actions"
+        >
+          <div
+            class="input-box"
+          >
+            <p
+              class="text"
+            >
+              Historical Range
+            </p>
+             
+            <v-date-picker
+              class="date-picker"
+              color="purple"
+              is-dark=""
+              mode="range"
+            />
+          </div>
+           
+          <button
+            class="button button--secondary active"
+          >
+            1 Day
+          </button>
+           
+          <button
+            class="button button--secondary"
+          >
+            2 Days
+          </button>
+           
+          <button
+            class="button button--secondary"
+          >
+            1 Week
+          </button>
+           
+          <button
+            class="button button--secondary"
+          >
+            1 Month
+          </button>
+        </div>
+         
+        <p>
+          Historical data loading.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Dashboard.vue historical data time period 1`] = `
+<div
+  class="content"
+>
+  <div
+    class="side-panel"
+  >
+    <div
+      class="side-panel-header"
+    >
+      <p
+        class="sub-heading"
+      >
+        Sensor Nodes
+      </p>
+       
+      <button
+        class="button button--secondary"
+      >
+        <i
+          class="material-icons"
+        >
+          refresh
+        </i>
+      </button>
+    </div>
+     
+    <div
+      class="side-panel-content"
+    >
+      <ul
+        class="list"
+      >
+        <li
+          class="list-item active"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            class="edit-box"
+          >
+            <p
+              class="heading underline"
+            >
+              
+                Node 1: Bedroom Sensor
+              
+            </p>
+             
+            <!---->
+             
+            <button
+              class="button button--tertiary"
+            >
+              <i
+                class="material-icons"
+              >
+                edit
+              </i>
+            </button>
+          </div>
+           
+          <div>
+            <ul
+              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
+            >
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Temperature:
+                      21.22°C
+                    
+                </p>
+                 
+                <!---->
+              </li>
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <!---->
+                 
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Humidity: 40.71%
+                    
+                </p>
+              </li>
+            </ul>
+             
+            <p
+              class="text"
+            >
+              
+                Date received: 2020-01-06 11:20
+              
+            </p>
+             
+            <p
+              class="text battery-status--medium"
+              style="display: flex;"
+            >
+              
+                Battery level:
+                Medium
+                
+              <!---->
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--secondary"
+            >
+              <i
+                class="material-icons"
+              >
+                settings
+              </i>
+            </button>
+             
+            <button
+              class="button button--primary"
+            >
+              View Climate
+            </button>
+          </div>
+           
+          <!---->
+        </li>
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            class="edit-box"
+          >
+            <p
+              class="heading"
+            >
+              
+                Node 2: Kitchen Sensor
+              
+            </p>
+             
+            <!---->
+             
+            <button
+              class="button button--tertiary"
+            >
+              <i
+                class="material-icons"
+              >
+                edit
+              </i>
+            </button>
+          </div>
+           
+          <div>
+            <ul
+              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
+            >
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Temperature:
+                      23.11°C
+                    
+                </p>
+                 
+                <!---->
+              </li>
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <!---->
+                 
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Humidity: 30%
+                    
+                </p>
+              </li>
+            </ul>
+             
+            <p
+              class="text"
+            >
+              
+                Date received: 2020-01-26 19:00
+              
+            </p>
+             
+            <p
+              class="text battery-status--low"
+              style="display: flex;"
+            >
+              
+                Battery level:
+                Low
+                
+              <i
+                class="material-icons"
+              >
+                battery_alert
+              </i>
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--secondary"
+            >
+              <i
+                class="material-icons"
+              >
+                settings
+              </i>
+            </button>
+             
+            <button
+              class="button button--primary"
+            >
+              View Climate
+            </button>
+          </div>
+           
+          <!---->
+        </li>
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            class="edit-box"
+          >
+            <p
+              class="heading"
+            >
+              
+                Node 3: Garden Sensor
+              
+            </p>
+             
+            <!---->
+             
+            <button
+              class="button button--tertiary"
+            >
+              <i
+                class="material-icons"
+              >
+                edit
+              </i>
+            </button>
+          </div>
+           
+          <div>
+            <ul
+              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
+            >
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Temperature:
+                      23.11°C
+                    
+                </p>
+                 
+                <!---->
+              </li>
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <!---->
+                 
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Humidity: 30%
+                    
+                </p>
+              </li>
+            </ul>
+             
+            <p
+              class="text"
+            >
+              
+                Date received: 2020-01-26 19:00
+              
+            </p>
+             
+            <p
+              class="text battery-status--high"
+              style="display: flex;"
+            >
+              
+                Battery level:
+                High
+                
+              <!---->
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--secondary"
+            >
+              <i
+                class="material-icons"
+              >
+                settings
+              </i>
+            </button>
+             
+            <button
+              class="button button--primary"
+            >
+              View Climate
+            </button>
+          </div>
+           
+          <!---->
+        </li>
+      </ul>
+    </div>
+  </div>
+   
+  <div
+    class="main-panel"
+  >
+    <div
+      class="main-panel-header"
+    >
+      <p
+        class="sub-heading"
+      >
+        
+          Node 1: Bedroom Sensor
+        
+      </p>
+       
+      <button
+        class="button button--secondary"
+      >
+        <i
+          class="material-icons"
+        >
+          refresh
+        </i>
+      </button>
+    </div>
+     
+    <div
+      class="main-panel-content"
+    >
+      <div
+        class="dashboard-content"
+      >
+        <!---->
+         
+        <h3
+          class="heading"
+        >
+          Recent Climate Data
+        </h3>
+         
+        <p
+          class="text"
+        >
+          
+              Date received:
+              2020-01-06 11:20
+            
+        </p>
+         
+        <ul
+          class="recent-data-list"
+        >
+          <li>
+            <p
+              class="text"
+            >
+              Temperature
+            </p>
+             
+            <p
+              class="sub-heading"
+            >
+              
+      21.22°C
+    
+            </p>
+          </li>
+          <li>
+            <p
+              class="text"
+            >
+              Humidity
+            </p>
+             
+            <p
+              class="sub-heading"
+            >
+              
+      40.71%
+    
+            </p>
+          </li>
+        </ul>
+         
+        <h3
+          class="heading"
+        >
+          Historical Climate Data
+        </h3>
+         
+        <div
+          class="historical-actions"
+        >
+          <div
+            class="input-box"
+          >
+            <p
+              class="text"
+            >
+              Historical Range
+            </p>
+             
+            <v-date-picker
+              class="date-picker"
+              color="purple"
+              is-dark=""
+              mode="range"
+            />
+          </div>
+           
+          <button
+            class="button button--secondary"
+          >
+            1 Day
+          </button>
+           
+          <button
+            class="button button--secondary"
+          >
+            2 Days
+          </button>
+           
+          <button
+            class="button button--secondary"
+          >
+            1 Week
+          </button>
+           
+          <button
+            class="button button--secondary active"
+          >
+            1 Month
+          </button>
+        </div>
+         
+        <p>
+          Historical data loading.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Dashboard.vue multiple sensors 1`] = `
+<div
+  class="content"
+>
+  <div
+    class="side-panel"
+  >
+    <div
+      class="side-panel-header"
+    >
+      <p
+        class="sub-heading"
+      >
+        Sensor Nodes
+      </p>
+       
+      <button
+        class="button button--secondary"
+      >
+        <i
+          class="material-icons"
+        >
+          refresh
+        </i>
+      </button>
+    </div>
+     
+    <div
+      class="side-panel-content"
+    >
+      <ul
+        class="list"
+      >
+        <li
+          class="list-item active"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            class="edit-box"
+          >
+            <p
+              class="heading underline"
+            >
+              
+                Node 1: Bedroom Sensor
+              
+            </p>
+             
+            <!---->
+             
+            <button
+              class="button button--tertiary"
+            >
+              <i
+                class="material-icons"
+              >
+                edit
+              </i>
+            </button>
+          </div>
+           
+          <div>
+            <ul
+              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
+            >
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Temperature:
+                      21.22°C
+                    
+                </p>
+                 
+                <!---->
+              </li>
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <!---->
+                 
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Humidity: 40.71%
+                    
+                </p>
+              </li>
+            </ul>
+             
+            <p
+              class="text"
+            >
+              
+                Date received: 2020-01-06 11:20
+              
+            </p>
+             
+            <p
+              class="text battery-status--medium"
+              style="display: flex;"
+            >
+              
+                Battery level:
+                Medium
+                
+              <!---->
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--secondary"
+            >
+              <i
+                class="material-icons"
+              >
+                settings
+              </i>
+            </button>
+             
+            <button
+              class="button button--primary"
+            >
+              View Climate
+            </button>
+          </div>
+           
+          <!---->
+        </li>
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            class="edit-box"
+          >
+            <p
+              class="heading"
+            >
+              
+                Node 2: Kitchen Sensor
+              
+            </p>
+             
+            <!---->
+             
+            <button
+              class="button button--tertiary"
+            >
+              <i
+                class="material-icons"
+              >
+                edit
+              </i>
+            </button>
+          </div>
+           
+          <div>
+            <ul
+              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
+            >
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Temperature:
+                      23.11°C
+                    
+                </p>
+                 
+                <!---->
+              </li>
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <!---->
+                 
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Humidity: 30%
+                    
+                </p>
+              </li>
+            </ul>
+             
+            <p
+              class="text"
+            >
+              
+                Date received: 2020-01-26 19:00
+              
+            </p>
+             
+            <p
+              class="text battery-status--low"
+              style="display: flex;"
+            >
+              
+                Battery level:
+                Low
+                
+              <i
+                class="material-icons"
+              >
+                battery_alert
+              </i>
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--secondary"
+            >
+              <i
+                class="material-icons"
+              >
+                settings
+              </i>
+            </button>
+             
+            <button
+              class="button button--primary"
+            >
+              View Climate
+            </button>
+          </div>
+           
+          <!---->
+        </li>
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            class="edit-box"
+          >
+            <p
+              class="heading"
+            >
+              
+                Node 3: Garden Sensor
+              
+            </p>
+             
+            <!---->
+             
+            <button
+              class="button button--tertiary"
+            >
+              <i
+                class="material-icons"
+              >
+                edit
+              </i>
+            </button>
+          </div>
+           
+          <div>
+            <ul
+              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
+            >
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Temperature:
+                      23.11°C
+                    
+                </p>
+                 
+                <!---->
+              </li>
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <!---->
+                 
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Humidity: 30%
+                    
+                </p>
+              </li>
+            </ul>
+             
+            <p
+              class="text"
+            >
+              
+                Date received: 2020-01-26 19:00
+              
+            </p>
+             
+            <p
+              class="text battery-status--high"
+              style="display: flex;"
+            >
+              
+                Battery level:
+                High
+                
+              <!---->
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--secondary"
+            >
+              <i
+                class="material-icons"
+              >
+                settings
+              </i>
+            </button>
+             
+            <button
+              class="button button--primary"
+            >
+              View Climate
+            </button>
+          </div>
+           
+          <!---->
+        </li>
+      </ul>
+    </div>
+  </div>
+   
+  <div
+    class="main-panel"
+  >
+    <div
+      class="main-panel-header"
+    >
+      <p
+        class="sub-heading"
+      >
+        
+          Node 1: Bedroom Sensor
+        
+      </p>
+       
+      <button
+        class="button button--secondary"
+      >
+        <i
+          class="material-icons"
+        >
+          refresh
+        </i>
+      </button>
+    </div>
+     
+    <div
+      class="main-panel-content"
+    >
+      <div
+        class="dashboard-content"
+      >
+        <!---->
+         
+        <h3
+          class="heading"
+        >
+          Recent Climate Data
+        </h3>
+         
+        <p
+          class="text"
+        >
+          
+              Date received:
+              2020-01-06 11:20
+            
+        </p>
+         
+        <ul
+          class="recent-data-list"
+        >
+          <li>
+            <p
+              class="text"
+            >
+              Temperature
+            </p>
+             
+            <p
+              class="sub-heading"
+            >
+              
+      21.22°C
+    
+            </p>
+          </li>
+          <li>
+            <p
+              class="text"
+            >
+              Humidity
+            </p>
+             
+            <p
+              class="sub-heading"
+            >
+              
+      40.71%
+    
+            </p>
+          </li>
+        </ul>
+         
+        <h3
+          class="heading"
+        >
+          Historical Climate Data
+        </h3>
+         
+        <div
+          class="historical-actions"
+        >
+          <div
+            class="input-box"
+          >
+            <p
+              class="text"
+            >
+              Historical Range
+            </p>
+             
+            <v-date-picker
+              class="date-picker"
+              color="purple"
+              is-dark=""
+              mode="range"
+            />
+          </div>
+           
+          <button
+            class="button button--secondary active"
+          >
+            1 Day
+          </button>
+           
+          <button
+            class="button button--secondary"
+          >
+            2 Days
+          </button>
+           
+          <button
+            class="button button--secondary"
+          >
+            1 Week
+          </button>
+           
+          <button
+            class="button button--secondary"
+          >
+            1 Month
+          </button>
+        </div>
+         
+        <p>
+          Historical data loading.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Dashboard.vue no sensors 1`] = `
+<div
+  class="content"
+>
+  <div
+    class="side-panel"
+  >
+    <div
+      class="side-panel-header"
+    >
+      <p
+        class="sub-heading"
+      >
+        Sensor Nodes
+      </p>
+       
+      <button
+        class="button button--secondary"
+      >
+        <i
+          class="material-icons"
+        >
+          refresh
+        </i>
+      </button>
+    </div>
+     
+    <div
+      class="side-panel-content"
+    >
       <ul
         class="list"
       >
@@ -30,31 +2299,1140 @@ exports[`Dashboard.vue has the expected html structure 1`] = `
             class="text"
           >
             
-            No sensors created. Connect a sensor node to the base station to
-            create a new sensor.
+            No sensor nodes created. Connect a sensor node to the base station
+            to create a new sensor.
           
           </p>
         </li>
       </ul>
-    </template>
-  </side-panel-stub>
+    </div>
+  </div>
    
-  <main-panel-stub>
-    <template>
+  <div
+    class="main-panel"
+  >
+    <div
+      class="main-panel-header"
+    >
       <p
         class="sub-heading"
       >
         Climate Data
       </p>
-    </template>
+    </div>
      
-    <template>
+    <div
+      class="main-panel-content"
+    >
       <p
         class="heading"
       >
         No sensor selected
       </p>
-    </template>
-  </main-panel-stub>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Dashboard.vue refresh 1`] = `
+<div
+  class="content"
+>
+  <div
+    class="side-panel"
+  >
+    <div
+      class="side-panel-header"
+    >
+      <p
+        class="sub-heading"
+      >
+        Sensor Nodes
+      </p>
+       
+      <button
+        class="button button--secondary"
+      >
+        <i
+          class="material-icons"
+        >
+          refresh
+        </i>
+      </button>
+    </div>
+     
+    <div
+      class="side-panel-content"
+    >
+      <ul
+        class="list"
+      >
+        <li
+          class="list-item active"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            class="edit-box"
+          >
+            <p
+              class="heading underline"
+            >
+              
+                Node 1: Bedroom Sensor
+              
+            </p>
+             
+            <!---->
+             
+            <button
+              class="button button--tertiary"
+            >
+              <i
+                class="material-icons"
+              >
+                edit
+              </i>
+            </button>
+          </div>
+           
+          <div>
+            <ul
+              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
+            >
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Temperature:
+                      21.22°C
+                    
+                </p>
+                 
+                <!---->
+              </li>
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <!---->
+                 
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Humidity: 40.71%
+                    
+                </p>
+              </li>
+            </ul>
+             
+            <p
+              class="text"
+            >
+              
+                Date received: 2020-01-06 11:20
+              
+            </p>
+             
+            <p
+              class="text battery-status--medium"
+              style="display: flex;"
+            >
+              
+                Battery level:
+                Medium
+                
+              <!---->
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--secondary"
+            >
+              <i
+                class="material-icons"
+              >
+                settings
+              </i>
+            </button>
+             
+            <button
+              class="button button--primary"
+            >
+              View Climate
+            </button>
+          </div>
+           
+          <!---->
+        </li>
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            class="edit-box"
+          >
+            <p
+              class="heading"
+            >
+              
+                Node 2: Kitchen Sensor
+              
+            </p>
+             
+            <!---->
+             
+            <button
+              class="button button--tertiary"
+            >
+              <i
+                class="material-icons"
+              >
+                edit
+              </i>
+            </button>
+          </div>
+           
+          <div>
+            <ul
+              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
+            >
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Temperature:
+                      23.11°C
+                    
+                </p>
+                 
+                <!---->
+              </li>
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <!---->
+                 
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Humidity: 30%
+                    
+                </p>
+              </li>
+            </ul>
+             
+            <p
+              class="text"
+            >
+              
+                Date received: 2020-01-26 19:00
+              
+            </p>
+             
+            <p
+              class="text battery-status--low"
+              style="display: flex;"
+            >
+              
+                Battery level:
+                Low
+                
+              <i
+                class="material-icons"
+              >
+                battery_alert
+              </i>
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--secondary"
+            >
+              <i
+                class="material-icons"
+              >
+                settings
+              </i>
+            </button>
+             
+            <button
+              class="button button--primary"
+            >
+              View Climate
+            </button>
+          </div>
+           
+          <!---->
+        </li>
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            class="edit-box"
+          >
+            <p
+              class="heading"
+            >
+              
+                Node 3: Garden Sensor
+              
+            </p>
+             
+            <!---->
+             
+            <button
+              class="button button--tertiary"
+            >
+              <i
+                class="material-icons"
+              >
+                edit
+              </i>
+            </button>
+          </div>
+           
+          <div>
+            <ul
+              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
+            >
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Temperature:
+                      23.11°C
+                    
+                </p>
+                 
+                <!---->
+              </li>
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <!---->
+                 
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Humidity: 30%
+                    
+                </p>
+              </li>
+            </ul>
+             
+            <p
+              class="text"
+            >
+              
+                Date received: 2020-01-26 19:00
+              
+            </p>
+             
+            <p
+              class="text battery-status--high"
+              style="display: flex;"
+            >
+              
+                Battery level:
+                High
+                
+              <!---->
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--secondary"
+            >
+              <i
+                class="material-icons"
+              >
+                settings
+              </i>
+            </button>
+             
+            <button
+              class="button button--primary"
+            >
+              View Climate
+            </button>
+          </div>
+           
+          <!---->
+        </li>
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            class="edit-box"
+          >
+            <p
+              class="heading"
+            >
+              
+                Node 4: Greenhouse Sensor
+              
+            </p>
+             
+            <!---->
+             
+            <button
+              class="button button--tertiary"
+            >
+              <i
+                class="material-icons"
+              >
+                edit
+              </i>
+            </button>
+          </div>
+           
+          <div>
+            <ul
+              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
+            >
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Temperature:
+                      21.22°C
+                    
+                </p>
+                 
+                <!---->
+              </li>
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <!---->
+                 
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Humidity: 40.71%
+                    
+                </p>
+              </li>
+            </ul>
+             
+            <p
+              class="text"
+            >
+              
+                Date received: 2020-01-06 11:20
+              
+            </p>
+             
+            <p
+              class="text battery-status--medium"
+              style="display: flex;"
+            >
+              
+                Battery level:
+                Medium
+                
+              <!---->
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--secondary"
+            >
+              <i
+                class="material-icons"
+              >
+                settings
+              </i>
+            </button>
+             
+            <button
+              class="button button--primary"
+            >
+              View Climate
+            </button>
+          </div>
+           
+          <!---->
+        </li>
+      </ul>
+    </div>
+  </div>
+   
+  <div
+    class="main-panel"
+  >
+    <div
+      class="main-panel-header"
+    >
+      <p
+        class="sub-heading"
+      >
+        
+          Node 1: Bedroom Sensor
+        
+      </p>
+       
+      <button
+        class="button button--secondary"
+      >
+        <i
+          class="material-icons"
+        >
+          refresh
+        </i>
+      </button>
+    </div>
+     
+    <div
+      class="main-panel-content"
+    >
+      <div
+        class="dashboard-content"
+      >
+        <!---->
+         
+        <h3
+          class="heading"
+        >
+          Recent Climate Data
+        </h3>
+         
+        <p
+          class="text"
+        >
+          
+              Date received:
+              2020-01-06 11:20
+            
+        </p>
+         
+        <ul
+          class="recent-data-list"
+        >
+          <li>
+            <p
+              class="text"
+            >
+              Temperature
+            </p>
+             
+            <p
+              class="sub-heading"
+            >
+              
+      21.22°C
+    
+            </p>
+          </li>
+          <li>
+            <p
+              class="text"
+            >
+              Humidity
+            </p>
+             
+            <p
+              class="sub-heading"
+            >
+              
+      40.71%
+    
+            </p>
+          </li>
+        </ul>
+         
+        <h3
+          class="heading"
+        >
+          Historical Climate Data
+        </h3>
+         
+        <div
+          class="historical-actions"
+        >
+          <div
+            class="input-box"
+          >
+            <p
+              class="text"
+            >
+              Historical Range
+            </p>
+             
+            <v-date-picker
+              class="date-picker"
+              color="purple"
+              is-dark=""
+              mode="range"
+            />
+          </div>
+           
+          <button
+            class="button button--secondary active"
+          >
+            1 Day
+          </button>
+           
+          <button
+            class="button button--secondary"
+          >
+            2 Days
+          </button>
+           
+          <button
+            class="button button--secondary"
+          >
+            1 Week
+          </button>
+           
+          <button
+            class="button button--secondary"
+          >
+            1 Month
+          </button>
+        </div>
+         
+        <p>
+          Historical data loading.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Dashboard.vue rename sensor 1`] = `
+<div
+  class="content"
+>
+  <div
+    class="side-panel"
+  >
+    <div
+      class="side-panel-header"
+    >
+      <p
+        class="sub-heading"
+      >
+        Sensor Nodes
+      </p>
+       
+      <button
+        class="button button--secondary"
+      >
+        <i
+          class="material-icons"
+        >
+          refresh
+        </i>
+      </button>
+    </div>
+     
+    <div
+      class="side-panel-content"
+    >
+      <ul
+        class="list"
+      >
+        <li
+          class="list-item active"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            class="edit-box"
+          >
+            <p
+              class="heading underline"
+            >
+              
+                Node 1: Shed Sensor
+              
+            </p>
+             
+            <!---->
+             
+            <button
+              class="button button--tertiary"
+            >
+              <i
+                class="material-icons"
+              >
+                edit
+              </i>
+            </button>
+          </div>
+           
+          <div>
+            <ul
+              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
+            >
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Temperature:
+                      21.22°C
+                    
+                </p>
+                 
+                <!---->
+              </li>
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <!---->
+                 
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Humidity: 40.71%
+                    
+                </p>
+              </li>
+            </ul>
+             
+            <p
+              class="text"
+            >
+              
+                Date received: 2020-01-06 11:20
+              
+            </p>
+             
+            <p
+              class="text battery-status--medium"
+              style="display: flex;"
+            >
+              
+                Battery level:
+                Medium
+                
+              <!---->
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--secondary"
+            >
+              <i
+                class="material-icons"
+              >
+                settings
+              </i>
+            </button>
+             
+            <button
+              class="button button--primary"
+            >
+              View Climate
+            </button>
+          </div>
+           
+          <!---->
+        </li>
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            class="edit-box"
+          >
+            <p
+              class="heading"
+            >
+              
+                Node 2: Kitchen Sensor
+              
+            </p>
+             
+            <!---->
+             
+            <button
+              class="button button--tertiary"
+            >
+              <i
+                class="material-icons"
+              >
+                edit
+              </i>
+            </button>
+          </div>
+           
+          <div>
+            <ul
+              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
+            >
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Temperature:
+                      23.11°C
+                    
+                </p>
+                 
+                <!---->
+              </li>
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <!---->
+                 
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Humidity: 30%
+                    
+                </p>
+              </li>
+            </ul>
+             
+            <p
+              class="text"
+            >
+              
+                Date received: 2020-01-26 19:00
+              
+            </p>
+             
+            <p
+              class="text battery-status--low"
+              style="display: flex;"
+            >
+              
+                Battery level:
+                Low
+                
+              <i
+                class="material-icons"
+              >
+                battery_alert
+              </i>
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--secondary"
+            >
+              <i
+                class="material-icons"
+              >
+                settings
+              </i>
+            </button>
+             
+            <button
+              class="button button--primary"
+            >
+              View Climate
+            </button>
+          </div>
+           
+          <!---->
+        </li>
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            class="edit-box"
+          >
+            <p
+              class="heading"
+            >
+              
+                Node 3: Garden Sensor
+              
+            </p>
+             
+            <!---->
+             
+            <button
+              class="button button--tertiary"
+            >
+              <i
+                class="material-icons"
+              >
+                edit
+              </i>
+            </button>
+          </div>
+           
+          <div>
+            <ul
+              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
+            >
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Temperature:
+                      23.11°C
+                    
+                </p>
+                 
+                <!---->
+              </li>
+              <li
+                style="padding-right: 0.5em;"
+              >
+                <!---->
+                 
+                <p
+                  class="text text--bold"
+                  style="margin: 0.5em 0px 0px 0px;"
+                >
+                  
+                      Humidity: 30%
+                    
+                </p>
+              </li>
+            </ul>
+             
+            <p
+              class="text"
+            >
+              
+                Date received: 2020-01-26 19:00
+              
+            </p>
+             
+            <p
+              class="text battery-status--high"
+              style="display: flex;"
+            >
+              
+                Battery level:
+                High
+                
+              <!---->
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--secondary"
+            >
+              <i
+                class="material-icons"
+              >
+                settings
+              </i>
+            </button>
+             
+            <button
+              class="button button--primary"
+            >
+              View Climate
+            </button>
+          </div>
+           
+          <!---->
+        </li>
+      </ul>
+    </div>
+  </div>
+   
+  <div
+    class="main-panel"
+  >
+    <div
+      class="main-panel-header"
+    >
+      <p
+        class="sub-heading"
+      >
+        
+          Node 1: Shed Sensor
+        
+      </p>
+       
+      <button
+        class="button button--secondary"
+      >
+        <i
+          class="material-icons"
+        >
+          refresh
+        </i>
+      </button>
+    </div>
+     
+    <div
+      class="main-panel-content"
+    >
+      <div
+        class="dashboard-content"
+      >
+        <!---->
+         
+        <h3
+          class="heading"
+        >
+          Recent Climate Data
+        </h3>
+         
+        <p
+          class="text"
+        >
+          
+              Date received:
+              2020-01-06 11:20
+            
+        </p>
+         
+        <ul
+          class="recent-data-list"
+        >
+          <li>
+            <p
+              class="text"
+            >
+              Temperature
+            </p>
+             
+            <p
+              class="sub-heading"
+            >
+              
+      21.22°C
+    
+            </p>
+          </li>
+          <li>
+            <p
+              class="text"
+            >
+              Humidity
+            </p>
+             
+            <p
+              class="sub-heading"
+            >
+              
+      40.71%
+    
+            </p>
+          </li>
+        </ul>
+         
+        <h3
+          class="heading"
+        >
+          Historical Climate Data
+        </h3>
+         
+        <div
+          class="historical-actions"
+        >
+          <div
+            class="input-box"
+          >
+            <p
+              class="text"
+            >
+              Historical Range
+            </p>
+             
+            <v-date-picker
+              class="date-picker"
+              color="purple"
+              is-dark=""
+              mode="range"
+            />
+          </div>
+           
+          <button
+            class="button button--secondary active"
+          >
+            1 Day
+          </button>
+           
+          <button
+            class="button button--secondary"
+          >
+            2 Days
+          </button>
+           
+          <button
+            class="button button--secondary"
+          >
+            1 Week
+          </button>
+           
+          <button
+            class="button button--secondary"
+          >
+            1 Month
+          </button>
+        </div>
+         
+        <p>
+          Historical data loading.
+        </p>
+      </div>
+    </div>
+  </div>
 </div>
 `;

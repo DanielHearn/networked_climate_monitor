@@ -89,7 +89,7 @@ exports[`Register.vue registered 1`] = `
           </p>
            
           <span
-            class="text bold"
+            class="text bold reset-token"
           >
             Reset token: 
           </span>
