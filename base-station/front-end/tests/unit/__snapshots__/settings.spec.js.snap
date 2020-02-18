@@ -1,19 +1,176 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Login.vue has the expected html structure 1`] = `
+exports[`Settings.vue category changing 1`] = `
 <div
   class="content"
 >
-  <side-panel-stub>
-    <template>
+  <div
+    class="side-panel"
+  >
+    <div
+      class="side-panel-header"
+    >
       <p
         class="sub-heading"
       >
         Settings Categories
       </p>
-    </template>
+    </div>
      
-    <template>
+    <div
+      class="side-panel-content"
+    >
+      <ul
+        class="list"
+      >
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            style="display: flex; flex-direction: row;"
+          >
+            <p
+              class="heading"
+              style="margin-right: 0.25em; display: flex; align-items: center;"
+            >
+              
+                Measurement Settings
+              
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--primary"
+            >
+              Edit settings
+            </button>
+          </div>
+        </li>
+         
+        <li
+          class="list-item active"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            style="display: flex; flex-direction: row;"
+          >
+            <p
+              class="heading underline"
+              style="margin-right: 0.25em; display: flex; align-items: center;"
+            >
+              
+                Account Management
+              
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--primary"
+            >
+              Manage account
+            </button>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+   
+  <div
+    class="main-panel"
+  >
+    <div
+      class="main-panel-header"
+    >
+      <p
+        class="sub-heading"
+      >
+        Account Management
+      </p>
+    </div>
+     
+    <div
+      class="main-panel-content"
+    >
+      <div
+        class="dashboard-content"
+      >
+        <!---->
+         
+        <div
+          class="settings-box"
+        >
+          <router-link
+            class="link"
+            to="/reset-password"
+          >
+            Change Password
+          </router-link>
+        </div>
+         
+        <div
+          class="settings-box"
+        >
+          <p
+            class="sub-heading"
+          >
+            Reset Token
+          </p>
+           
+          <p
+            class="text italics"
+          >
+            
+                This reset token can be used to reset the account password on
+                the password reset page.
+              
+          </p>
+           
+          <p
+            class="text"
+          >
+            
+                Reset Token:
+                
+            <span
+              class="bold"
+            >
+              1234
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Settings.vue change temperature unit 1`] = `
+<div
+  class="content"
+>
+  <div
+    class="side-panel"
+  >
+    <div
+      class="side-panel-header"
+    >
+      <p
+        class="sub-heading"
+      >
+        Settings Categories
+      </p>
+    </div>
+     
+    <div
+      class="side-panel-content"
+    >
       <ul
         class="list"
       >
@@ -37,10 +194,11 @@ exports[`Login.vue has the expected html structure 1`] = `
           <div
             class="actions"
           >
-            <v-button-stub
-              hierachylevel="primary"
-              text="Edit settings"
-            />
+            <button
+              class="button button--primary"
+            >
+              Edit settings
+            </button>
           </div>
         </li>
          
@@ -64,38 +222,448 @@ exports[`Login.vue has the expected html structure 1`] = `
           <div
             class="actions"
           >
-            <v-button-stub
-              hierachylevel="primary"
-              text="Manage account"
-            />
+            <button
+              class="button button--primary"
+            >
+              Manage account
+            </button>
           </div>
         </li>
       </ul>
-    </template>
-  </side-panel-stub>
+    </div>
+  </div>
    
-  <main-panel-stub>
-    <template>
+  <div
+    class="main-panel"
+  >
+    <div
+      class="main-panel-header"
+    >
       <p
         class="sub-heading"
       >
         Measurement Settings
       </p>
-    </template>
+    </div>
      
-    <template>
+    <div
+      class="main-panel-content"
+    >
       <div
         class="dashboard-content"
       >
         <!---->
          
-        <p>
-          Please log in
-        </p>
+        <div
+          class="input-box"
+        >
+          <p
+            class="sub-heading"
+          >
+            Temperature Unit:
+          </p>
+           
+          <div
+            class="radio-container"
+          >
+            <div
+              class="radio-option"
+            >
+              <label
+                for="temp_unit_c"
+              >
+                Celsius
+                      
+                <input
+                  class="radio"
+                  id="temp_unit_c"
+                  type="radio"
+                  value="c"
+                />
+                 
+                <span
+                  class="input"
+                >
+                  <i
+                    class="material-icons"
+                  />
+                </span>
+              </label>
+            </div>
+             
+            <div
+              class="radio-option active"
+            >
+              <label
+                for="temp_unit_f"
+              >
+                Farenheit
+                      
+                <input
+                  class="radio"
+                  id="temp_unit_f"
+                  type="radio"
+                  value="f"
+                />
+                 
+                <span
+                  class="input"
+                >
+                  <i
+                    class="material-icons"
+                  >
+                    done
+                  </i>
+                </span>
+              </label>
+            </div>
+          </div>
+           
+          <p
+            class="text italics"
+          >
+            
+                  Temperatures are stored in celsius and will be displayed in
+                  farenheit
+                
+          </p>
+        </div>
       </div>
-    </template>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Settings.vue has the expected html structure 1`] = `
+<div
+  class="content"
+>
+  <div
+    class="side-panel"
+  >
+    <div
+      class="side-panel-header"
+    >
+      <p
+        class="sub-heading"
+      >
+        Settings Categories
+      </p>
+    </div>
      
-    <!---->
-  </main-panel-stub>
+    <div
+      class="side-panel-content"
+    >
+      <ul
+        class="list"
+      >
+        <li
+          class="list-item active"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            style="display: flex; flex-direction: row;"
+          >
+            <p
+              class="heading underline"
+              style="margin-right: 0.25em; display: flex; align-items: center;"
+            >
+              
+                Measurement Settings
+              
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--primary"
+            >
+              Edit settings
+            </button>
+          </div>
+        </li>
+         
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            style="display: flex; flex-direction: row;"
+          >
+            <p
+              class="heading"
+              style="margin-right: 0.25em; display: flex; align-items: center;"
+            >
+              
+                Account Management
+              
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--primary"
+            >
+              Manage account
+            </button>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+   
+  <div
+    class="main-panel"
+  >
+    <div
+      class="main-panel-header"
+    >
+      <p
+        class="sub-heading"
+      >
+        Measurement Settings
+      </p>
+    </div>
+     
+    <div
+      class="main-panel-content"
+    >
+      <div
+        class="dashboard-content"
+      >
+        <!---->
+         
+        <div
+          class="input-box"
+        >
+          <p
+            class="sub-heading"
+          >
+            Temperature Unit:
+          </p>
+           
+          <div
+            class="radio-container"
+          >
+            <div
+              class="radio-option active"
+            >
+              <label
+                for="temp_unit_c"
+              >
+                Celsius
+                      
+                <input
+                  class="radio"
+                  id="temp_unit_c"
+                  type="radio"
+                  value="c"
+                />
+                 
+                <span
+                  class="input"
+                >
+                  <i
+                    class="material-icons"
+                  >
+                    done
+                  </i>
+                </span>
+              </label>
+            </div>
+             
+            <div
+              class="radio-option"
+            >
+              <label
+                for="temp_unit_f"
+              >
+                Farenheit
+                      
+                <input
+                  class="radio"
+                  id="temp_unit_f"
+                  type="radio"
+                  value="f"
+                />
+                 
+                <span
+                  class="input"
+                >
+                  <i
+                    class="material-icons"
+                  />
+                </span>
+              </label>
+            </div>
+          </div>
+           
+          <p
+            class="text italics"
+          >
+            
+                  Temperatures are stored in celsius and will be displayed in
+                  celsius.
+                
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Settings.vue reset token 1`] = `
+<div
+  class="content"
+>
+  <div
+    class="side-panel"
+  >
+    <div
+      class="side-panel-header"
+    >
+      <p
+        class="sub-heading"
+      >
+        Settings Categories
+      </p>
+    </div>
+     
+    <div
+      class="side-panel-content"
+    >
+      <ul
+        class="list"
+      >
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            style="display: flex; flex-direction: row;"
+          >
+            <p
+              class="heading"
+              style="margin-right: 0.25em; display: flex; align-items: center;"
+            >
+              
+                Measurement Settings
+              
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--primary"
+            >
+              Edit settings
+            </button>
+          </div>
+        </li>
+         
+        <li
+          class="list-item active"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            style="display: flex; flex-direction: row;"
+          >
+            <p
+              class="heading underline"
+              style="margin-right: 0.25em; display: flex; align-items: center;"
+            >
+              
+                Account Management
+              
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--primary"
+            >
+              Manage account
+            </button>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+   
+  <div
+    class="main-panel"
+  >
+    <div
+      class="main-panel-header"
+    >
+      <p
+        class="sub-heading"
+      >
+        Account Management
+      </p>
+    </div>
+     
+    <div
+      class="main-panel-content"
+    >
+      <div
+        class="dashboard-content"
+      >
+        <!---->
+         
+        <div
+          class="settings-box"
+        >
+          <router-link
+            class="link"
+            to="/reset-password"
+          >
+            Change Password
+          </router-link>
+        </div>
+         
+        <div
+          class="settings-box"
+        >
+          <p
+            class="sub-heading"
+          >
+            Reset Token
+          </p>
+           
+          <p
+            class="text italics"
+          >
+            
+                This reset token can be used to reset the account password on
+                the password reset page.
+              
+          </p>
+           
+          <p
+            class="text"
+          >
+            
+                Reset Token:
+                
+            <span
+              class="bold"
+            >
+              1234
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 `;

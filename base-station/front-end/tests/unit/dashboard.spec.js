@@ -10,14 +10,7 @@ import {
   deleteClimateData,
   patchSensor
 } from './../../src/static/api.js'
-import {
-  sub,
-  startOfYesterday,
-  endOfToday,
-  startOfToday,
-  startOfDay,
-  endOfDay
-} from 'date-fns'
+import { sub, startOfYesterday, endOfToday, startOfToday } from 'date-fns'
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
