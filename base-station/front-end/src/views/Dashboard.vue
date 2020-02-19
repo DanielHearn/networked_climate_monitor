@@ -340,16 +340,32 @@ const chartOptions = {
 }
 
 const typeColours = {
-  temperature: '#f87979',
-  humidity: '#79a6f8',
-  battery: '#FFE453'
+  temperature: {
+    light: '#FFCA95',
+    dark: '#EFA050'
+  },
+  humidity: {
+    light: '#BCDFF9',
+    dark: '#5CB2F2'
+  },
+  battery: {
+    light: '#ffe78e',
+    dark: '#ffdb56'
+  },
+  pressure: {
+    light: '#be96f5',
+    dark: '#9450ef'
+  }
 }
 
-function getTypeColor(lowercaseType) {
+function getTypeColors(lowercaseType) {
   if (typeColours[lowercaseType]) {
     return typeColours[lowercaseType]
   } else {
-    return '#FFE453'
+    return {
+      light: '#FFE453',
+      dark: '#FFE453'
+    }
   }
 }
 
@@ -509,6 +525,7 @@ export default {
         ]
       }
 
+      const batteryColours = getTypeColors('battery')
       // Create battery chart data
       historicalData['battery'] = {
         title: 'Battery Level',
@@ -516,13 +533,16 @@ export default {
         datasets: [
           {
             label: 'Battery Voltage (v)',
-            backgroundColor: typeColours['battery'],
+            backgroundColor: batteryColours.light,
+            borderColor: batteryColours.dark,
+            pointBackgroundColor: '#313131',
+            pointBorderWidth: 0,
+            pointBorderColor: 'transparent',
+            pointRadius: 3.5,
+            borderWidth: 4,
             spanGaps: true,
             data: [],
             lineTension: 0
-            //borderColor: 'rgba(255, 228, 83, 1)',
-            //pointBorderColor: 'rgba(255, 228, 83, 1)',
-            //pointBackgroundColor: 'rgba(255, 240, 90, 1)'
           }
         ],
         options: batteryChartOptions
@@ -558,6 +578,7 @@ export default {
           ]
         }
 
+        const typeColour = getTypeColors(lowercaseType)
         // Create chart data
         historicalData[lowercaseType] = {
           title: type,
@@ -565,9 +586,15 @@ export default {
           datasets: [
             {
               label: `${type} (${unit})`,
-              backgroundColor: getTypeColor(lowercaseType),
+              backgroundColor: typeColour.light,
+              borderColor: typeColour.dark,
               spanGaps: true,
-              data: []
+              data: [],
+              pointBackgroundColor: '#313131',
+              pointBorderWidth: 0,
+              pointBorderColor: 'transparent',
+              pointRadius: 3.5,
+              lineTension: 0
             }
           ],
           options: climateChartOptions
