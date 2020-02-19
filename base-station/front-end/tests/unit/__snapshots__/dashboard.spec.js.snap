@@ -465,7 +465,9 @@ exports[`Dashboard.vue change active sensor 1`] = `
             />
           </div>
            
-          <div>
+          <div
+            class="button-grid"
+          >
             <button
               class="button button--secondary active"
             >
@@ -1229,7 +1231,9 @@ exports[`Dashboard.vue delete sensor 1`] = `
             />
           </div>
            
-          <div>
+          <div
+            class="button-grid"
+          >
             <button
               class="button button--secondary active"
             >
@@ -1730,7 +1734,9 @@ exports[`Dashboard.vue historical data time period 1`] = `
             />
           </div>
            
-          <div>
+          <div
+            class="button-grid"
+          >
             <button
               class="button button--secondary"
             >
@@ -2231,7 +2237,9 @@ exports[`Dashboard.vue multiple sensors 1`] = `
             />
           </div>
            
-          <div>
+          <div
+            class="button-grid"
+          >
             <button
               class="button button--secondary active"
             >
@@ -2912,7 +2920,9 @@ exports[`Dashboard.vue refresh 1`] = `
             />
           </div>
            
-          <div>
+          <div
+            class="button-grid"
+          >
             <button
               class="button button--secondary active"
             >
@@ -3413,7 +3423,9 @@ exports[`Dashboard.vue rename sensor 1`] = `
             />
           </div>
            
-          <div>
+          <div
+            class="button-grid"
+          >
             <button
               class="button button--secondary active"
             >

@@ -514,7 +514,9 @@ class UserLogin(Resource):
                 return {
                     'status': 'Successful login',
                     'access_token': access_token,
-                    'refresh_token': refresh_token
+                    'refresh_token': refresh_token,
+                    'email': current_user.email,
+                    'settings': current_user.settings
                 }
             except:
                 return {'status': 'Error', 'errors': [

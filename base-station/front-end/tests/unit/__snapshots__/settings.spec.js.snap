@@ -269,7 +269,7 @@ exports[`Settings.vue change temperature unit 1`] = `
               <label
                 for="temp_unit_c"
               >
-                Celsius
+                Celsius:
                       
                 <input
                   class="radio"
@@ -294,7 +294,7 @@ exports[`Settings.vue change temperature unit 1`] = `
               <label
                 for="temp_unit_f"
               >
-                Farenheit
+                Fahrenheit:
                       
                 <input
                   class="radio"
@@ -452,7 +452,7 @@ exports[`Settings.vue has the expected html structure 1`] = `
               <label
                 for="temp_unit_c"
               >
-                Celsius
+                Celsius:
                       
                 <input
                   class="radio"
@@ -479,7 +479,7 @@ exports[`Settings.vue has the expected html structure 1`] = `
               <label
                 for="temp_unit_f"
               >
-                Farenheit
+                Fahrenheit:
                       
                 <input
                   class="radio"

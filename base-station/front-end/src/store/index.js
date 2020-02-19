@@ -37,12 +37,9 @@ export const actions = {
    * @param {object} data - User details
    * @param {boolean} doRetrieveAcc - Whether user details should be retrieved from the API
    */
-  login({ commit, dispatch }, data, doRetrieveAcc) {
+  login({ commit }, data) {
+    data.settings = JSON.parse(data.settings.replace(/'/g, '"'))
     commit('setUser', data)
-
-    if (doRetrieveAcc) {
-      dispatch('retrieveAccount', data.access_token)
-    }
   },
   /**
    * Update the user details and retrieve user details from the API

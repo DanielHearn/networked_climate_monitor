@@ -26,9 +26,8 @@ export default {
         .then(response => {
           const data = response.data
           if (data.status && data.access_token && data.refresh_token) {
-            data.email = email
             data.logged_in = true
-            this.$store.dispatch('login', data, true)
+            this.$store.dispatch('login', data)
           }
         })
         .catch(e => {
