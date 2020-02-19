@@ -548,9 +548,9 @@ export default {
             type: 'time',
             distribution: 'series',
             time: {
-              unit: 'quarter',
+              unit: 'custom',
               displayFormats: {
-                quarter: 'h:mma MMM D'
+                custom: 'h:mma D MMM'
               }
             },
             ticks: {
@@ -622,9 +622,9 @@ export default {
               type: 'time',
               distribution: 'series',
               time: {
-                unit: 'quarter',
+                unit: 'custom',
                 displayFormats: {
-                  quarter: 'h:mma MMM D'
+                  custom: 'h:mma D MMM'
                 }
               },
               ticks: {
