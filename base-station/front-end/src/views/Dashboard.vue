@@ -310,12 +310,16 @@ import {
   endOfToday,
   startOfToday,
   startOfDay,
-  endOfDay
+  endOfDay,
+  parseISO
 } from 'date-fns'
 
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
+  animation: {
+    duration: 0
+  },
   legend: {
     labels: {
       fontFamily: 'Poppins'
@@ -336,9 +340,14 @@ const chartOptions = {
         }
       }
     ]
+  },
+  elements: {
+    line: {
+      tension: 0 // disables bezier curves
+    }
   }
 }
-
+const darkestColour = '#242424'
 const typeColours = {
   temperature: {
     light: '#FFCA95',
@@ -403,9 +412,17 @@ export default {
     },
     settings: function() {
       return this.$store.state.user.settings
+    },
+    mobile: function() {
+      return this.$store.state.mobile
     }
   },
   watch: {
+    mobile: function(newMobile, oldMobile) {
+      if (newMobile !== oldMobile) {
+        this.loadHistoricalData(this.activeSensorID)
+      }
+    },
     sensors: function(newSensors) {
       if (newSensors.length && !this.$store.state.mobile) {
         this.makeNextActiveSensor()
@@ -497,7 +514,7 @@ export default {
     processHistoricalData: function(climateData) {
       // Disable existing charts so that the new charts can be generated
       this.historicalData = []
-      this.historicalData = false
+      this.historicalDataLoaded = false
 
       const historicalData = {}
       const dates = []
@@ -519,7 +536,28 @@ export default {
               beginAtZero: false,
               callback: function(value) {
                 return `${value}v`
+              },
+              source: 'labels',
+              fontFamily: 'Poppins',
+              fontColor: darkestColour
+            }
+          }
+        ],
+        xAxes: [
+          {
+            type: 'time',
+            distribution: 'series',
+            time: {
+              unit: 'quarter',
+              displayFormats: {
+                quarter: 'h:mma MMM D'
               }
+            },
+            ticks: {
+              source: 'labels',
+              fontFamily: 'Poppins',
+              fontColor: darkestColour,
+              display: !this.mobile
             }
           }
         ]
@@ -572,7 +610,28 @@ export default {
                 beginAtZero: true,
                 callback: function(value) {
                   return `${value}${unit}`
+                },
+                source: 'labels',
+                fontFamily: 'Poppins',
+                fontColor: darkestColour
+              }
+            }
+          ],
+          xAxes: [
+            {
+              type: 'time',
+              distribution: 'series',
+              time: {
+                unit: 'quarter',
+                displayFormats: {
+                  quarter: 'h:mma MMM D'
                 }
+              },
+              ticks: {
+                source: 'labels',
+                fontFamily: 'Poppins',
+                fontColor: darkestColour,
+                display: !this.mobile
               }
             }
           ]
@@ -603,7 +662,7 @@ export default {
 
       // Put climate data into the corresponding datasets
       orderedClimateData.forEach(climate => {
-        dates.push(climate.date)
+        dates.push(parseISO(climate.date))
         historicalData['battery'].datasets[0].data.push(climate.battery_voltage)
         if (climate.climate_data) {
           const climate_data = climate.climate_data
@@ -634,7 +693,9 @@ export default {
         }
       })
       this.historicalData = historicalData
-      this.historicalDataLoaded = true
+      setTimeout(() => {
+        this.historicalDataLoaded = true
+      }, 10)
     },
     // Retrieve historical climate data for the sensor and generate the historical data charts
     loadHistoricalData: function(sensorID) {
