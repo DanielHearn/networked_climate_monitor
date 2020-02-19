@@ -123,15 +123,15 @@
 .battery-status {
   &--high {
     color: $green;
-    font-weight: 500;
+    font-weight: 500 !important;
   }
   &--medium {
     color: $orange;
-    font-weight: 500;
+    font-weight: 500 !important;
   }
   &--low {
     color: $red;
-    font-weight: 500;
+    font-weight: 500 !important;
   }
 }
 

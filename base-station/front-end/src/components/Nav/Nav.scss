@@ -26,7 +26,7 @@
     .title--nav {
       color: $white;
       text-decoration: none;
-      padding-left: 0.25em;
+      padding-left: 0.5em;
       &:hover {
         text-decoration: underline;
       }
@@ -62,5 +62,8 @@
         text-decoration: underline;
       }
     }
+  }
+  .button {
+    height: 100%;
   }
 }
