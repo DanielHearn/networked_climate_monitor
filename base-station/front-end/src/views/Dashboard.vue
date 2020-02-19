@@ -225,7 +225,7 @@
                     is-dark
                   />
                 </div>
-                <div>
+                <div class="button-grid">
                   <v-button
                     @click.native="rangeLastDay()"
                     :hierachyLevel="'secondary'"

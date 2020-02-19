@@ -94,7 +94,7 @@
                       :class="{ active: settings.temperature_unit === 'c' }"
                     >
                       <label for="temp_unit_c"
-                        >Celsius
+                        >Celsius:
                         <input
                           type="radio"
                           id="temp_unit_c"
@@ -115,7 +115,7 @@
                       :class="{ active: settings.temperature_unit === 'f' }"
                     >
                       <label for="temp_unit_f"
-                        >Farenheit
+                        >Fahrenheit:
                         <input
                           type="radio"
                           id="temp_unit_f"

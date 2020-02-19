@@ -68,25 +68,27 @@ input.vc-text-base.vc-border {
 
 .radio-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   .radio-option {
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin: 0.25em 0;
+    margin: 0.15em 0;
     label {
       display: flex;
-      width: 8em;
       align-items: center;
       justify-content: space-between;
+      cursor: pointer;
+      margin-right: 2em;
       &:hover .input {
         background: rgb(168, 168, 168);
         border-color: $darkest;
       }
     }
     .input {
-      width: 1.8em;
-      height: 1.8em;
+      width: 1.7em;
+      height: 1.7em;
+      margin-left: 0.5em;
       background: #d2d2d2;
       border: solid 2px $darkest;
       cursor: pointer;

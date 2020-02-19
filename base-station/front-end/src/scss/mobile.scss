@@ -2,6 +2,7 @@
 
 .mobile {
   .historical-actions {
+    width: 100%;
     .button {
       margin-right: 1em;
       margin-bottom: 1em;
@@ -13,5 +14,10 @@
         width: 100%;
       }
     }
+  }
+  .button-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 50%);
+    width: 100%;
   }
 }

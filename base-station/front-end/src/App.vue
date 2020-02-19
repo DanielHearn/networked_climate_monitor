@@ -54,7 +54,7 @@ export default {
   methods: {
     checkScreenSize: function() {
       // Update mobile state if the browser's window with is below threshold
-      this.$store.commit('setMobile', window.innerWidth <= 800)
+      this.$store.commit('setMobile', window.innerWidth <= 900)
     },
     loginFromStorage: function() {
       // Retrieve the tokens from local storage

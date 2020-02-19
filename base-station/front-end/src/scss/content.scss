@@ -57,10 +57,11 @@
     margin-right: 0.25em;
     display: flex;
     align-items: center;
+    white-space: nowrap;
   }
   .input--text{
     height: fit-content;
-    font-size: $m-size;
+    //font-size: $m-size;
   }
   .button {
     height: auto;

@@ -27,3 +27,15 @@
     }
   }
 }
+
+.mobile {
+  .recent-data-list {
+    display: grid;
+    grid-template-columns: repeat(2, 50%);
+    width: 100%;
+    li {
+      height: initial;
+      width: initial;
+    }
+  }
+}
