@@ -383,11 +383,13 @@ void processPacket() {
         String value_string = token_string.substring(part_split_index + 1);
 
         // Perform actions based on packet data
-        if (packet_type == "I" && key_string == "id" && new_node == true) {
+        if (packet_type == "I" && key_string == "id") {
           Serial.println("Initial node ID received");
+          Serial.println(value_string); 
           node_id = value_string.toInt();
           storeNodeId(node_id);
-        } else if (packet_type == "T" && key_string == "next") {
+          new_node = true;
+        } else if ((packet_type == "I" || packet_type == "T") && key_string == "next") {
           Serial.println("Time period received");
           send_interval = value_string.toInt();
           if(initialised == false) {
@@ -407,10 +409,11 @@ void processPacket() {
 }
 
 void initialise() {
+  clearEEPROM();
   Serial.println("Attempting initialisation");
   long initial_delay = 0;
 
-  int node_id = getStoredNodeId();
+  node_id = getStoredNodeId();
   new_node = node_id == 254;
   Serial.println(node_id);
   initRadio(node_id);
@@ -424,11 +427,10 @@ void initialise() {
   // Send initialisation packet
   radio.send(BASESTATIONID,  payload_data, sizeof(payload_data), false);
   processPacket();
-
+  Serial.println(node_id);
   // Re-initialise radio with new node ID
   if(new_node) {
     initRadio(node_id);
-    radio.sleep();
   } 
 
   radio.sleep();

@@ -9,7 +9,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 # Config variables
 base_station_id = 255
 network_id = 100
-api_root = 'http://100.89.161.91/api/'
+api_root = 'http://100.89.163.230/api/'
 api_key = 'xgLxTX7Nkem5qc9jllg2'
 encrypt_key = 'pnOvzy105sF5g8Ot'
 number_of_time_periods = 10
@@ -268,7 +268,11 @@ def process_initialisation(radio, sensor_id, packet_datetime):
     # Allocate sensor ID for new sensor
     if sensor_id == 254:
         print('Allocating ID for new sensor')
-        new_id = get_next_available_sensor_id()
+        try:
+            new_id = get_next_available_sensor_id()
+        except:
+            print('Error while retrieving next available sensor ID')
+            return None
 
     # Calculate time period
     assigned_period = None
@@ -301,7 +305,7 @@ def process_initialisation(radio, sensor_id, packet_datetime):
     sensor = create_sensor(id_str, packet_datetime)
     connected_sensors[id_str] = sensor
 
-    payload_data = 'T=T|id=' + str(new_id) + ',next=' + str(start_time)
+    payload_data = 'T=I|id=' + str(new_id) + ',next=' + str(start_time)
     print(payload_data)
 
     # Send back time period
