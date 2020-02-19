@@ -1,23 +1,32 @@
 @import "./../../scss/variables.scss";
 
+.mobile .nav {
+  padding: 0;
+  .nav__side {
+    padding: 0;
+  }
+  height: initial
+}
+
 .nav {
   background: $accent-dark;
   color: $white;
   display: grid;
   grid-template-columns: repeat(3,1fr);
-  padding: .25em .5em;
-  flex: 1 auto;
-  max-height: 3em;
+  padding: 0;
+  //flex: 1 auto;
+  //max-height: 3em;
   width: 100%;
   box-sizing: border-box;
   .nav__side {
     display: flex;
     flex-direction: row;
-    padding: 0 0.2em;
+    //padding: 0 0.2em;
     align-items: center;
     .title--nav {
       color: $white;
       text-decoration: none;
+      padding-left: 0.25em;
       &:hover {
         text-decoration: underline;
       }

@@ -161,15 +161,14 @@
                 :text="'Back'"
               />
               <div class="settings-box">
+                <p class="sub-heading">Change Password</p>
                 <router-link to="/reset-password" class="link"
                   >Change Password</router-link
                 >
-              </div>
-              <div class="settings-box">
-                <p class="sub-heading">Reset Token</p>
                 <p class="text italics">
                   This reset token can be used to reset the account password on
-                  the password reset page.
+                  the password reset page, make sure it is saved somewhere
+                  secure.
                 </p>
                 <p class="text">
                   Reset Token:

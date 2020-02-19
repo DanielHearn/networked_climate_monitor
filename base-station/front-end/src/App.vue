@@ -2,7 +2,7 @@
   <div
     id="app"
     :class="{
-      'mobile-menu--active': $store.state.mobileMenu,
+      'mobile-menu--active': $store.state.mobileMenu && $store.state.mobile,
       mobile: $store.state.mobile
     }"
   >
@@ -12,10 +12,12 @@
       :logged-in="$store.state.user.logged_in"
     ></v-nav>
     <mobile-menu
-      v-if="$store.state.mobileMenu"
+      v-if="$store.state.mobileMenu && $store.state.mobile"
       :logged-in="$store.state.user.logged_in"
     />
-    <router-view :class="{ hidden: $store.state.mobileMenu }" />
+    <router-view
+      :class="{ hidden: $store.state.mobileMenu && $store.state.mobile }"
+    />
   </div>
 </template>
 

@@ -210,7 +210,7 @@
               <h3 class="heading">Historical Climate Data</h3>
               <div class="historical-actions">
                 <div class="input-box">
-                  <p class="text">Historical Range</p>
+                  <p class="text">Historical Date Range</p>
                   <v-date-picker
                     v-model="timePeriod"
                     mode="range"
@@ -225,30 +225,32 @@
                     is-dark
                   />
                 </div>
-                <v-button
-                  @click.native="rangeLastDay()"
-                  :hierachyLevel="'secondary'"
-                  :text="'1 Day'"
-                  :class="{ active: historicalRangeType === '1-day' }"
-                />
-                <v-button
-                  @click.native="rangeLast2Days()"
-                  :hierachyLevel="'secondary'"
-                  :text="'2 Days'"
-                  :class="{ active: historicalRangeType === '2-days' }"
-                />
-                <v-button
-                  @click.native="rangeLastWeek()"
-                  :hierachyLevel="'secondary'"
-                  :text="'1 Week'"
-                  :class="{ active: historicalRangeType === '1-week' }"
-                />
-                <v-button
-                  @click.native="rangeLastMonth()"
-                  :hierachyLevel="'secondary'"
-                  :text="'1 Month'"
-                  :class="{ active: historicalRangeType === '1-month' }"
-                />
+                <div>
+                  <v-button
+                    @click.native="rangeLastDay()"
+                    :hierachyLevel="'secondary'"
+                    :text="'1 Day'"
+                    :class="{ active: historicalRangeType === '1-day' }"
+                  />
+                  <v-button
+                    @click.native="rangeLast2Days()"
+                    :hierachyLevel="'secondary'"
+                    :text="'2 Days'"
+                    :class="{ active: historicalRangeType === '2-days' }"
+                  />
+                  <v-button
+                    @click.native="rangeLastWeek()"
+                    :hierachyLevel="'secondary'"
+                    :text="'1 Week'"
+                    :class="{ active: historicalRangeType === '1-week' }"
+                  />
+                  <v-button
+                    @click.native="rangeLastMonth()"
+                    :hierachyLevel="'secondary'"
+                    :text="'1 Month'"
+                    :class="{ active: historicalRangeType === '1-month' }"
+                  />
+                </div>
               </div>
               <template v-if="historicalDataLoaded && historicalData">
                 <div
@@ -498,9 +500,12 @@ export default {
         datasets: [
           {
             label: 'Battery Voltage (v)',
-            backgroundColor: typeColours['battery'],
+            backgroundColor: 'rgba(255, 228, 83, 0.8)',
             spanGaps: true,
-            data: []
+            data: [],
+            borderColor: 'rgba(255, 228, 83, 1)',
+            pointBorderColor: 'rgba(255, 228, 83, 1)',
+            pointBackgroundColor: 'rgba(255, 240, 90, 1)'
           }
         ],
         options: batteryChartOptions
