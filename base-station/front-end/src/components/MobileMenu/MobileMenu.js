@@ -1,3 +1,4 @@
+// Displays a mobile menu
 export default {
   name: 'mobile-menu',
   props: {
@@ -8,6 +9,7 @@ export default {
     }
   },
   methods: {
+    // Toggle mobile menu visibility
     toggleMenu: function() {
       this.$store.commit('setMobileMenu', !this.$store.state.mobileMenu)
     }

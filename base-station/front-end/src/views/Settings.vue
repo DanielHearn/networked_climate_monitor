@@ -207,6 +207,7 @@ export default {
   watch: {
     settings: {
       handler(newSettings) {
+        // Updates the settings in the database if the settings have changed values
         if (this.hasBeenEdited && Object.keys(newSettings).length) {
           const user = cloneDeep(this.$store.state.user)
           user.settings = Object.assign({}, newSettings)
@@ -221,6 +222,7 @@ export default {
     }
   },
   methods: {
+    // Load settings from the database
     loadSettings: function() {
       const accessToken = this.$store.state.user.access_token
       if (accessToken) {
@@ -245,6 +247,7 @@ export default {
         this.$router.push('/login')
       }
     },
+    // Update settings in the database
     updateSettings: function() {
       const accessToken = this.$store.state.user.access_token
       const stringifiedSettings = JSON.stringify(this.settings)
@@ -265,6 +268,7 @@ export default {
     if (!this.$store.state.mobile) {
       this.activeCategoryID = 0
     }
+    // Use the settings from the state or retrieve from the API
     if (Object.keys(this.$store.state.user.settings).length) {
       this.settings = this.$store.state.user.settings
     } else {

@@ -1,0 +1,17 @@
+@import './scss/variables.scss';
+
+.mobile {
+  .historical-actions {
+    .button {
+      margin-right: 1em;
+      margin-bottom: 1em;
+    }
+    .input-box {
+      width: 100%;
+      margin-bottom: 1em;
+      .date-picker {
+        width: 100%;
+      }
+    }
+  }
+}

@@ -1,0 +1,128 @@
+@import './scss/variables.scss';
+
+.input-box {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  padding: 0.4em 0;
+  text-align: left;
+  p {
+    margin: 0;
+  }
+}
+
+.date-picker {
+  display: flex;
+  &.active {
+    color: $accent;
+    input.vc-border {
+      border: 2px solid $accent;
+    }
+  }
+  &.vc-container {
+    font-family: $font-family;
+    .vc-grid-cell .vc-day-content {
+      font-weight: 400;
+      color: $white;
+    }
+  }
+}
+
+.input {
+  &--text {
+    font-family: $font-family;
+    font-weight: $medium-weight;
+    font-size: $s-size;
+    padding: 0.8em 0.75em;
+    background: $white;
+    border: 2px solid $darkest;
+    font-weight: $medium-weight;
+    font-size: $s-size;
+    border-radius: 0;
+    -webkit-appearance: none;
+    transition: background $transition-fast;
+    &:hover {
+      background: $grey-light;
+    }
+  }
+  &--small {
+    padding: 0.4em 0.325em;
+  }
+}
+
+input.vc-text-base.vc-border {
+  font-family: $font-family;
+  font-size: $s-size;
+  border: 2px solid $darkest;
+  border-radius: 0;
+  -webkit-appearance: none;
+  padding: 0.8em 0.75em;
+  background: $white;
+}
+
+.vc-popover-content-wrapper {
+  font-family: $font-family;
+}
+
+.radio-container {
+  display: flex;
+  flex-direction: column;
+  .radio-option {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 0.25em 0;
+    label {
+      display: flex;
+      width: 8em;
+      align-items: center;
+      justify-content: space-between;
+      &:hover .input {
+        background: rgb(168, 168, 168);
+        border-color: $darkest;
+      }
+    }
+    .input {
+      width: 1.8em;
+      height: 1.8em;
+      background: #d2d2d2;
+      border: solid 2px $darkest;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: $white;
+      transition: $transition-fast background ease-in-out, $transition-fast border-color ease-in-out;
+    }
+    &.active {
+      .input {
+        background: $accent;
+        border-color: $accent;
+      }
+      &:hover .input {
+        background: $accent-dark;
+        border-color: $accent-dark;
+      }
+    }
+    .radio {
+      display: none;
+
+    }
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+*::-webkit-scrollbar {
+  width: 16px;
+}
+*::-webkit-scrollbar-track {
+  background: $dark; 
+}
+*::-webkit-scrollbar-thumb {
+  background: $darkest;
+}

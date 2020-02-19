@@ -3,6 +3,7 @@ import { changePassword } from './../../static/api'
 import { processErrors } from './../../static/helpers'
 import vButton from './../vButton/vButton.vue'
 
+// Displays a reset password form with reset token, new password, and confirm password inputs
 export default {
   name: 'reset-password-form',
   components: {
@@ -26,6 +27,7 @@ export default {
     }
   },
   methods: {
+    // Validate form inputs and attempt reset password request if all inputs are valid
     checkResetPassword: function(e) {
       e.preventDefault()
       this.errors = []
@@ -34,32 +36,36 @@ export default {
       const resetToken = this.resetToken
       const newPassword = this.newPassword
       const confirmPassword = this.confirmPassword
-      let valid = true
+      const numOfRequiredInputs = 3
+      const validInputs = []
 
       if (resetToken === '') {
         this.errors.push('Enter the reset token.')
-        valid = false
+      } else {
+        validInputs.push('reset_token')
       }
+
       if (newPassword === '') {
         this.errors.push('Enter a password.')
-        valid = false
       } else if (newPassword.length < 8 || newPassword.length > 40) {
         this.errors.push('Password must be between 8 and 40 characters long.')
-        valid = false
+      } else {
+        validInputs.push('new_password')
       }
 
       if (confirmPassword === '') {
         this.errors.push('Enter the password again to confirm.')
-        valid = false
       } else if (newPassword !== confirmPassword) {
         this.errors.push('Password and confirm password should be identical.')
-        valid = false
+      } else {
+        validInputs.push('confirm_password')
       }
 
-      if (valid) {
+      if (numOfRequiredInputs === validInputs.length) {
         this.resetPassword(resetToken, newPassword)
       }
     },
+    // Send reset password request to API and update user state if request is valid
     resetPassword: function(resetToken, password) {
       this.$toasted.show('Sending change request')
 
@@ -87,6 +93,7 @@ export default {
     }
   },
   created: function() {
+    // Prefill reset token with token from props
     if (this.currentResetToken) {
       this.resetToken = this.currentResetToken
     }

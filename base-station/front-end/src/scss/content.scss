@@ -1,0 +1,176 @@
+@import './scss/variables.scss';
+
+.content {
+  text-align: center;
+  display: flex;
+  flex: 1 auto;
+  flex-direction: row;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.ordered-list {
+  padding: 0 0 0 1em;
+  margin: 0;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  .list-item {
+    background: $white;
+    padding-top: 0.5em;
+    color: $darkest;
+    border-bottom: 5px solid $grey-dark;
+    & > div {
+      padding-left: 0.5em;
+      padding-right: 0.5em;
+    }
+    &.active {
+      background: $grey-darker;
+      .actions--active {
+        background: $grey-darker;
+      }
+    }
+    .actions {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      padding: 0.5em;
+      box-shadow: #e8e8e8 2px 3px 3px;
+      .button {
+        margin-right: 0.5em;
+      }
+    }
+  }
+}
+
+.edit-box {
+  display: flex;
+  flex-direction: row;
+  .heading {
+    margin-right: 0.25em;
+    display: flex;
+    align-items: center;
+  }
+  .input--text{
+    height: fit-content;
+    font-size: $m-size;
+  }
+  .button {
+    height: auto;
+  }
+  .button--active {
+    background-attachment: $accent;
+  }
+}
+
+
+.content-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 30em;
+  text-align: left;
+  padding: 1em;
+  margin-top: 1em;
+  background: $white;
+  height: min-content;
+  .button, .link {
+    margin: 0.5em 0;
+  }
+  .title, .heading {
+    width: 100%;
+    text-align: center;
+  }
+  .form {
+    width: 100%;
+  }
+  .input-box {
+    width: 100%;
+    input {
+      width: 100%;
+      box-sizing: border-box;
+    }
+  }
+}
+
+.historical-chart {
+  text-align: left;
+  padding: 0.5em;
+  margin: 0.5em 0;
+  width: 95%;
+  background: $white;
+  box-shadow: #e8e8e8 2px 3px 3px;
+  .chart {
+    max-height: 15em;
+    max-width: 80em;
+  }
+}
+
+.settings-box {
+  p {
+    margin: 0.5em 0;
+  }
+}
+
+.battery-status {
+  &--high {
+    color: $green;
+    font-weight: 500;
+  }
+  &--medium {
+    color: $orange;
+    font-weight: 500;
+  }
+  &--low {
+    color: $red;
+    font-weight: 500;
+  }
+}
+
+.dashboard-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  flex: 1 auto;
+  width: 100%;
+  height: 100%;
+  padding-bottom: 2em;
+  box-sizing: border-box;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.historical-actions {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding-top: 0.4em;
+  .button {
+    margin-right: 0.5em;
+  }
+  .input-box {
+    padding: 0;
+    margin-right: 0.5em;
+    display: flex;
+    flex-direction: column;
+  }
+  & > div {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 0.5em;
+  }
+}
+
+
+

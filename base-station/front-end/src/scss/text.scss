@@ -1,0 +1,64 @@
+@import './scss/variables.scss';
+
+
+.title {
+  font-size: $l-size;
+  font-weight: $semibold-weight;
+  margin: 0;
+  &--nav {
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+  }
+}
+
+.heading {
+  font-size: $m-size;
+  font-weight: $semibold-weight;
+  margin: 0;
+}
+
+.sub-heading {
+  font-size: $m-size;
+  font-weight: $medium-weight;
+  margin: 0;
+}
+
+.text {
+  font-size: $s-size;
+  font-weight: $regular-weight;
+  &--bold {
+    font-weight: $semibold-weight;
+  }
+}
+
+.italics {
+  font-style: italic;
+}
+
+.bold {
+  font-weight: 500;
+}
+
+.sub-text {
+  font-size: $xs-size;
+  font-weight: $regular-weight;
+}
+
+
+.link {
+  font-size: $s-size;
+  font-weight: $medium-weight;
+  text-decoration: underline;
+  color: $darkest;
+  &:visited {
+    color: $darkest;
+  }
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.underline {
+  text-decoration: underline;
+}

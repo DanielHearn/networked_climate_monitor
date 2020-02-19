@@ -1,5 +1,6 @@
 import { formatClimateData } from './../../static/helpers'
 
+// Displays a list of climate data
 export default {
   name: 'recent-climate-data',
   props: {
@@ -15,6 +16,7 @@ export default {
     }
   },
   computed: {
+    // Format climate data
     climateData: function() {
       const recentClimateData = this.recentClimateData
       const climateData = []

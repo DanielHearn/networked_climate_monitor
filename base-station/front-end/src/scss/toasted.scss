@@ -1,0 +1,13 @@
+@import './scss/variables.scss';
+
+.toasted-container .toasted {
+  font-size: $xs-size !important;
+  font-weight: $regular-weight;
+  font-family: $font-family;
+  .action {
+    background: $accent !important;
+    color: $white !important;
+    border-radius: 0 !important;
+    padding: 8px 12px !important;
+  }
+}

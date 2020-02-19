@@ -454,7 +454,7 @@ exports[`Dashboard.vue change active sensor 1`] = `
             <p
               class="text"
             >
-              Historical Range
+              Historical Date Range
             </p>
              
             <v-date-picker
@@ -465,29 +465,31 @@ exports[`Dashboard.vue change active sensor 1`] = `
             />
           </div>
            
-          <button
-            class="button button--secondary active"
-          >
-            1 Day
-          </button>
-           
-          <button
-            class="button button--secondary"
-          >
-            2 Days
-          </button>
-           
-          <button
-            class="button button--secondary"
-          >
-            1 Week
-          </button>
-           
-          <button
-            class="button button--secondary"
-          >
-            1 Month
-          </button>
+          <div>
+            <button
+              class="button button--secondary active"
+            >
+              1 Day
+            </button>
+             
+            <button
+              class="button button--secondary"
+            >
+              2 Days
+            </button>
+             
+            <button
+              class="button button--secondary"
+            >
+              1 Week
+            </button>
+             
+            <button
+              class="button button--secondary"
+            >
+              1 Month
+            </button>
+          </div>
         </div>
          
         <p>
@@ -1216,7 +1218,7 @@ exports[`Dashboard.vue delete sensor 1`] = `
             <p
               class="text"
             >
-              Historical Range
+              Historical Date Range
             </p>
              
             <v-date-picker
@@ -1227,29 +1229,31 @@ exports[`Dashboard.vue delete sensor 1`] = `
             />
           </div>
            
-          <button
-            class="button button--secondary active"
-          >
-            1 Day
-          </button>
-           
-          <button
-            class="button button--secondary"
-          >
-            2 Days
-          </button>
-           
-          <button
-            class="button button--secondary"
-          >
-            1 Week
-          </button>
-           
-          <button
-            class="button button--secondary"
-          >
-            1 Month
-          </button>
+          <div>
+            <button
+              class="button button--secondary active"
+            >
+              1 Day
+            </button>
+             
+            <button
+              class="button button--secondary"
+            >
+              2 Days
+            </button>
+             
+            <button
+              class="button button--secondary"
+            >
+              1 Week
+            </button>
+             
+            <button
+              class="button button--secondary"
+            >
+              1 Month
+            </button>
+          </div>
         </div>
          
         <p>
@@ -1715,7 +1719,7 @@ exports[`Dashboard.vue historical data time period 1`] = `
             <p
               class="text"
             >
-              Historical Range
+              Historical Date Range
             </p>
              
             <v-date-picker
@@ -1726,29 +1730,31 @@ exports[`Dashboard.vue historical data time period 1`] = `
             />
           </div>
            
-          <button
-            class="button button--secondary"
-          >
-            1 Day
-          </button>
-           
-          <button
-            class="button button--secondary"
-          >
-            2 Days
-          </button>
-           
-          <button
-            class="button button--secondary"
-          >
-            1 Week
-          </button>
-           
-          <button
-            class="button button--secondary active"
-          >
-            1 Month
-          </button>
+          <div>
+            <button
+              class="button button--secondary"
+            >
+              1 Day
+            </button>
+             
+            <button
+              class="button button--secondary"
+            >
+              2 Days
+            </button>
+             
+            <button
+              class="button button--secondary"
+            >
+              1 Week
+            </button>
+             
+            <button
+              class="button button--secondary active"
+            >
+              1 Month
+            </button>
+          </div>
         </div>
          
         <p>
@@ -2214,7 +2220,7 @@ exports[`Dashboard.vue multiple sensors 1`] = `
             <p
               class="text"
             >
-              Historical Range
+              Historical Date Range
             </p>
              
             <v-date-picker
@@ -2225,29 +2231,31 @@ exports[`Dashboard.vue multiple sensors 1`] = `
             />
           </div>
            
-          <button
-            class="button button--secondary active"
-          >
-            1 Day
-          </button>
-           
-          <button
-            class="button button--secondary"
-          >
-            2 Days
-          </button>
-           
-          <button
-            class="button button--secondary"
-          >
-            1 Week
-          </button>
-           
-          <button
-            class="button button--secondary"
-          >
-            1 Month
-          </button>
+          <div>
+            <button
+              class="button button--secondary active"
+            >
+              1 Day
+            </button>
+             
+            <button
+              class="button button--secondary"
+            >
+              2 Days
+            </button>
+             
+            <button
+              class="button button--secondary"
+            >
+              1 Week
+            </button>
+             
+            <button
+              class="button button--secondary"
+            >
+              1 Month
+            </button>
+          </div>
         </div>
          
         <p>
@@ -2893,7 +2901,7 @@ exports[`Dashboard.vue refresh 1`] = `
             <p
               class="text"
             >
-              Historical Range
+              Historical Date Range
             </p>
              
             <v-date-picker
@@ -2904,29 +2912,31 @@ exports[`Dashboard.vue refresh 1`] = `
             />
           </div>
            
-          <button
-            class="button button--secondary active"
-          >
-            1 Day
-          </button>
-           
-          <button
-            class="button button--secondary"
-          >
-            2 Days
-          </button>
-           
-          <button
-            class="button button--secondary"
-          >
-            1 Week
-          </button>
-           
-          <button
-            class="button button--secondary"
-          >
-            1 Month
-          </button>
+          <div>
+            <button
+              class="button button--secondary active"
+            >
+              1 Day
+            </button>
+             
+            <button
+              class="button button--secondary"
+            >
+              2 Days
+            </button>
+             
+            <button
+              class="button button--secondary"
+            >
+              1 Week
+            </button>
+             
+            <button
+              class="button button--secondary"
+            >
+              1 Month
+            </button>
+          </div>
         </div>
          
         <p>
@@ -3392,7 +3402,7 @@ exports[`Dashboard.vue rename sensor 1`] = `
             <p
               class="text"
             >
-              Historical Range
+              Historical Date Range
             </p>
              
             <v-date-picker
@@ -3403,29 +3413,31 @@ exports[`Dashboard.vue rename sensor 1`] = `
             />
           </div>
            
-          <button
-            class="button button--secondary active"
-          >
-            1 Day
-          </button>
-           
-          <button
-            class="button button--secondary"
-          >
-            2 Days
-          </button>
-           
-          <button
-            class="button button--secondary"
-          >
-            1 Week
-          </button>
-           
-          <button
-            class="button button--secondary"
-          >
-            1 Month
-          </button>
+          <div>
+            <button
+              class="button button--secondary active"
+            >
+              1 Day
+            </button>
+             
+            <button
+              class="button button--secondary"
+            >
+              2 Days
+            </button>
+             
+            <button
+              class="button button--secondary"
+            >
+              1 Week
+            </button>
+             
+            <button
+              class="button button--secondary"
+            >
+              1 Month
+            </button>
+          </div>
         </div>
          
         <p>

@@ -3,6 +3,7 @@ import { register } from './../../static/api'
 import { processErrors } from './../../static/helpers'
 import vButton from './../vButton/vButton.vue'
 
+// Displays a register form with email, password, and confirm password inputs
 export default {
   name: 'register-form',
   components: {
@@ -18,6 +19,7 @@ export default {
     }
   },
   methods: {
+    // Validate form inputs and attempt register request if all inputs are valid
     checkRegister: function(e) {
       e.preventDefault()
       this.errors = []
@@ -25,35 +27,38 @@ export default {
       const email = this.email
       const password = this.password
       const confirmPassword = this.confirmPassword
-      let valid = true
+      const numOfRequiredInputs = 3
+      const validInputs = []
 
       if (email === '') {
         this.errors.push('Enter an email.')
-        valid = false
       } else if (email.indexOf('@') === -1) {
         this.errors.push('Enter a valid email.')
-        valid = false
+      } else {
+        validInputs.push('email')
       }
+
       if (password === '') {
         this.errors.push('Enter a password.')
-        valid = false
       } else if (password.length < 8 || password.length > 40) {
         this.errors.push('Password must be between 8 and 40 characters long.')
-        valid = false
+      } else {
+        validInputs.push('password')
       }
 
       if (confirmPassword === '') {
         this.errors.push('Enter the password again to confirm.')
-        valid = false
       } else if (password !== confirmPassword) {
         this.errors.push('Password and confirm password should be identical.')
-        valid = false
+      } else {
+        validInputs.push('confirm_password')
       }
 
-      if (valid) {
+      if (numOfRequiredInputs === validInputs.length) {
         this.register(email, password)
       }
     },
+    // Send register request to API and update user state if request is valid
     register: function(email, password) {
       this.$toasted.show('Sending register request')
 

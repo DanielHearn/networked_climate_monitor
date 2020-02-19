@@ -3,6 +3,7 @@ import { login } from './../../static/api'
 import { processErrors } from './../../static/helpers'
 import vButton from './../vButton/vButton.vue'
 
+// Displays a login form with email and password inputs
 export default {
   name: 'login-form',
   components: {
@@ -17,8 +18,10 @@ export default {
     }
   },
   methods: {
+    // Send login request to API and update user state if request is valid
     login: function(email, password) {
       this.$toasted.show('Sending login request')
+
       login(email, password)
         .then(response => {
           const data = response.data
@@ -36,29 +39,32 @@ export default {
           }
         })
     },
+    // Validate form inputs and attempt login request if all inputs are valid
     checkLogin: function(e) {
       e.preventDefault()
       this.errors = []
       const email = this.email
       const password = this.password
-      let valid = true
+      const numOfRequiredInputs = 2
+      const validInputs = []
 
       if (email === '') {
         this.errors.push('Enter an email.')
-        valid = false
       } else if (email.indexOf('@') === -1) {
         this.errors.push('Enter a valid email.')
-        valid = false
-      }
-      if (password === '') {
-        this.errors.push('Enter a password.')
-        valid = false
-      } else if (password.length < 8 || password.length > 40) {
-        this.errors.push('Password must be between 8 and 40 characters long.')
-        valid = false
+      } else {
+        validInputs.push('email')
       }
 
-      if (valid) {
+      if (password === '') {
+        this.errors.push('Enter a password.')
+      } else if (password.length < 8 || password.length > 40) {
+        this.errors.push('Password must be between 8 and 40 characters long.')
+      } else {
+        validInputs.push('password')
+      }
+
+      if (numOfRequiredInputs === validInputs.length) {
         this.login(email, password)
       }
     }

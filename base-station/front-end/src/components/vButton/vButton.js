@@ -1,3 +1,4 @@
+// Displays text or icon button
 export default {
   name: 'v-button',
   props: {
@@ -18,6 +19,7 @@ export default {
     }
   },
   computed: {
+    // Generates the hierarchy class
     typeClass: function() {
       return `button--${this.hierachyLevel}`
     }

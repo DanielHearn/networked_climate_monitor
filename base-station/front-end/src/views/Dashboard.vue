@@ -429,26 +429,34 @@ export default {
   methods: {
     formatClimateData: formatClimateData,
     getBatteryStatusFromVoltage: getBatteryStatusFromVoltage,
+    // Sets active sensor ID and index to the first sensor in the sensors array
     makeNextActiveSensor: function() {
+      // Checks if the current active sensor exists in the sensors array
       const activeSensorExists = !!this.sensors.filter(
         sensor => sensor.id === this.activeSensorID
       )
       if (this.activeSensorID === -1 || !activeSensorExists) {
         let lowestSensorID = -1
         let lowestIndex = -1
+
+        // Finds the lowest sensor ID in the sensors array
         this.sensors.forEach((sensor, index) => {
           if (lowestSensorID === -1 || sensor.id < lowestSensorID) {
             lowestSensorID = sensor.id
             lowestIndex = index
           }
         })
+
+        // Makes the lowest sensor ID active
         if (lowestSensorID !== -1 && lowestIndex !== -1) {
           this.activeSensorID = lowestSensorID
           this.activeSensorIndex = lowestIndex
         }
       }
     },
+    // Updates the sensor's name in the database
     changeSensorName: function(sensorID, sensorName) {
+      // Disable name editing for any sensor names being edited
       this.sensors.forEach(sensor => {
         sensor.editing = false
       })
@@ -457,6 +465,7 @@ export default {
       const patchData = {
         name: sensorName
       }
+      // Update sensor with new name
       patchSensor(accessToken, sensorID, patchData)
         .then(response => {
           const data = response.data
@@ -468,18 +477,24 @@ export default {
           console.warn(e)
         })
     },
+    // Process historical climate data and generate the charts for each type of climate data
     processHistoricalData: function(climateData) {
+      // Disable existing charts so that the new charts can be generated
       this.historicalData = []
       this.historicalData = false
+
       const historicalData = {}
       const dates = []
       const orderedClimateData = climateData.slice().reverse()
       const recentClimateData = climateData[0]
       const labels = []
+
+      // Error out if the sensor has no climate data
       if (!recentClimateData || !recentClimateData.climate_data) {
         return false
       }
 
+      // Create battery chart options
       const batteryChartOptions = Object.assign({}, chartOptions)
       batteryChartOptions.scales = {
         yAxes: [
@@ -494,18 +509,20 @@ export default {
         ]
       }
 
+      // Create battery chart data
       historicalData['battery'] = {
         title: 'Battery Level',
         labels: dates,
         datasets: [
           {
             label: 'Battery Voltage (v)',
-            backgroundColor: 'rgba(255, 228, 83, 0.8)',
+            backgroundColor: typeColours['battery'],
             spanGaps: true,
             data: [],
-            borderColor: 'rgba(255, 228, 83, 1)',
-            pointBorderColor: 'rgba(255, 228, 83, 1)',
-            pointBackgroundColor: 'rgba(255, 240, 90, 1)'
+            lineTension: 0
+            //borderColor: 'rgba(255, 228, 83, 1)',
+            //pointBorderColor: 'rgba(255, 228, 83, 1)',
+            //pointBackgroundColor: 'rgba(255, 240, 90, 1)'
           }
         ],
         options: batteryChartOptions
@@ -521,11 +538,13 @@ export default {
         const lowercaseType = type.toLowerCase()
         const climateChartOptions = Object.assign({}, chartOptions)
 
+        // Format temperature data
         if (type === 'Temperature') {
           unit = `°${this.settings.temperature_unit.toUpperCase()}`
           value = convertTemperature(value, this.settings.temperature_unit)
         }
 
+        // Create chart options
         climateChartOptions.scales = {
           yAxes: [
             {
@@ -539,6 +558,7 @@ export default {
           ]
         }
 
+        // Create chart data
         historicalData[lowercaseType] = {
           title: type,
           labels: dates,
@@ -562,6 +582,7 @@ export default {
           const climate_data = climate.climate_data
           const usedTypes = []
 
+          // Put sensor data into the dataset for each type of climate data
           climate_data.forEach(sensor => {
             let value = sensor.value
             if (sensor.type === 'Temperature') {
@@ -588,12 +609,14 @@ export default {
       this.historicalData = historicalData
       this.historicalDataLoaded = true
     },
+    // Retrieve historical climate data for the sensor and generate the historical data charts
     loadHistoricalData: function(sensorID) {
       const accessToken = this.$store.state.user.access_token
       const timePeriod = this.timePeriod
       const rangeStart = timePeriod.start.toISOString()
       const rangeEnd = timePeriod.end.toISOString()
 
+      // Retrieve historical climate data
       getClimateData(accessToken, sensorID, 20, rangeStart, rangeEnd)
         .then(response => {
           const data = response.data
@@ -606,17 +629,22 @@ export default {
           this.$toasted.show('Error retrieving historical data')
         })
     },
+    // Activates the config actions interface for the specified sensor
     setSensorConfig: function(sensorID) {
+      // Finds the sensor that matches the sensorID
       const selectedSensor = this.sensors.filter(sensor => {
         if (sensorID !== sensor.id) {
           sensor.config = false
         }
         return sensor.id === sensorID
       })[0]
+
+      // Toggles visibility of the config actions interface
       if (selectedSensor) {
         selectedSensor.config = !selectedSensor.config
       }
     },
+    // Activates the editing actions interface for the specified sensor
     setSensorEditing: function(sensorID) {
       const selectedSensor = this.sensors.filter(sensor => {
         if (sensorID !== sensor.id) {
@@ -635,15 +663,20 @@ export default {
         })
       }
     },
+    // Makes the specified sensor active so that it's climate data is visible
     setActiveSensor: function(sensorID) {
+      // Find the sensor that matches the sensorID
       const activeSensor = this.sensors.filter(
         sensor => sensor.id === sensorID
       )[0]
+
+      // Makes the sensor active
       if (activeSensor) {
         this.activeSensorID = activeSensor.id
         this.activeSensorIndex = this.sensors.indexOf(activeSensor)
       }
     },
+    // Deletes the sensor from the database
     deleteSensor: function(sensorID, sensorName) {
       const accessToken = this.$store.state.user.access_token
       deleteSensor(accessToken, sensorID)
@@ -651,8 +684,11 @@ export default {
           const data = response.data
           if (data && data.status) {
             this.$toasted.show(`Deleted sensor node: ${sensorName}`)
+
+            // Locally remove the deleted sensor
             this.sensors = this.sensors.filter(sensor => sensor.id !== sensorID)
 
+            // If the active sensor has been deleted then make the next sensor active
             if (sensorID === this.activeSensorID && !this.$store.state.mobile) {
               this.activeSensorIndex = -1
               this.activeSensorID = -1
@@ -666,8 +702,14 @@ export default {
           }
         })
     },
+    // Deletes the sensors climate data from the database
     deleteClimate: function(sensorID, sensorName) {
       const accessToken = this.$store.state.user.access_token
+      const sensor = this.sensors.filter(sensor => sensor.id === sensorID)[0]
+      if (sensor) {
+        sensor.climate_data = []
+        sensor.recent_climate_data = null
+      }
       deleteClimateData(accessToken, sensorID)
         .then(response => {
           const data = response.data
@@ -690,11 +732,14 @@ export default {
           }
         })
     },
+    // Reloads the dashboard with new sensor data
     refreshSensors: function() {
       this.$toasted.show('Refreshing sensor nodes')
       this.loadDashboard()
     },
+    // Loads the dashboard's data from the API
     loadDashboard: function() {
+      // If a sensor is active then retrieve the historical data
       if (this.activeSensorID !== -1) {
         this.loadHistoricalData(this.activeSensorID)
       }
@@ -742,12 +787,13 @@ export default {
         this.$router.push('/login')
       }
     },
+    // Reload dashboard every minute
     createDashboardReloadInterval: function() {
-      // Reload dashboard every minute
       this.reloadID = setInterval(() => {
         this.loadDashboard(false)
       }, 60000)
     },
+    // Initialise the dashboard
     initDashboard: function() {
       // Load the dashboard immediately if logged in or wait
       // to see if user can be logged in from localstorage data
@@ -761,10 +807,12 @@ export default {
         }, 100)
       }
     },
+    // Deactivate the current active sensor
     backToSensorList: function() {
       this.activeSensorID = -1
       this.activeSensorIndex = -1
     },
+    // Sets the historical time period to 1 day
     rangeLastDay: function() {
       this.historicalRangeType = '1-day'
       this.timePeriod = {
@@ -772,6 +820,7 @@ export default {
         end: endOfToday()
       }
     },
+    // Sets the historical time period to 2 days
     rangeLast2Days: function() {
       this.historicalRangeType = '2-days'
       this.timePeriod = {
@@ -779,6 +828,7 @@ export default {
         end: endOfToday()
       }
     },
+    // Sets the historical time period to 1 week
     rangeLastWeek: function() {
       this.historicalRangeType = '1-week'
       const date = sub(startOfToday(), { days: 7 })
@@ -788,6 +838,7 @@ export default {
         end: endOfToday()
       }
     },
+    // Sets the historical time period to 1 month
     rangeLastMonth: function() {
       this.historicalRangeType = '1-month'
       const date = sub(startOfToday(), { months: 1 })
