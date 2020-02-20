@@ -206,6 +206,7 @@
                 :recent-climate-data="
                   activeSensor.recent_climate_data.climate_data
                 "
+                :trends="trends"
                 :temperature-unit="settings.temperature_unit"
               />
 
@@ -305,7 +306,8 @@ import {
   getClimateData,
   deleteSensor,
   deleteClimateData,
-  getSensors
+  getSensors,
+  getTrends
 } from './../static/api'
 import {
   getBatteryStatusFromVoltage,
@@ -403,6 +405,7 @@ export default {
       sensors: [],
       activeSensorID: -1,
       activeSensorIndex: -1,
+      trends: {},
       historicalData: {},
       historicalDataLoaded: false,
       historicalRangeType: '1-day',
@@ -445,6 +448,7 @@ export default {
       this.historicalDataLoaded = false
       if (newID !== -1) {
         this.loadHistoricalData(newID)
+        this.loadTrends(newID)
       }
     },
     timePeriod: function() {
@@ -496,6 +500,21 @@ export default {
           this.activeSensorIndex = lowestIndex
         }
       }
+    },
+    loadTrends: function(sensorID) {
+      const accessToken = this.$store.state.user.access_token
+      // Update sensor with new name
+      getTrends(accessToken, sensorID)
+        .then(response => {
+          const data = response.data
+          if (data.status && data.trends) {
+            console.log(data.trends)
+            this.trends = data.trends
+          }
+        })
+        .catch(e => {
+          console.warn(e)
+        })
     },
     // Updates the sensor's name in the database
     changeSensorName: function(sensorID, sensorName) {

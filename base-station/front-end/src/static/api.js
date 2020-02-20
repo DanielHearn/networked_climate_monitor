@@ -242,6 +242,26 @@ export const deleteClimateData = (accessToken, sensorID) => {
 }
 
 /**
+ * Gets climate data trends for the specified sensor
+ * @param {string} accessToken - User's access token
+ * @param {number} sensorID - Sensor ID
+ */
+export const getTrends = (accessToken, sensorID) => {
+  const promise = new Promise(function(resolve, reject) {
+    HTTP.get(`sensors/${sensorID}/trends`, {
+      headers: { Authorization: 'Bearer ' + accessToken }
+    })
+      .then(response => {
+        resolve(response)
+      })
+      .catch(e => {
+        reject(e)
+      })
+  })
+  return promise
+}
+
+/**
  * Get all sensors from the API
  * @param {string} accessToken - User's access token
  */

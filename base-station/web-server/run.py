@@ -1030,7 +1030,6 @@ class Trends(Resource):
             sensor = SensorModel.query.filter_by(id=sensor_id).first()
             sensor_types = []
             sensor_trends = {}
-            number = 0
             if sensor:
                 sensor_dict = sensor.to_dict()
 
@@ -1058,7 +1057,6 @@ class Trends(Resource):
 
                     for climate in one_day_climate_data:
                         for sensor_data in climate.climate_data:
-                            number = number + 1
                             sensor_type = sensor_data.type.lower()
                             sensor_value = sensor_data.value
 
@@ -1073,7 +1071,7 @@ class Trends(Resource):
                                 elif sensor_value > sensor_trends[sensor_type]['1_day']['high']:
                                     sensor_trends[sensor_type]['1_day']['high'] = sensor_value
 
-                return {'status': 'Trends successfully retrieved', 'trends': sensor_trends, 'number': number}, 200
+                return {'status': 'Trends successfully retrieved', 'trends': sensor_trends}, 200
             else:
                 return {'status': 'Error', 'errors': ['Sensor doesn\'t exist']}, 500
         except:
