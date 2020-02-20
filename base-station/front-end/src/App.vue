@@ -79,7 +79,7 @@ export default {
               user.settings = JSON.parse(
                 data.account.settings.replace(/'/g, '"')
               )
-              this.$store.dispatch('login', user, false)
+              this.$store.dispatch('login', user)
             }
           })
           .catch(e => {
@@ -119,11 +119,7 @@ export default {
           break
         case 'logout':
           this.$toasted.show('Logged out')
-          if (
-            this.$route.name === 'dashboard' ||
-            this.$route.name === 'settings' ||
-            this.$route.name === 'login'
-          ) {
+          if (this.$route.name !== 'home') {
             this.$router.push({ name: 'home' })
           }
 
