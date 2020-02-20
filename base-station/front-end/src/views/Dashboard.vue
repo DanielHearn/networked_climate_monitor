@@ -151,10 +151,12 @@
         </ul>
         <ul v-else class="list">
           <li class="list-item">
-            <p class="text">
-              No sensor nodes created. Connect a sensor node to the base station
-              to create a new sensor.
-            </p>
+            <div>
+              <p class="text">
+                No sensor nodes created. Connect a sensor node to the base
+                station to create a new sensor.
+              </p>
+            </div>
           </li>
         </ul>
       </template>

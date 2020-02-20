@@ -12,6 +12,7 @@ from flask_jwt_extended import (JWTManager, create_access_token, create_refresh_
                                 jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask_cors import CORS
+import time
 
 # Local imports
 from helpers import get_unit_from_type, create_settings, generate_reset_key
@@ -358,6 +359,7 @@ class ClimateModel(db.Model, SerializerMixin):
     sensor_id = db.Column(db.Integer, db.ForeignKey('sensor.id'), nullable=False)
     battery_voltage = db.Column(db.Float, nullable=False)
     date = db.Column(db.DateTime, nullable=False)
+    climate_data = db.relationship('SensorDataModel', lazy=True, cascade="all, delete, delete-orphan")
 
     def __repr__(self):
         """
@@ -438,7 +440,7 @@ class SensorDataModel(db.Model, SerializerMixin):
     __tablename__ = 'sensordata'
 
     id = db.Column(db.Integer, primary_key=True)
-    climate_id = db.Column(db.Integer, db.ForeignKey('climate.id'), nullable=False)
+    climate_id = db.Column(db.Integer, db.ForeignKey('climate.id', ondelete='CASCADE'), nullable=False)
     value = db.Column(db.Float, nullable=False)
     type = db.Column(db.String(100), nullable=False)
     unit = db.Column(db.String(20), nullable=False)
@@ -814,7 +816,9 @@ class ClimateData(Resource):
                     data_interval = 5
                 elif days_in_range > 2 and climate_data_length > 48:
                     data_interval = 4
-                elif days_in_range > 1 and climate_data_length > 24:
+                elif days_in_range >= 1 and climate_data_length > 24:
+                    data_interval = 4
+                elif days_in_range < 1 and climate_data_length > 24:
                     data_interval = 3
 
                 # Get climate data between the two dates with descending date order
@@ -832,14 +836,6 @@ class ClimateData(Resource):
             climate_dict_list = []
             for climate in climate_data:
                 climate_dict = climate.to_dict()
-                climate_id = climate_dict['id']
-
-                sensor_data = SensorDataModel.query.filter_by(climate_id=climate_id)
-                sensor_dict_list = []
-                for sensor in sensor_data:
-                    sensor_dict = sensor.to_dict()
-                    sensor_dict_list.append(sensor_dict)
-                climate_dict['climate_data'] = sensor_dict_list
                 climate_dict_list.append(climate_dict)
 
             return {'status': 'Climate data successfully retrieved', 'climate_data': climate_dict_list}, 200
@@ -859,18 +855,8 @@ class ClimateData(Resource):
 
             # Delete all climate data
             for climate in climate_data:
-                climate_dict = climate.to_dict()
-                climate_id = climate_dict['id']
+                climate.delete()
 
-                # Delete all sensor data for the climate data
-                sensor_data = SensorDataModel.__table__.delete().where(SensorDataModel.climate_id == climate_id)
-                db.session.execute(sensor_data)
-                db.session.commit()
-
-            # Delete climate data
-            climate_data = ClimateModel.__table__.delete().where(ClimateModel.sensor_id == sensor_id)
-            db.session.execute(climate_data)
-            db.session.commit()
             return {'status': 'Sensor climate data successfully deleted'}, 200
         return {'status': 'Error', 'errors': ['Sensor doesn\'t exist']}, 500
 
@@ -925,23 +911,13 @@ class Sensor(Resource):
             # Delete sensor
             sensor.delete()
 
-            # Find all climate data for the sensor
+            # Get all climate data for that sensor
             climate_data = ClimateModel.query.filter_by(sensor_id=sensor_id)
 
             # Delete all climate data
             for climate in climate_data:
-                climate_dict = climate.to_dict()
-                climate_id = climate_dict['id']
+                climate.delete()
 
-                # Delete all sensor data for the climate data
-                sensor_data = SensorDataModel.__table__.delete().where(SensorDataModel.climate_id == climate_id)
-                db.session.execute(sensor_data)
-                db.session.commit()
-
-            # Delete climate data
-            climate_data = ClimateModel.__table__.delete().where(ClimateModel.sensor_id==sensor_id)
-            db.session.execute(climate_data)
-            db.session.commit()
             return {'status': 'Sensor successfully deleted'}, 200
         return {'status': 'Error', 'errors': ['Sensor doesn\'t exist']}, 500
 
@@ -960,16 +936,7 @@ class Sensor(Resource):
             recent_climate_data = ClimateModel.query.order_by(ClimateModel.id.desc()).filter_by(
                 sensor_id=sensor_dict['id']).first()
             if recent_climate_data:
-                climate_data = recent_climate_data.to_dict()
-
-                # Find sensor data for the most recent climate data
-                sensor_data_list = SensorDataModel.query.filter_by(climate_id=recent_climate_data.id)
-                if sensor_data_list:
-                    sensor_data_dict_list = []
-                    for sensor_data in sensor_data_list:
-                        sensor_data_dict_list.append(sensor_data.to_dict())
-                    climate_data['climate_data'] = sensor_data_dict_list
-                sensor_dict['recent_climate_data'] = climate_data
+                sensor_dict['recent_climate_data'] = recent_climate_data.to_dict()
             return {'status': 'Sensor successfully retrieved', 'sensor': sensor_dict}, 200
         return {'status': 'Error', 'errors': ['Sensor doesn\'t exist']}, 500
 
@@ -1026,21 +993,13 @@ class Sensors(Resource):
             # Convert all sensors into dicts
             for sensor in sensors_list:
                 sensor_dict = sensor.to_dict()
+                sensor_id = sensor_dict['id']
 
                 # Retrieve most recent climate data for the current sensor
                 recent_climate_data = ClimateModel.query.order_by(ClimateModel.id.desc()).filter_by(
-                    sensor_id=sensor_dict['id']).first()
+                    sensor_id=sensor_id).first()
                 if recent_climate_data:
-                    climate_data = recent_climate_data.to_dict()
-
-                    # Retrieve sensor data recordings for the climate data
-                    sensor_data_list = SensorDataModel.query.filter_by(climate_id=recent_climate_data.id)
-                    if sensor_data_list:
-                        sensor_data_dict_list = []
-                        for sensor_data in sensor_data_list:
-                            sensor_data_dict_list.append(sensor_data.to_dict())
-                        climate_data['climate_data'] = sensor_data_dict_list
-                    sensor_dict['recent_climate_data'] = climate_data
+                    sensor_dict['recent_climate_data'] = recent_climate_data.to_dict()
                 sensor_dict_list.append(sensor_dict)
             return {'status': 'Sensors successfully retrieved', 'sensors': sensor_dict_list}, 200
         except:
@@ -1057,6 +1016,68 @@ class Sensors(Resource):
             return {'status': 'Sensors successfully deleted'}, 200
         except:
             return {'status': 'Error', 'errors': ['Error while deleting all sensors from database']}, 500
+
+
+class Trends(Resource):
+    @jwt_required
+    def get(self, sensor_id):
+        """
+        Get all sensors
+        """
+
+        try:
+            # Retrieve sensor based on sensor id
+            sensor = SensorModel.query.filter_by(id=sensor_id).first()
+            sensor_types = []
+            sensor_trends = {}
+            number = 0
+            if sensor:
+                sensor_dict = sensor.to_dict()
+
+                # Retrieve most recent climate data for the sensor
+                recent_climate_data = ClimateModel.query.order_by(ClimateModel.id.desc()).filter_by(
+                    sensor_id=sensor_dict['id']).first()
+                if recent_climate_data:
+                    climate_data = recent_climate_data.to_dict()
+                    if climate_data['climate_data']:
+                        sensor_data_list = []
+                        for sensor_data in climate_data['climate_data']:
+                            sensor_data_list.append(sensor_data)
+                            sensor_types.append(sensor_data['type'].lower())
+                            sensor_trends[sensor_data['type'].lower()] = {}
+                        climate_data['climate_data'] = sensor_data_list
+                    sensor_dict['recent_climate_data'] = climate_data
+
+                    one_day_end = dateutil.parser.parse(climate_data['date']) + timedelta(minutes=1)
+                    one_day_start = one_day_end.replace(hour=0, minute=0, second=0, microsecond=0)
+
+                    one_day_climate_data = ClimateModel.query.filter(
+                        ClimateModel.sensor_id == sensor_id,
+                        ClimateModel.date >= one_day_start,
+                        ClimateModel.date <= one_day_end)
+
+                    for climate in one_day_climate_data:
+                        for sensor_data in climate.climate_data:
+                            number = number + 1
+                            sensor_type = sensor_data.type.lower()
+                            sensor_value = sensor_data.value
+
+                            if '1_day' not in sensor_trends[sensor_type]:
+                                sensor_trends[sensor_type]['1_day'] = {
+                                    'low': sensor_value,
+                                    'high': sensor_value
+                                }
+                            else:
+                                if sensor_value < sensor_trends[sensor_type]['1_day']['low']:
+                                    sensor_trends[sensor_type]['1_day']['low'] = sensor_value
+                                elif sensor_value > sensor_trends[sensor_type]['1_day']['high']:
+                                    sensor_trends[sensor_type]['1_day']['high'] = sensor_value
+
+                return {'status': 'Trends successfully retrieved', 'trends': sensor_trends, 'number': number}, 200
+            else:
+                return {'status': 'Error', 'errors': ['Sensor doesn\'t exist']}, 500
+        except:
+            return {'status': 'Error', 'errors': ['Error while calculating trends from sensor data']}, 500
 
 
 class ChangePassword(Resource):
@@ -1146,6 +1167,7 @@ api.add_resource(ChangePassword, '/api/accounts/actions/change-password')
 api.add_resource(Sensor, '/api/sensors/<int:sensor_id>')
 api.add_resource(Sensors, '/api/sensors')
 api.add_resource(ClimateData, '/api/sensors/<int:sensor_id>/climate-data')
+api.add_resource(Trends, '/api/sensors/<int:sensor_id>/trends')
 api.add_resource(NextAvailableSensorID, '/api/sensors/actions/next-available-sensor-id')
 
 
@@ -1193,8 +1215,10 @@ def remove_old_climate_data():
             db.session.execute(sensor_data)
             db.session.commit()
 
+
         # Delete climate data
-        climate_data = ClimateModel.__table__.delete().where(ClimateModel.sensor_id == sensor_id).where(ClimateModel.date <= old_time)
+        climate_data = ClimateModel.__table__.delete().where(ClimateModel.sensor_id == sensor_id).where(
+            ClimateModel.date <= old_time)
         db.session.execute(climate_data)
         db.session.commit()
 
@@ -1204,7 +1228,6 @@ def init():
     scheduler = BackgroundScheduler()
 
     # Create job to remove old climate data every 24 hours
-    remove_old_climate_data()
     old_climate_job = scheduler.add_job(remove_old_climate_data, 'interval', hours=24)
     scheduler.start()
 

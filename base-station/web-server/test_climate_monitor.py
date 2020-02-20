@@ -2609,7 +2609,23 @@ def test_post_climate_data_endpoint(client, init_database):
         "id": 1,
         "sensor_id": 1,
         "battery_voltage": 4.3,
-        "date": "2020-01-26 19:00"
+        "date": "2020-01-26 19:00",
+        'climate_data': [
+            {
+                'climate_id': 1,
+                'id': 1,
+                'type': 'Temperature',
+                'unit': 'c',
+                'value': 23.11
+            },
+            {
+                'climate_id': 1,
+                'id': 2,
+                'type': 'Humidity',
+                'unit': '%',
+                'value': 30.0
+            }
+        ]
     }
     sensor_data = SensorDataModel.query.all()
     assert sensor_data[0].to_dict() == {
@@ -2651,5 +2667,14 @@ def test_remove_old_climate_data(init_database):
         'id': 2,
         'sensor_id': 1,
         'battery_voltage': 4.20,
-        'date': current_date.strftime("%Y-%m-%d %H:%M")
+        'date': current_date.strftime("%Y-%m-%d %H:%M"),
+        'climate_data': [
+            {
+                'climate_id': 2,
+                'id': 2,
+                'type': 'Temperature',
+                'unit': 'c',
+                'value': 23.43
+            }
+        ]
     }
