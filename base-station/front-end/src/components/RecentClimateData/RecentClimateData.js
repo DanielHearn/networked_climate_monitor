@@ -21,7 +21,7 @@ export default {
       default: () => {
         return []
       },
-      required: true
+      required: false
     },
     temperatureUnit: {
       type: String,
@@ -55,23 +55,25 @@ export default {
           )
         }
 
-        const previousData = this.previousClimateData.filter(
-          climateData => climateData.type === data.type
-        )[0]
-        if (previousData) {
-          const previousValue = previousData.value
-          if (previousValue > data.value) {
-            modifiedData.trendDirection = 'Down'
-            modifiedData.trendDirectionIcon = 'arrow_downward'
-          } else {
-            modifiedData.trendDirection = 'Up'
-            modifiedData.trendDirectionIcon = 'arrow_upward'
+        if (this.previousClimateData) {
+          const previousData = this.previousClimateData.filter(
+            climateData => climateData.type === data.type
+          )[0]
+          if (previousData) {
+            const previousValue = previousData.value
+            if (previousValue > data.value) {
+              modifiedData.trendDirection = 'Down'
+              modifiedData.trendDirectionIcon = 'arrow_downward'
+            } else {
+              modifiedData.trendDirection = 'Up'
+              modifiedData.trendDirectionIcon = 'arrow_upward'
+            }
+            modifiedData.previousValue = formatClimateData(
+              modifiedData.type,
+              Math.abs(previousValue - data.value),
+              modifiedData.unit
+            )
           }
-          modifiedData.previousValue = formatClimateData(
-            modifiedData.type,
-            Math.abs(previousValue - data.value),
-            modifiedData.unit
-          )
         }
 
         modifiedData.formattedText = formatClimateData(

@@ -18,6 +18,12 @@ exports[`RecentClimateData.vue has the expected html structure 1`] = `
       23.45°C
     
     </p>
+     
+    <!---->
+     
+    <!---->
+     
+    <!---->
   </li>
   <li>
     <p
@@ -33,6 +39,12 @@ exports[`RecentClimateData.vue has the expected html structure 1`] = `
       56.34%
     
     </p>
+     
+    <!---->
+     
+    <!---->
+     
+    <!---->
   </li>
 </ul>
 `;

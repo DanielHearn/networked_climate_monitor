@@ -8,7 +8,8 @@ import {
   getClimateData,
   deleteSensor,
   deleteClimateData,
-  patchSensor
+  patchSensor,
+  getTrends
 } from './../../src/static/api.js'
 import { sub, startOfYesterday, endOfToday, startOfToday } from 'date-fns'
 
@@ -159,6 +160,11 @@ const patchSensorResponseData = {
     status: 'Success'
   }
 }
+const trendResponseData = {
+  data: {
+    status: 'Success'
+  }
+}
 
 let wrapper
 let store
@@ -182,7 +188,8 @@ const factory = () => {
         push: jest.fn()
       },
       getSensors,
-      getClimateData
+      getClimateData,
+      getTrends
     },
     store,
     localVue
@@ -219,6 +226,8 @@ describe('Dashboard.vue', () => {
     getSensors.mockResolvedValueOnce(sensorsResponse)
     const historicalResponse = cloneDeep(historicalData)
     getClimateData.mockResolvedValueOnce(historicalResponse)
+    const trendResponse = cloneDeep(trendResponseData)
+    getTrends.mockResolvedValueOnce(trendResponse)
 
     wrapper = factory()
 
@@ -242,6 +251,8 @@ describe('Dashboard.vue', () => {
     getSensors.mockResolvedValueOnce(sensorsResponse)
     const historicalResponse = cloneDeep(historicalData)
     getClimateData.mockResolvedValueOnce(historicalResponse)
+    const trendResponse = cloneDeep(trendResponseData)
+    getTrends.mockResolvedValueOnce(trendResponse)
 
     wrapper = factory()
 
@@ -251,6 +262,7 @@ describe('Dashboard.vue', () => {
       'Node 1: Bedroom Sensor'
     )
 
+    getTrends.mockResolvedValueOnce(trendResponse)
     getClimateData.mockResolvedValueOnce(historicalResponse)
     wrapper
       .findAll('.list .list-item .actions .button--primary')
@@ -259,6 +271,8 @@ describe('Dashboard.vue', () => {
     expect(wrapper.find('.main-panel .sub-heading').text()).toContain(
       'Node 2: Kitchen Sensor'
     )
+
+    getTrends.mockResolvedValueOnce(trendResponse)
     getClimateData.mockResolvedValueOnce(historicalResponse)
     wrapper
       .findAll('.list .list-item .actions .button--primary')
@@ -276,6 +290,8 @@ describe('Dashboard.vue', () => {
     getSensors.mockResolvedValueOnce(sensorsResponse)
     const historicalResponse = cloneDeep(historicalData)
     getClimateData.mockResolvedValueOnce(historicalResponse)
+    const trendResponse = cloneDeep(trendResponseData)
+    getTrends.mockResolvedValueOnce(trendResponse)
 
     wrapper = factory()
 
@@ -319,6 +335,7 @@ describe('Dashboard.vue', () => {
     })
     getSensors.mockResolvedValueOnce(sensorsResponse)
     getClimateData.mockResolvedValueOnce(historicalResponse)
+    getTrends.mockResolvedValueOnce(trendResponse)
     wrapper.find('.side-panel .side-panel-header button').trigger('click')
 
     await wrapper.vm.$nextTick()
@@ -338,6 +355,8 @@ describe('Dashboard.vue', () => {
     getClimateData.mockResolvedValueOnce(historicalResponse)
     const deleteResponse = cloneDeep(deleteSensorData)
     deleteSensor.mockResolvedValueOnce(deleteResponse)
+    const trendResponse = cloneDeep(trendResponseData)
+    getTrends.mockResolvedValueOnce(trendResponse)
 
     wrapper = factory()
 
@@ -363,6 +382,7 @@ describe('Dashboard.vue', () => {
       .trigger('click')
 
     getClimateData.mockResolvedValueOnce(historicalResponse)
+    getTrends.mockResolvedValueOnce(trendResponse)
     await wrapper.vm.$nextTick()
 
     expect(wrapper.findAll('.list .edit-box').length).toBe(2)
@@ -380,6 +400,8 @@ describe('Dashboard.vue', () => {
     getClimateData.mockResolvedValueOnce(historicalResponse)
     const deleteResponse = cloneDeep(deleteClimateResponseData)
     deleteClimateData.mockResolvedValueOnce(deleteResponse)
+    const trendResponse = cloneDeep(trendResponseData)
+    getTrends.mockResolvedValueOnce(trendResponse)
 
     wrapper = factory()
 
@@ -405,6 +427,7 @@ describe('Dashboard.vue', () => {
       .trigger('click')
 
     getClimateData.mockResolvedValueOnce({ data: { climate_data: [] } })
+    getTrends.mockResolvedValueOnce(trendResponse)
     await wrapper.vm.$nextTick()
 
     expect(wrapper.findAll('.list .edit-box').length).toBe(3)
@@ -425,6 +448,8 @@ describe('Dashboard.vue', () => {
     getClimateData.mockResolvedValueOnce(historicalResponse)
     const patchSensorResponse = cloneDeep(patchSensorResponseData)
     patchSensor.mockResolvedValueOnce(patchSensorResponse)
+    const trendResponse = cloneDeep(trendResponseData)
+    getTrends.mockResolvedValueOnce(trendResponse)
 
     wrapper = factory()
 
@@ -460,6 +485,8 @@ describe('Dashboard.vue', () => {
     getSensors.mockResolvedValueOnce(sensorsResponse)
     const historicalResponse = cloneDeep(historicalData)
     getClimateData.mockResolvedValueOnce(historicalResponse)
+    const trendResponse = cloneDeep(trendResponseData)
+    getTrends.mockResolvedValueOnce(trendResponse)
 
     wrapper = factory()
 
@@ -472,6 +499,7 @@ describe('Dashboard.vue', () => {
     expect(wrapper.vm.timePeriod.end).toEqual(endOfToday())
     expect(wrapper.vm.historicalRangeType).toBe('1-day')
 
+    getTrends.mockResolvedValueOnce(trendResponse)
     getClimateData.mockResolvedValueOnce(historicalResponse)
     periodButtons.at(1).trigger('click')
     await wrapper.vm.$nextTick()
@@ -481,6 +509,7 @@ describe('Dashboard.vue', () => {
     expect(wrapper.vm.historicalRangeType).toBe('2-days')
     expect(periodButtons.at(1).classes()).toContain('active')
 
+    getTrends.mockResolvedValueOnce(trendResponse)
     getClimateData.mockResolvedValueOnce(historicalResponse)
     periodButtons.at(2).trigger('click')
     await wrapper.vm.$nextTick()
@@ -492,6 +521,7 @@ describe('Dashboard.vue', () => {
     expect(wrapper.vm.historicalRangeType).toBe('1-week')
     expect(periodButtons.at(2).classes()).toContain('active')
 
+    getTrends.mockResolvedValueOnce(trendResponse)
     getClimateData.mockResolvedValueOnce(historicalResponse)
     periodButtons.at(3).trigger('click')
     await wrapper.vm.$nextTick()

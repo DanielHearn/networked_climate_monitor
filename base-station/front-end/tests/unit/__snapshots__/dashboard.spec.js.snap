@@ -421,6 +421,12 @@ exports[`Dashboard.vue change active sensor 1`] = `
       23.11°C
     
             </p>
+             
+            <!---->
+             
+            <!---->
+             
+            <!---->
           </li>
           <li>
             <p
@@ -436,6 +442,12 @@ exports[`Dashboard.vue change active sensor 1`] = `
       30%
     
             </p>
+             
+            <!---->
+             
+            <!---->
+             
+            <!---->
           </li>
         </ul>
          
@@ -1187,6 +1199,12 @@ exports[`Dashboard.vue delete sensor 1`] = `
       23.11°C
     
             </p>
+             
+            <!---->
+             
+            <!---->
+             
+            <!---->
           </li>
           <li>
             <p
@@ -1202,6 +1220,12 @@ exports[`Dashboard.vue delete sensor 1`] = `
       30%
     
             </p>
+             
+            <!---->
+             
+            <!---->
+             
+            <!---->
           </li>
         </ul>
          
@@ -1690,6 +1714,12 @@ exports[`Dashboard.vue historical data time period 1`] = `
       21.22°C
     
             </p>
+             
+            <!---->
+             
+            <!---->
+             
+            <!---->
           </li>
           <li>
             <p
@@ -1705,6 +1735,12 @@ exports[`Dashboard.vue historical data time period 1`] = `
       40.71%
     
             </p>
+             
+            <!---->
+             
+            <!---->
+             
+            <!---->
           </li>
         </ul>
          
@@ -2193,6 +2229,12 @@ exports[`Dashboard.vue multiple sensors 1`] = `
       21.22°C
     
             </p>
+             
+            <!---->
+             
+            <!---->
+             
+            <!---->
           </li>
           <li>
             <p
@@ -2208,6 +2250,12 @@ exports[`Dashboard.vue multiple sensors 1`] = `
       40.71%
     
             </p>
+             
+            <!---->
+             
+            <!---->
+             
+            <!---->
           </li>
         </ul>
          
@@ -2311,14 +2359,16 @@ exports[`Dashboard.vue no sensors 1`] = `
         <li
           class="list-item"
         >
-          <p
-            class="text"
-          >
+          <div>
+            <p
+              class="text"
+            >
+              
+              No sensor nodes created. Connect a sensor node to the base
+              station to create a new sensor.
             
-            No sensor nodes created. Connect a sensor node to the base station
-            to create a new sensor.
-          
-          </p>
+            </p>
+          </div>
         </li>
       </ul>
     </div>
@@ -2876,6 +2926,12 @@ exports[`Dashboard.vue refresh 1`] = `
       21.22°C
     
             </p>
+             
+            <!---->
+             
+            <!---->
+             
+            <!---->
           </li>
           <li>
             <p
@@ -2891,6 +2947,12 @@ exports[`Dashboard.vue refresh 1`] = `
       40.71%
     
             </p>
+             
+            <!---->
+             
+            <!---->
+             
+            <!---->
           </li>
         </ul>
          
@@ -3379,6 +3441,12 @@ exports[`Dashboard.vue rename sensor 1`] = `
       21.22°C
     
             </p>
+             
+            <!---->
+             
+            <!---->
+             
+            <!---->
           </li>
           <li>
             <p
@@ -3394,6 +3462,12 @@ exports[`Dashboard.vue rename sensor 1`] = `
       40.71%
     
             </p>
+             
+            <!---->
+             
+            <!---->
+             
+            <!---->
           </li>
         </ul>
          

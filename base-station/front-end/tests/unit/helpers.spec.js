@@ -27,9 +27,9 @@ describe('helpers', () => {
 
   it('convertTemperature', () => {
     expect(convertTemperature(24.23, 'c')).toBe(24.23)
-    expect(convertTemperature(24.236272, 'c')).toBe(24.24)
-    expect(convertTemperature(24.23, 'f')).toBe(75.61)
-    expect(convertTemperature(24.237245, 'f')).toBe(75.63)
+    expect(convertTemperature(24.236272, 'c')).toBe(24.236272)
+    expect(convertTemperature(24.23, 'f')).toBe(75.614)
+    expect(convertTemperature(24.237245, 'f')).toBe(75.627041)
   })
 
   it('formatClimateData', () => {
