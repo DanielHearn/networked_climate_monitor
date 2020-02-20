@@ -5,12 +5,16 @@
       <p class="sub-heading">
         {{ data.formattedText }}
       </p>
-      <p v-if="data.one_day_high" class="text">
-        Today's High:
-        {{ data.one_day_high }}
+      <p v-if="data.previousValue && data.trendDirection">
+        <i class="material-icons">{{ data.trendDirectionIcon }}</i>
+        {{ data.previousValue }}
       </p>
-      <p v-if="data.one_day_low" class="text">
-        Today's Low: {{ data.one_day_low }}
+      <p v-if="data.oneDayHigh" class="text">
+        Today's High:
+        {{ data.oneDayHigh }}
+      </p>
+      <p v-if="data.oneDayLow" class="text">
+        Today's Low: {{ data.oneDayLow }}
       </p>
     </li>
   </ul>

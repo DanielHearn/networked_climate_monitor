@@ -16,8 +16,6 @@ export const convertTemperature = (value, unit) => {
   if (unit === 'f') {
     convertedValue = value * 1.8 + 32
   }
-  convertedValue = convertedValue.toFixed(2)
-  convertedValue = parseFloat(convertedValue, 10)
   return convertedValue
 }
 
@@ -33,8 +31,8 @@ export const formatClimateData = (type, value, unit) => {
       value = convertTemperature(value, unit)
       unit = `°${unit.toUpperCase()}`
   }
-
-  return `${value}${unit}`
+  const formattedValue = parseFloat(value.toFixed(2), 10)
+  return `${formattedValue}${unit}`
 }
 
 /**

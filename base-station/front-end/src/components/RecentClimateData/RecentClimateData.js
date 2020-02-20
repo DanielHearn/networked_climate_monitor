@@ -16,6 +16,13 @@ export default {
       },
       required: false
     },
+    previousClimateData: {
+      type: Array,
+      default: () => {
+        return []
+      },
+      required: true
+    },
     temperatureUnit: {
       type: String,
       default: 'c',
@@ -36,14 +43,33 @@ export default {
         }
 
         if (this.trends && this.trends[lowercaseType]) {
-          modifiedData.one_day_high = formatClimateData(
+          modifiedData.oneDayHigh = formatClimateData(
             modifiedData.type,
             this.trends[lowercaseType]['1_day']['high'],
             modifiedData.unit
           )
-          modifiedData.one_day_low = formatClimateData(
+          modifiedData.oneDayLow = formatClimateData(
             modifiedData.type,
             this.trends[lowercaseType]['1_day']['low'],
+            modifiedData.unit
+          )
+        }
+
+        const previousData = this.previousClimateData.filter(
+          climateData => climateData.type === data.type
+        )[0]
+        if (previousData) {
+          const previousValue = previousData.value
+          if (previousValue > data.value) {
+            modifiedData.trendDirection = 'Down'
+            modifiedData.trendDirectionIcon = 'arrow_downward'
+          } else {
+            modifiedData.trendDirection = 'Up'
+            modifiedData.trendDirectionIcon = 'arrow_upward'
+          }
+          modifiedData.previousValue = formatClimateData(
+            modifiedData.type,
+            Math.abs(previousValue - data.value),
             modifiedData.unit
           )
         }
