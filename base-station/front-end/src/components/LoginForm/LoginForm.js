@@ -27,6 +27,7 @@ export default {
           const data = response.data
           if (data.status && data.access_token && data.refresh_token) {
             data.logged_in = true
+            data.settings = JSON.parse(data.settings.replace(/'/g, '"'))
             this.$store.dispatch('login', data)
           }
         })

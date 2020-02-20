@@ -38,7 +38,6 @@ export const actions = {
    * @param {boolean} doRetrieveAcc - Whether user details should be retrieved from the API
    */
   login({ commit }, data) {
-    data.settings = JSON.parse(data.settings.replace(/'/g, '"'))
     commit('setUser', data)
   },
   /**
