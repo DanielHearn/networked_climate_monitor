@@ -254,7 +254,11 @@
                   />
                 </div>
               </div>
-              <template v-if="historicalDataLoaded && historicalData">
+              <template
+                v-if="
+                  historicalDataLoaded && Object.keys(historicalData).length
+                "
+              >
                 <div
                   v-for="data in historicalData"
                   :key="data.type"
@@ -270,11 +274,15 @@
                   />
                 </div>
               </template>
-              <template v-else-if="!historicalData">
-                <p>No historical data for this time period.</p>
-              </template>
               <template v-else-if="!historicalDataLoaded">
                 <p>Historical data loading.</p>
+              </template>
+              <template
+                v-else-if="
+                  !Object.keys(historicalData).length && historicalDataLoaded
+                "
+              >
+                <p>No historical data for this time period.</p>
               </template>
             </template>
             <template v-else>
@@ -526,6 +534,7 @@ export default {
 
       // Error out if the sensor has no climate data
       if (!recentClimateData || !recentClimateData.climate_data) {
+        this.historicalDataLoaded = true
         return false
       }
 
@@ -694,6 +703,7 @@ export default {
           })
         }
       })
+
       this.historicalData = historicalData
       setTimeout(() => {
         this.historicalDataLoaded = true
@@ -710,7 +720,7 @@ export default {
       getClimateData(accessToken, sensorID, 20, rangeStart, rangeEnd)
         .then(response => {
           const data = response.data
-          if (data.climate_data) {
+          if ('climate_data' in data) {
             this.processHistoricalData(data.climate_data)
           }
         })
