@@ -64,9 +64,12 @@ export default {
             if (previousValue > data.value) {
               modifiedData.trendDirection = 'Down'
               modifiedData.trendDirectionIcon = 'arrow_downward'
-            } else {
+            } else if (previousValue < data.value) {
               modifiedData.trendDirection = 'Up'
               modifiedData.trendDirectionIcon = 'arrow_upward'
+            } else {
+              modifiedData.trendDirection = 'Stay'
+              modifiedData.trendDirectionIcon = 'remove'
             }
             modifiedData.previousValue = formatClimateData(
               modifiedData.type,

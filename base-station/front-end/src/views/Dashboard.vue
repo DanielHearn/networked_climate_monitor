@@ -208,7 +208,9 @@
                 "
                 :trends="trends"
                 :temperature-unit="settings.temperature_unit"
-                :previous-climate-data="activeSensor.previousClimateData"
+                :previous-climate-data="
+                  activeSensor.previous_climate_data.climate_data
+                "
               />
 
               <h3 class="heading">Historical Climate Data</h3>
@@ -552,12 +554,6 @@ export default {
       const recentClimateData = climateData[0]
       const labels = []
 
-      if (climateData && climateData.length > 1) {
-        this.activeSensor.previousClimateData = climateData[1].climate_data
-      } else {
-        this.activeSensor.previousClimateData = []
-      }
-
       // Error out if the sensor has no climate data
       if (!recentClimateData || !recentClimateData.climate_data) {
         this.historicalDataLoaded = true
@@ -877,6 +873,12 @@ export default {
             const data = response.data
             if (data.sensors) {
               for (let sensor of data.sensors) {
+                if (!sensor.previous_climate_data) {
+                  sensor.previous_climate_data = {
+                    climate_data: []
+                  }
+                }
+
                 // Preserve config and sensor name editing when sensors are reloaded
                 const oldSensors = this.sensors.slice()
                 if (oldSensors.length) {

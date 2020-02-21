@@ -741,7 +741,7 @@ def test_get_account_endpoint(client, init_database):
     assert type(json_data['account']) is dict
     assert json_data['account']['id'] == 1
     assert json_data['account']['email'] == 'email@email.com'
-    assert json_data['account']['settings'] == "{'temperature_unit': 'c'}"
+    assert json_data['account']['settings'] == "{'temperature_unit': 'c', 'measurement_interval': '10_min', 'wifi': {'ssid': '', 'password': ''}}"
     assert type(json_data['account']['reset_token']) is str
 
     '''

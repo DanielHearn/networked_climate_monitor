@@ -10,12 +10,10 @@
         {{ data.previousValue }}
       </p>
       <p v-if="data.oneDayHigh" class="text">
-        Today's High:
+        Day's High:
         {{ data.oneDayHigh }}
       </p>
-      <p v-if="data.oneDayLow" class="text">
-        Today's Low: {{ data.oneDayLow }}
-      </p>
+      <p v-if="data.oneDayLow" class="text">Day's Low: {{ data.oneDayLow }}</p>
     </li>
   </ul>
 </template>

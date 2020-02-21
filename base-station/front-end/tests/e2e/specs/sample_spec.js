@@ -251,6 +251,43 @@ describe('Climate Monitor', function() {
       'Temperatures are stored in celsius and will be displayed in farenheit'
     )
   })
+  it('change wifi settings', function() {
+    cy.visit(`${url}/settings`)
+    cy.get('.side-panel .list .list-item.active').contains(
+      'Measurement Settings'
+    )
+    cy.get('.side-panel .list .list-item')
+      .eq(2)
+      .find('.button--primary')
+      .click()
+    cy.get('.side-panel .list .list-item.active').contains(
+      'Base Station Management'
+    )
+    cy.get('#wifi_ssid_input').type('wifi-ssid')
+    cy.get('#wifi_password_input').type('wifi-password')
+    cy.get('.main-panel').contains(
+      "The base station will connect to the 'wifi-ssid' wifi network"
+    )
+  })
+  it('change measurement interval', function() {
+    cy.visit(`${url}/settings`)
+    cy.get('.main-panel').contains(
+      'Sensor nodes will record climate data every 10 minutes'
+    )
+    cy.get('.measurement-interval-setting select').should('be.visible')
+    cy.get('.measurement-interval-setting select').select('5_min')
+    cy.get('.main-panel').contains(
+      'Sensor nodes will record climate data every 5 minutes'
+    )
+    cy.get('.measurement-interval-setting select').select('30_min')
+    cy.get('.main-panel').contains(
+      'Sensor nodes will record climate data every 30 minutes'
+    )
+    cy.get('.measurement-interval-setting select').select('60_min')
+    cy.get('.main-panel').contains(
+      'Sensor nodes will record climate data every 1 hour'
+    )
+  })
   it('fahrenheit temperature data', function() {
     cy.visit(`${url}/dashboard`)
     cy.title().should('eq', 'Dashboard - Climate Monitor')

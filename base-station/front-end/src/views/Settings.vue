@@ -62,6 +62,32 @@
               </div>
             </template>
           </li>
+          <li
+            class="list-item"
+            v-bind:class="{ active: activeCategoryID === 2 }"
+            style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+          >
+            <template>
+              <div style="display: flex; flex-direction: row;">
+                <p
+                  class="heading"
+                  style="margin-right: 0.25em; display: flex; align-items: center;"
+                  :class="{
+                    underline: activeCategoryID === 2
+                  }"
+                >
+                  Base Station Management
+                </p>
+              </div>
+              <div class="actions">
+                <v-button
+                  @click.native="activeCategoryID = 2"
+                  :hierachyLevel="'primary'"
+                  :text="'Manage base station'"
+                />
+              </div>
+            </template>
+          </li>
         </ul>
       </template>
     </side-panel>
@@ -86,7 +112,33 @@
               />
               <p v-if="!$store.state.user.logged_in">Please log in</p>
               <template v-else-if="settings">
-                <div class="input-box" v-if="settings.temperature_unit">
+                <div
+                  v-if="settings.measurement_interval"
+                  class="input-box measurement-interval-setting"
+                >
+                  <p class="sub-heading">Node Measurement Interval:</p>
+                  <select v-model="settings.measurement_interval">
+                    <option
+                      v-for="option in measurementIntervalOptions"
+                      v-bind:value="option.value"
+                      :key="option.value"
+                    >
+                      {{ option.text }}
+                    </option>
+                  </select>
+                  <p class="text italics">
+                    Sensor nodes will record climate data every
+                    {{
+                      $options.intervalMappings[
+                        settings.measurement_interval
+                      ].toLowerCase()
+                    }}
+                  </p>
+                </div>
+                <div
+                  class="input-box temperature-unit-setting"
+                  v-if="settings.temperature_unit"
+                >
                   <p class="sub-heading">Temperature Unit:</p>
                   <div class="radio-container">
                     <div
@@ -178,6 +230,47 @@
             </div>
           </template>
         </template>
+        <template v-if="activeCategoryID === 2">
+          <template slot="header">
+            <p class="sub-heading">Base Station Management</p>
+          </template>
+          <template slot="content">
+            <div class="dashboard-content">
+              <v-button
+                v-if="$store.state.mobile"
+                @click.native="activeCategoryID = -1"
+                :hierachyLevel="'tertiary'"
+                :text="'Back'"
+              />
+              <div
+                v-if="settings.wifi"
+                class="input-box measurement-interval-setting"
+              >
+                <p class="sub-heading">Wifi Settings</p>
+                <input
+                  type="text"
+                  class="input--text input--small"
+                  v-model="settings.wifi.ssid"
+                  placeholder="Wifi SSID"
+                  id="wifi_ssid_input"
+                />
+                <input
+                  type="text"
+                  class="input--text input--small"
+                  v-model="settings.wifi.password"
+                  placeholder="Wifi Password"
+                  id="wifi_password_input"
+                />
+                <p v-if="settings.wifi.ssid">
+                  The base station will connect to the '{{
+                    settings.wifi.ssid
+                  }}' wifi network if it is available, otherwise it will try to
+                  connect to the 'climate-monitor' wifi network.
+                </p>
+              </div>
+            </div>
+          </template>
+        </template>
       </main-panel>
     </template>
   </div>
@@ -190,6 +283,13 @@ import vButton from './../components/vButton/vButton.vue'
 import { getAccount, patchAccount } from './../static/api'
 import { cloneDeep } from 'lodash'
 
+const intervalMappings = {
+  '5_min': '5 Minutes',
+  '10_min': '10 Minutes',
+  '30_min': '30 Minutes',
+  '60_min': '1 Hour'
+}
+
 export default {
   name: 'settings',
   components: {
@@ -197,11 +297,18 @@ export default {
     SidePanel,
     vButton
   },
+  intervalMappings,
   data: function() {
     return {
       activeCategoryID: -1,
       settings: {},
-      hasBeenEdited: false
+      hasBeenEdited: false,
+      measurementIntervalOptions: [
+        { text: intervalMappings['5_min'], value: '5_min' },
+        { text: intervalMappings['10_min'], value: '10_min' },
+        { text: intervalMappings['30_min'], value: '30_min' },
+        { text: intervalMappings['60_min'], value: '60_min' }
+      ]
     }
   },
   watch: {

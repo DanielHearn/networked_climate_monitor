@@ -78,6 +78,34 @@ exports[`Settings.vue category changing 1`] = `
             </button>
           </div>
         </li>
+         
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            style="display: flex; flex-direction: row;"
+          >
+            <p
+              class="heading"
+              style="margin-right: 0.25em; display: flex; align-items: center;"
+            >
+              
+                Base Station Management
+              
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--primary"
+            >
+              Manage base station
+            </button>
+          </div>
+        </li>
       </ul>
     </div>
   </div>
@@ -140,6 +168,267 @@ exports[`Settings.vue category changing 1`] = `
             >
               1234
             </span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Settings.vue change measurement interval 1`] = `
+<div
+  class="content"
+>
+  <div
+    class="side-panel"
+  >
+    <div
+      class="side-panel-header"
+    >
+      <p
+        class="sub-heading"
+      >
+        Settings Categories
+      </p>
+    </div>
+     
+    <div
+      class="side-panel-content"
+    >
+      <ul
+        class="list"
+      >
+        <li
+          class="list-item active"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            style="display: flex; flex-direction: row;"
+          >
+            <p
+              class="heading underline"
+              style="margin-right: 0.25em; display: flex; align-items: center;"
+            >
+              
+                Measurement Settings
+              
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--primary"
+            >
+              Edit settings
+            </button>
+          </div>
+        </li>
+         
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            style="display: flex; flex-direction: row;"
+          >
+            <p
+              class="heading"
+              style="margin-right: 0.25em; display: flex; align-items: center;"
+            >
+              
+                Account Management
+              
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--primary"
+            >
+              Manage account
+            </button>
+          </div>
+        </li>
+         
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            style="display: flex; flex-direction: row;"
+          >
+            <p
+              class="heading"
+              style="margin-right: 0.25em; display: flex; align-items: center;"
+            >
+              
+                Base Station Management
+              
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--primary"
+            >
+              Manage base station
+            </button>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+   
+  <div
+    class="main-panel"
+  >
+    <div
+      class="main-panel-header"
+    >
+      <p
+        class="sub-heading"
+      >
+        Measurement Settings
+      </p>
+    </div>
+     
+    <div
+      class="main-panel-content"
+    >
+      <div
+        class="dashboard-content"
+      >
+        <!---->
+         
+        <div
+          class="input-box measurement-interval-setting"
+        >
+          <p
+            class="sub-heading"
+          >
+            Node Measurement Interval:
+          </p>
+           
+          <select>
+            <option
+              value="5_min"
+            >
+              
+                    5 Minutes
+                  
+            </option>
+            <option
+              value="10_min"
+            >
+              
+                    10 Minutes
+                  
+            </option>
+            <option
+              value="30_min"
+            >
+              
+                    30 Minutes
+                  
+            </option>
+            <option
+              value="60_min"
+            >
+              
+                    1 Hour
+                  
+            </option>
+          </select>
+           
+          <p
+            class="text italics"
+          >
+            
+                  Sensor nodes will record climate data every
+                  5 minutes
+                
+          </p>
+        </div>
+         
+        <div
+          class="input-box temperature-unit-setting"
+        >
+          <p
+            class="sub-heading"
+          >
+            Temperature Unit:
+          </p>
+           
+          <div
+            class="radio-container"
+          >
+            <div
+              class="radio-option active"
+            >
+              <label
+                for="temp_unit_c"
+              >
+                Celsius:
+                      
+                <input
+                  class="radio"
+                  id="temp_unit_c"
+                  type="radio"
+                  value="c"
+                />
+                 
+                <span
+                  class="input"
+                >
+                  <i
+                    class="material-icons"
+                  >
+                    done
+                  </i>
+                </span>
+              </label>
+            </div>
+             
+            <div
+              class="radio-option"
+            >
+              <label
+                for="temp_unit_f"
+              >
+                Fahrenheit:
+                      
+                <input
+                  class="radio"
+                  id="temp_unit_f"
+                  type="radio"
+                  value="f"
+                />
+                 
+                <span
+                  class="input"
+                >
+                  <i
+                    class="material-icons"
+                  />
+                </span>
+              </label>
+            </div>
+          </div>
+           
+          <p
+            class="text italics"
+          >
+            
+                  Temperatures are stored in celsius and will be displayed in
+                  celsius.
+                
           </p>
         </div>
       </div>
@@ -226,6 +515,34 @@ exports[`Settings.vue change temperature unit 1`] = `
             </button>
           </div>
         </li>
+         
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            style="display: flex; flex-direction: row;"
+          >
+            <p
+              class="heading"
+              style="margin-right: 0.25em; display: flex; align-items: center;"
+            >
+              
+                Base Station Management
+              
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--primary"
+            >
+              Manage base station
+            </button>
+          </div>
+        </li>
       </ul>
     </div>
   </div>
@@ -252,7 +569,57 @@ exports[`Settings.vue change temperature unit 1`] = `
         <!---->
          
         <div
-          class="input-box"
+          class="input-box measurement-interval-setting"
+        >
+          <p
+            class="sub-heading"
+          >
+            Node Measurement Interval:
+          </p>
+           
+          <select>
+            <option
+              value="5_min"
+            >
+              
+                    5 Minutes
+                  
+            </option>
+            <option
+              value="10_min"
+            >
+              
+                    10 Minutes
+                  
+            </option>
+            <option
+              value="30_min"
+            >
+              
+                    30 Minutes
+                  
+            </option>
+            <option
+              value="60_min"
+            >
+              
+                    1 Hour
+                  
+            </option>
+          </select>
+           
+          <p
+            class="text italics"
+          >
+            
+                  Sensor nodes will record climate data every
+                  10 minutes
+                
+          </p>
+        </div>
+         
+        <div
+          class="input-box temperature-unit-setting"
         >
           <p
             class="sub-heading"
@@ -409,6 +776,34 @@ exports[`Settings.vue has the expected html structure 1`] = `
             </button>
           </div>
         </li>
+         
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            style="display: flex; flex-direction: row;"
+          >
+            <p
+              class="heading"
+              style="margin-right: 0.25em; display: flex; align-items: center;"
+            >
+              
+                Base Station Management
+              
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--primary"
+            >
+              Manage base station
+            </button>
+          </div>
+        </li>
       </ul>
     </div>
   </div>
@@ -435,7 +830,57 @@ exports[`Settings.vue has the expected html structure 1`] = `
         <!---->
          
         <div
-          class="input-box"
+          class="input-box measurement-interval-setting"
+        >
+          <p
+            class="sub-heading"
+          >
+            Node Measurement Interval:
+          </p>
+           
+          <select>
+            <option
+              value="5_min"
+            >
+              
+                    5 Minutes
+                  
+            </option>
+            <option
+              value="10_min"
+            >
+              
+                    10 Minutes
+                  
+            </option>
+            <option
+              value="30_min"
+            >
+              
+                    30 Minutes
+                  
+            </option>
+            <option
+              value="60_min"
+            >
+              
+                    1 Hour
+                  
+            </option>
+          </select>
+           
+          <p
+            class="text italics"
+          >
+            
+                  Sensor nodes will record climate data every
+                  10 minutes
+                
+          </p>
+        </div>
+         
+        <div
+          class="input-box temperature-unit-setting"
         >
           <p
             class="sub-heading"
@@ -592,6 +1037,34 @@ exports[`Settings.vue reset token 1`] = `
             </button>
           </div>
         </li>
+         
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            style="display: flex; flex-direction: row;"
+          >
+            <p
+              class="heading"
+              style="margin-right: 0.25em; display: flex; align-items: center;"
+            >
+              
+                Base Station Management
+              
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--primary"
+            >
+              Manage base station
+            </button>
+          </div>
+        </li>
       </ul>
     </div>
   </div>
@@ -654,6 +1127,173 @@ exports[`Settings.vue reset token 1`] = `
             >
               1234
             </span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Settings.vue wifi settings 1`] = `
+<div
+  class="content"
+>
+  <div
+    class="side-panel"
+  >
+    <div
+      class="side-panel-header"
+    >
+      <p
+        class="sub-heading"
+      >
+        Settings Categories
+      </p>
+    </div>
+     
+    <div
+      class="side-panel-content"
+    >
+      <ul
+        class="list"
+      >
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            style="display: flex; flex-direction: row;"
+          >
+            <p
+              class="heading"
+              style="margin-right: 0.25em; display: flex; align-items: center;"
+            >
+              
+                Measurement Settings
+              
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--primary"
+            >
+              Edit settings
+            </button>
+          </div>
+        </li>
+         
+        <li
+          class="list-item"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            style="display: flex; flex-direction: row;"
+          >
+            <p
+              class="heading"
+              style="margin-right: 0.25em; display: flex; align-items: center;"
+            >
+              
+                Account Management
+              
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--primary"
+            >
+              Manage account
+            </button>
+          </div>
+        </li>
+         
+        <li
+          class="list-item active"
+          style="display: flex; flex-direction: column; justify-content: flex-start; text-align: left;"
+        >
+          <div
+            style="display: flex; flex-direction: row;"
+          >
+            <p
+              class="heading underline"
+              style="margin-right: 0.25em; display: flex; align-items: center;"
+            >
+              
+                Base Station Management
+              
+            </p>
+          </div>
+           
+          <div
+            class="actions"
+          >
+            <button
+              class="button button--primary"
+            >
+              Manage base station
+            </button>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+   
+  <div
+    class="main-panel"
+  >
+    <div
+      class="main-panel-header"
+    >
+      <p
+        class="sub-heading"
+      >
+        Base Station Management
+      </p>
+    </div>
+     
+    <div
+      class="main-panel-content"
+    >
+      <div
+        class="dashboard-content"
+      >
+        <!---->
+         
+        <div
+          class="input-box measurement-interval-setting"
+        >
+          <p
+            class="sub-heading"
+          >
+            Wifi Settings
+          </p>
+           
+          <input
+            class="input--text input--small"
+            id="wifi_ssid_input"
+            placeholder="Wifi SSID"
+            type="text"
+          />
+           
+          <input
+            class="input--text input--small"
+            id="wifi_password_input"
+            placeholder="Wifi Password"
+            type="text"
+          />
+           
+          <p>
+            
+                The base station will connect to the 'wifi-name' wifi network if it is available, otherwise it will try to
+                connect to the 'climate-monitor' wifi network.
+              
           </p>
         </div>
       </div>

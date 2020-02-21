@@ -115,6 +115,17 @@ input.vc-text-base.vc-border {
   }
 }
 
+select {
+  padding: 0.5em 0.75em;
+  background: $darkest;
+  color: $white;
+  font-family: $font-family;
+  &, option {
+    font-size: 1em;
+    font-weight: 500;
+  }
+}
+
 .form {
   display: flex;
   flex-direction: column;

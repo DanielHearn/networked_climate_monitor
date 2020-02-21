@@ -804,20 +804,20 @@ class ClimateData(Resource):
 
                 # Only collect climate data at an interval depending on the range length and quantity of climate data
                 # stored by the sensor
-                if days_in_range > 120 and climate_data_length > 2880:
+                if days_in_range > 120 and climate_data_length > 1440:
                     data_interval = 20
-                elif days_in_range > 60 and climate_data_length > 1440:
+                elif days_in_range > 60 and climate_data_length > 720:
                     data_interval = 10
-                elif days_in_range > 30 and climate_data_length > 720:
+                elif days_in_range > 30 and climate_data_length > 360:
+                    data_interval = 9
+                elif days_in_range > 14 and climate_data_length > 180:
+                    data_interval = 8
+                elif days_in_range > 7 and climate_data_length > 92:
                     data_interval = 7
-                elif days_in_range > 14 and climate_data_length > 360:
-                    data_interval = 6
-                elif days_in_range > 7 and climate_data_length > 168:
-                    data_interval = 5
                 elif days_in_range > 2 and climate_data_length > 48:
-                    data_interval = 4
+                    data_interval = 6
                 elif days_in_range >= 1 and climate_data_length > 24:
-                    data_interval = 4
+                    data_interval = 5
                 elif days_in_range < 1 and climate_data_length > 24:
                     data_interval = 3
 
@@ -1000,6 +1000,10 @@ class Sensors(Resource):
                     sensor_id=sensor_id).first()
                 if recent_climate_data:
                     sensor_dict['recent_climate_data'] = recent_climate_data.to_dict()
+                    previous_climate_data = ClimateModel.query.order_by(ClimateModel.id.desc()).filter_by(sensor_id=sensor_id).limit(
+                    2)
+                    if previous_climate_data.count() > 1:
+                        sensor_dict['previous_climate_data'] = previous_climate_data[1].to_dict()
                 sensor_dict_list.append(sensor_dict)
             return {'status': 'Sensors successfully retrieved', 'sensors': sensor_dict_list}, 200
         except:
@@ -1150,6 +1154,25 @@ class NextAvailableSensorID(Resource):
             return {'status': 'Next available ID found', 'ID': 1}, 200
         return {'status': 'Error', 'errors': ['Invalid API key']}, 401
 
+class BaseStationSettings(Resource):
+    def get(self):
+        """
+        Get the next unused sensor id
+        """
+
+        input_api_key = request.args.get('api_key')
+
+        if input_api_key == api_key:
+            user = UserModel.return_first()
+
+            # Error if a user hasn't been registered
+            if not user:
+                return {'status': 'Error', 'errors': ['The account has not been created']}, 500
+
+            # Process user data to avoid sensitive data from being retrieved
+            settings = user.to_dict()['settings']
+            return {'status': 'Settings successfully retrieved', 'settings': settings}, 200
+        return {'status': 'Error', 'errors': ['Invalid API key']}, 401
 
 # RESOURCES
 
@@ -1168,6 +1191,7 @@ api.add_resource(ClimateData, '/api/sensors/<int:sensor_id>/climate-data')
 api.add_resource(Trends, '/api/sensors/<int:sensor_id>/trends')
 api.add_resource(NextAvailableSensorID, '/api/sensors/actions/next-available-sensor-id')
 
+api.add_resource(BaseStationSettings, '/api/base-station-settings')
 
 # ROUTES
 

@@ -5,11 +5,14 @@ import requests
 import time
 import dateutil.parser
 from apscheduler.schedulers.background import BackgroundScheduler
+import json
+
+from helpers import ascii_to_string, milliseconds_to_time_period, create_sensor, convert_type_to_string, get_unit_from_type
 
 # Config variables
 base_station_id = 255
 network_id = 100
-api_root = 'http://100.89.163.230/api/'
+api_root = 'http://0.0.0.0/api/'
 api_key = 'xgLxTX7Nkem5qc9jllg2'
 encrypt_key = 'pnOvzy105sF5g8Ot'
 number_of_time_periods = 10
@@ -17,98 +20,14 @@ number_of_time_periods = 10
 # State variables
 connected_sensors = {}
 time_periods = {}
+settings = {}
 
-
-def create_sensor(id, last_date):
-    """
-    Creates a dictionary to represent a sensor within the system
-
-    Parameters
-    ----------
-    id : Integer
-        Sensor ID assigned by the base station
-    last_date : datetime
-        The date that the sensor last communicated with the base station
-
-    Returns
-    -------
-    Dictionary
-        Dictionary representing the sensor within the system
-    """
-    sensor = {
-        "id": id,
-        "last_date": last_date
-    }
-    return sensor
-
-
-def ascii_to_string(ascii_list):
-    """
-    Converts an ascii string to the equivalent unicode string
-
-    Parameters
-    ----------
-    ascii_list : list
-        List of ascii characters
-
-    Returns
-    -------
-    String
-        String of unicode characters that has been assembled from the ascii characters
-    """
-    converted_string = ''
-
-    for x in ascii_list:
-        converted_string += chr(x)
-
-    return converted_string
-
-
-def convert_type_to_string(type_char):
-    """
-    Converts sensor type character to the equivalent string
-
-    Parameters
-    ----------
-    type_char : string
-        Single character string that represents the sensor data type
-
-    Returns
-    -------
-    String
-        String describing the sensor data type
-    """
-    types = {
-        'H': 'Humidity',
-        'T': 'Temperature',
-        'P': 'Pressure'
-    }
-
-    return types[type_char]
-
-
-def get_unit_from_type(type):
-    """
-    Converts the sensor data type into the unit of measurement for that type
-
-    Parameters
-    ----------
-    type : string
-        String describing the sensor data type
-
-    Returns
-    -------
-    String
-        Unit of measurement for that sensor data type
-    """
-    units = {
-        'Humidity': '%',
-        'Temperature': 'c',
-        'Pressure': 'hPa'
-    }
-
-    return units[type]
-
+intervalMappings = {
+    '5_min': 300000,
+    '10_min': 600000,
+    '30_min': 1800000,
+    '60_min': 3600000
+}
 
 # Process packet control data
 def process_packet_control(control):
@@ -191,38 +110,6 @@ def process_climate_data(packet_data, sensor_id, control_dict, main_data):
         print('Error sending data to API')
 
 
-def milliseconds_to_time_period(time_period):
-    """
-    Calculate next time period for the node to start sending data at
-
-    Parameters
-    ----------
-    time_period : integer
-        Integer representing the time period for the sensor
-
-    Returns
-    -------
-    integer
-        Milliseconds until the next climate data sending date based on the time period
-    """
-
-    now = datetime.now()
-
-    # Use next ten minute period to calculate the time period minute
-    start_time = now + timedelta(minutes=10)
-    minutes = str(start_time.minute)
-    if len(minutes) == 1:
-        minutes = '0' + minutes
-    period = int(minutes[0] + str(int(time_period) - 1))
-    start_time = start_time.replace(minute=period, second=0, microsecond=0)
-
-    # Calculate milliseconds to the start of the time period
-    milliseconds_till_start = int((start_time - now).total_seconds() * 1000)
-
-    print('Next time period: ' + str(start_time))
-    return milliseconds_till_start
-
-
 def get_next_available_sensor_id():
     """
     Return the next unused sensor ID
@@ -297,8 +184,8 @@ def process_initialisation(radio, sensor_id, packet_datetime):
         time_periods.update({str(assigned_period): new_id})
 
     print('Assigned sensor with period: ' + assigned_period)
-
-    start_time = milliseconds_to_time_period(assigned_period)
+    print('Using measurement interval: ' + settings['measurement_interval'])
+    start_time = milliseconds_to_time_period(datetime.now(), settings['measurement_interval'], int(assigned_period))
 
     # Create sensor object to track connected sensors
     id_str = str(new_id)
@@ -392,7 +279,7 @@ def process_packet(packet, radio):
                 # If sensor has an assigned time period then send the next time period
                 if assigned_period:
                     print('Sensor has time period: ' + assigned_period)
-                    next_send_time = milliseconds_to_time_period(assigned_period)
+                    next_send_time = milliseconds_to_time_period(datetime.now(), settings['measurement_interval'], int(assigned_period))
                     payload_data = 'T=T|next=' + str(next_send_time)
                     print("Sending time period")
                     print(payload_data)
@@ -452,8 +339,8 @@ def filter_inactive_sensors(sensors):
         Dictionary containing active sensors that have communicated in the last 10 minutes
     """
 
-    # Calculate date 10 minutes ago
-    inactive_time = datetime.now() - timedelta(minutes=10)
+    # Calculate date based on the current interval period
+    inactive_time = datetime.now() - timedelta(milliseconds=intervalMappings[settings['measurement_interval']]*2)
 
     temp_sensors = {}
 
@@ -461,7 +348,7 @@ def filter_inactive_sensors(sensors):
     for sensor_id in sensors:
         sensor = connected_sensors[sensor_id]
 
-        # Keep sensors that have communicated in the last 10 minutes
+        # Keep sensors that have communicated in the last measurement period
         if sensor['last_date'] > inactive_time:
             temp_sensors[sensor_id] = sensor
         else:
@@ -504,10 +391,31 @@ def run_radio():
             time.sleep(delay)
 
 
+def retrieve_settings():
+    '''
+    Retrieves new settings from API and triggers node reinitialisation if new settings are found
+    -------
+
+    '''
+    global settings
+    global connected_sensors
+
+    params = {
+        'api_key': api_key
+    }
+    settings_get_url = api_root + 'base-station-settings'
+    response = requests.get(settings_get_url, params=params)
+    response_data = response.json()
+    raw_settings = response_data['settings'].replace('\'', '"')
+    new_settings = json.loads(raw_settings)
+    settings = new_settings
+
+
 def run():
     """
     Initialise program and start radio loop
     """
+    retrieve_settings()
 
     # Initialise sensor communication time periods
     init_time_periods()
@@ -517,13 +425,18 @@ def run():
 
     # Create job to remove inactive sensors every 10 minutes
     inactive_job = scheduler.add_job(remove_inactive_sensors, 'interval', minutes=25)
+    settings_job = scheduler.add_job(retrieve_settings, 'interval', minutes=5)
     scheduler.start()
 
-    # Start processing incoming radio packets
-    run_radio()
+    if settings['measurement_interval']:
+        # Start processing incoming radio packets
+        run_radio()
+    else:
+        print('Settings not loaded')
 
     # Shutdown any scheduler jobs
     inactive_job.remove()
+    settings_job.remove()
     scheduler.shutdown()
 
 

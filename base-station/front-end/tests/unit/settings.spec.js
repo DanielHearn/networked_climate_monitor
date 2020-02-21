@@ -15,7 +15,8 @@ let store
 const accountData = {
   status: 'Account successfully retrieved',
   account: {
-    settings: '{\'temperature_unit\': \'c\'}',
+    settings:
+      "{'temperature_unit':'f','measurement_interval':'30_min','wifi':{'ssid':'test-wifi','password':'test-password'}}",
     id: 1,
     reset_token: '1234',
     email: 'email@email.com'
@@ -34,7 +35,12 @@ const factory = () => {
   store.state.user.reset_token = '1234'
   store.state.user.email = 'email@email.com'
   store.state.user.settings = {
-    temperature_unit: 'c'
+    temperature_unit: 'c',
+    measurement_interval: '10_min',
+    wifi: {
+      ssid: 'test-wifi',
+      password: 'test-password'
+    }
   }
 
   return mount(Settings, {
@@ -124,6 +130,83 @@ describe('Settings.vue', () => {
       settings: stringifiedSettings
     })
 
+    expect(wrapper.element).toMatchSnapshot()
+  })
+
+  it('change measurement interval', async () => {
+    const accountResponse = cloneDeep(accountData)
+    getAccount.mockResolvedValueOnce(accountResponse)
+    const patchResponse = cloneDeep(patchAccountData)
+    patchAccount.mockResolvedValueOnce(patchResponse)
+
+    wrapper = factory()
+
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.vm.settings.measurement_interval).toBe('10_min')
+
+    expect(
+      wrapper.find('.measurement-interval-setting .text').text()
+    ).toContain('10 minutes')
+    expect(
+      wrapper.findAll('.measurement-interval-setting select option').length
+    ).toBe(4)
+    wrapper
+      .findAll('.measurement-interval-setting select option')
+      .at(0).element.selected = true
+    wrapper
+      .findAll('.measurement-interval-setting select option')
+      .at(1).element.selected = false
+    wrapper.find('.measurement-interval-setting select ').trigger('change')
+
+    await wrapper.vm.$nextTick()
+
+    const stringifiedSettings = JSON.stringify(wrapper.vm.settings)
+    expect(wrapper.vm.settings.measurement_interval).toBe('5_min')
+    expect(patchAccount).toBeCalledWith(store.state.user.access_token, {
+      settings: stringifiedSettings
+    })
+    expect(
+      wrapper.find('.measurement-interval-setting .text').text()
+    ).toContain('5 minutes')
+
+    expect(wrapper.element).toMatchSnapshot()
+  })
+
+  it('wifi settings', async () => {
+    const accountResponse = cloneDeep(accountData)
+    getAccount.mockResolvedValueOnce(accountResponse)
+    const patchResponse = cloneDeep(patchAccountData)
+    patchAccount.mockResolvedValue(patchResponse)
+
+    wrapper = factory()
+
+    await wrapper.vm.$nextTick()
+
+    wrapper
+      .findAll('.side-panel .list-item')
+      .at(2)
+      .find('.actions .button')
+      .trigger('click')
+    expect(wrapper.vm.activeCategoryID).toBe(2)
+
+    const ssidInput = wrapper.find('#wifi_ssid_input')
+    ssidInput.trigger('focus')
+    ssidInput.setValue('wifi-name')
+
+    const passwordInput = wrapper.find('#wifi_password_input')
+    passwordInput.trigger('focus')
+    passwordInput.setValue('wifi-password')
+
+    const stringifiedSettings = JSON.stringify(wrapper.vm.settings)
+    expect(wrapper.vm.settings.wifi.ssid).toBe('wifi-name')
+    expect(wrapper.vm.settings.wifi.password).toBe('wifi-password')
+    expect(wrapper.find('.main-panel').text()).toContain(
+      'The base station will connect to the \'wifi-name\' wifi network'
+    )
+    expect(patchAccount).toBeCalledWith(store.state.user.access_token, {
+      settings: stringifiedSettings
+    })
     expect(wrapper.element).toMatchSnapshot()
   })
 

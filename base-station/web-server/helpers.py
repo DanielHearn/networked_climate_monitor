@@ -34,7 +34,12 @@ def create_settings():
         Dictionary representing all user settings
     """
     settings = {
-        "temperature_unit": "c"
+        "temperature_unit": "c",
+        "measurement_interval": "10_min",
+        "wifi": {
+            "ssid": "",
+            "password": ""
+        }
     }
     return settings
 
