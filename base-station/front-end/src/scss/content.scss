@@ -174,5 +174,20 @@
   }
 }
 
+.measurement-interval-setting {
+  input {
+    margin-bottom: 0.5em;
+  }
+  button {
+    margin-bottom: 0.5em;
+  }
+}
+
+.input-box {
+  select, .radio-container {
+    margin-bottom: 0.5em;
+    margin-top: 0.5em;
+  }
+}
 
 

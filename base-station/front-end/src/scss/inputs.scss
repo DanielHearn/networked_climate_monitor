@@ -120,6 +120,7 @@ select {
   background: $darkest;
   color: $white;
   font-family: $font-family;
+  border: none;
   &, option {
     font-size: 1em;
     font-weight: 500;

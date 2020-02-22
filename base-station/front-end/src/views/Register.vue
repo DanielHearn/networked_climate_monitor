@@ -40,8 +40,7 @@
             <li>
               <p class="text">
                 Plugin each sensor node's micro usb port to a USB port with a
-                USB cable to charge the node's battery until the battery level
-                on the dashboard is "High".
+                USB cable to charge the node's battery for 5 hours".
               </p>
             </li>
             <li>
@@ -55,6 +54,19 @@
                 If the sensor nodes or climate data aren't appearing in the
                 dashboard move the nodes closer to the base station so that they
                 can communicate.
+              </p>
+            </li>
+            <li>
+              <p class="text">
+                To access the website via your home wifi network open the
+                <router-link to="/settings" class="link"
+                  >settings page</router-link
+                >
+                and click on the 'Base Station Management' settings category.
+                Then input your wifi network's name and password into the input
+                boxes. The base station will then connect to the wifi network
+                within the next few minutes, the website will be accessible once
+                you connect to this network.
               </p>
             </li>
           </ol>

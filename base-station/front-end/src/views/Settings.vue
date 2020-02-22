@@ -211,6 +211,7 @@
                 @click.native="activeCategoryID = -1"
                 :hierachyLevel="'tertiary'"
                 :text="'Back'"
+                class="back-button"
               />
               <div class="settings-box">
                 <p class="sub-heading">Change Password</p>
@@ -241,30 +242,38 @@
                 @click.native="activeCategoryID = -1"
                 :hierachyLevel="'tertiary'"
                 :text="'Back'"
+                class="back-button"
               />
               <div
-                v-if="settings.wifi"
+                v-if="localWifi"
                 class="input-box measurement-interval-setting"
               >
                 <p class="sub-heading">Wifi Settings</p>
                 <input
                   type="text"
                   class="input--text input--small"
-                  v-model="settings.wifi.ssid"
+                  v-model="localWifi.ssid"
                   placeholder="Wifi SSID"
                   id="wifi_ssid_input"
                 />
                 <input
                   type="text"
                   class="input--text input--small"
-                  v-model="settings.wifi.password"
+                  v-model="localWifi.password"
                   placeholder="Wifi Password"
                   id="wifi_password_input"
                 />
-                <p v-if="settings.wifi.ssid">
-                  The base station will connect to the '{{
-                    settings.wifi.ssid
-                  }}' wifi network if it is available, otherwise it will try to
+                <v-button
+                  @click.native="updateWifiSettings"
+                  :hierachyLevel="'primary'"
+                  :text="'Save Settings'"
+                  :class="{
+                    disabled: !wifiSettingsChanged
+                  }"
+                />
+                <p v-if="localWifi.ssid">
+                  The base station will connect to the '{{ localWifi.ssid }}'
+                  wifi network if it is available, otherwise it will try to
                   connect to the 'climate-monitor' wifi network.
                 </p>
               </div>
@@ -308,12 +317,27 @@ export default {
         { text: intervalMappings['10_min'], value: '10_min' },
         { text: intervalMappings['30_min'], value: '30_min' },
         { text: intervalMappings['60_min'], value: '60_min' }
-      ]
+      ],
+      localWifi: {
+        ssid: '',
+        password: ''
+      }
+    }
+  },
+  computed: {
+    wifiSettingsChanged: function() {
+      return !(
+        this.localWifi.ssid === this.settings.wifi.ssid &&
+        this.localWifi.password === this.settings.wifi.password
+      )
     }
   },
   watch: {
     settings: {
       handler(newSettings) {
+        this.localWifi.ssid = newSettings.wifi.ssid
+        this.localWifi.password = newSettings.wifi.password
+
         // Updates the settings in the database if the settings have changed values
         if (this.hasBeenEdited && Object.keys(newSettings).length) {
           const user = cloneDeep(this.$store.state.user)
@@ -369,6 +393,12 @@ export default {
         .catch(e => {
           console.warn(e)
         })
+    },
+    updateWifiSettings: function() {
+      if (this.wifiSettingsChanged) {
+        this.settings.wifi.ssid = this.localWifi.ssid
+        this.settings.wifi.password = this.localWifi.password
+      }
     }
   },
   created: function() {

@@ -19,6 +19,10 @@
     &:hover {
       background: $accent-dark;
     }
+    &.disabled {
+      background: $dark;
+      border-color: $dark;
+    }
   }
   &--secondary {
     color: $white;
@@ -46,5 +50,9 @@
     &:hover {
       background: $grey-dark;
     }
+  }
+  &.disabled {
+    user-select: none;
+    cursor: not-allowed;
   }
 }
