@@ -272,8 +272,9 @@
                   }"
                 />
                 <p v-if="localWifi.ssid">
-                  The base station will connect to the '{{ localWifi.ssid }}'
-                  wifi network if it is available, otherwise it will try to
+                  The base station will connect to the '{{
+                    settings.wifi.ssid
+                  }}' wifi network if it is available, otherwise it will try to
                   connect to the 'climate-monitor' wifi network.
                 </p>
               </div>
