@@ -5,15 +5,17 @@
       <p class="sub-heading">
         {{ data.formattedText }}
       </p>
-      <p v-if="data.previousValue && data.trendDirection">
+      <p v-if="data.previousValue && data.trendDirection" class="trend">
         <i class="material-icons">{{ data.trendDirectionIcon }}</i>
         {{ data.previousValue }}
       </p>
-      <p v-if="data.oneDayHigh" class="text">
-        Day's High:
+      <p v-if="data.oneDayHigh" class="text one-day-high">
+        High:
         {{ data.oneDayHigh }}
       </p>
-      <p v-if="data.oneDayLow" class="text">Day's Low: {{ data.oneDayLow }}</p>
+      <p v-if="data.oneDayLow" class="text one-day-low">
+        Low: {{ data.oneDayLow }}
+      </p>
     </li>
   </ul>
 </template>
