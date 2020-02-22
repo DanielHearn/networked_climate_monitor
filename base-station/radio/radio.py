@@ -5,9 +5,9 @@ import requests
 import time
 import dateutil.parser
 from apscheduler.schedulers.background import BackgroundScheduler
-import json
 
-from helpers import ascii_to_string, milliseconds_to_time_period, create_sensor, convert_type_to_string, get_unit_from_type
+from helpers import ascii_to_string, milliseconds_to_time_period, create_sensor, process_packet_control,\
+    retrieve_settings, get_next_available_sensor_id, init_time_periods, process_climate_data, filter_inactive_sensors
 
 # Config variables
 base_station_id = 255
@@ -28,111 +28,6 @@ intervalMappings = {
     '30_min': 1800000,
     '60_min': 3600000
 }
-
-# Process packet control data
-def process_packet_control(control):
-    """
-    Process packet control string into a dictionary
-
-    Parameters
-    ----------
-    control : string
-        String of the control data from a radio packet
-
-    Returns
-    -------
-    dictionary
-        Dictionary of the control data from a radio packet
-    """
-    control_dict = {}
-    control_data = control.split(',')
-
-    # Create a new key value pair for control data
-    for control_part in control_data:
-        control_parts = control_part.split('=')
-        if len(control_parts) == 2:
-            control_dict[control_parts[0]] = control_parts[1]
-    return control_dict
-
-
-def process_climate_data(packet_data, sensor_id, control_dict, main_data):
-    """
-    Process a climate data packet
-
-    Parameters
-    ----------
-    packet_data : string
-        String of the radio packet data
-    sensor_id : integer
-        Sensor ID assigned by the base station
-    control_dict : dictionary
-        Dictionary of the control data from a radio packet
-    main_data : string
-        String of the main data from a radio packet
-    """
-
-    # Create object for API usage
-    climate_api_object = {
-        'date': str(packet_data),
-        'battery_voltage': control_dict['V'],
-        'climate_data': []
-    }
-    params = {
-        'api_key': api_key
-    }
-
-    # Process climate data
-    climate_data_parts = main_data.split(',')
-    for climate_part in climate_data_parts:
-        climate_parts = climate_part.split('=')
-
-        # Generate climate data dictionary from key value pair in packet
-        if len(climate_parts) == 2:
-            sensor_type = convert_type_to_string(climate_parts[0])
-            unit = get_unit_from_type(sensor_type)
-            value = climate_parts[1]
-
-            climate_data_dict = {
-                'type': sensor_type,
-                'value': value,
-                'unit': unit
-            }
-            climate_api_object['climate_data'].append(climate_data_dict)
-
-    print(climate_api_object)
-
-    # Send climate data to API
-    try:
-        climate_post_url = api_root + 'sensors/' + str(sensor_id) + '/climate-data'
-        response = requests.post(climate_post_url, json=climate_api_object, params=params)
-        print(response.json())
-    except:
-        print('Error sending data to API')
-
-
-def get_next_available_sensor_id():
-    """
-    Return the next unused sensor ID
-
-    Returns
-    -------
-    integer
-        Next unused sensor ID
-    """
-
-    params = {
-        'api_key': api_key
-    }
-
-    # Retrieve sensor ID from API
-    sensor_next_id_url = api_root + 'sensors/actions/next-available-sensor-id'
-    response = requests.get(sensor_next_id_url, params=params)
-    response_data = response.json()
-    if response_data['ID']:
-        return response_data['ID']
-    else:
-        print('Couldn\'t retrieve next sensor ID')
-        return None
 
 
 def process_initialisation(radio, sensor_id, packet_datetime):
@@ -156,7 +51,7 @@ def process_initialisation(radio, sensor_id, packet_datetime):
     if sensor_id == 254:
         print('Allocating ID for new sensor')
         try:
-            new_id = get_next_available_sensor_id()
+            new_id = get_next_available_sensor_id(api_key, api_root)
         except:
             print('Error while retrieving next available sensor ID')
             return None
@@ -279,7 +174,8 @@ def process_packet(packet, radio):
                 # If sensor has an assigned time period then send the next time period
                 if assigned_period:
                     print('Sensor has time period: ' + assigned_period)
-                    next_send_time = milliseconds_to_time_period(datetime.now(), settings['measurement_interval'], int(assigned_period))
+                    next_send_time = milliseconds_to_time_period(datetime.now(), settings['measurement_interval'],
+                                                                 int(assigned_period))
                     payload_data = 'T=T|next=' + str(next_send_time)
                     print("Sending time period")
                     print(payload_data)
@@ -290,9 +186,6 @@ def process_packet(packet, radio):
                         print('No ack')
                 else:
                     print('Sensor isn\'t stored in time periods')
-
-                # Send climate data to API
-                process_climate_data(packet.received, sensor_id, control_dict, main_data)
             else:
                 print('Sensor isn\'t stored in connected_sensors')
 
@@ -304,8 +197,8 @@ def process_packet(packet, radio):
                 else:
                     print('No ack')
 
-                # Send climate data to API
-                process_climate_data(packet.received, sensor_id, control_dict, main_data)
+            # Send climate data to API
+            process_climate_data(packet.received, sensor_id, control_dict, main_data, api_key, api_root)
 
         elif packet_type == 'I':
             process_initialisation(radio, sensor_id, packet_datetime)
@@ -321,54 +214,10 @@ def remove_inactive_sensors():
 
     print('Removing inactive sensors')
     global connected_sensors
-    connected_sensors = filter_inactive_sensors(connected_sensors)
-
-
-def filter_inactive_sensors(sensors):
-    """
-    Removes sensors that have not send data in the last 10 minutes
-
-    Parameters
-    ----------
-    sensors : dictionary
-        Dictionary containing all of the sensors currently connected to the base station
-
-    Returns
-    -------
-    dictionary
-        Dictionary containing active sensors that have communicated in the last 10 minutes
-    """
-
-    # Calculate date based on the current interval period
-    inactive_time = datetime.now() - timedelta(milliseconds=intervalMappings[settings['measurement_interval']]*2)
-
-    temp_sensors = {}
-
-    # Filter only active sensors
-    for sensor_id in sensors:
-        sensor = connected_sensors[sensor_id]
-
-        # Keep sensors that have communicated in the last measurement period
-        if sensor['last_date'] > inactive_time:
-            temp_sensors[sensor_id] = sensor
-        else:
-            print('Removed sensor with id: ' + sensor_id)
-
-            # Remove sensor from assigned time period
-            for period in time_periods:
-                period_sensor = time_periods[period]
-                if period_sensor == sensor_id:
-                    time_periods.update({str(period): None})
-
-    return temp_sensors
-
-
-def init_time_periods():
-    """
-    Initialise the time periods
-    """
-    for i in range(1, number_of_time_periods):
-        time_periods[str(i)] = None
+    global time_periods
+    data = filter_inactive_sensors(connected_sensors, time_periods, intervalMappings[settings['measurement_interval']])
+    connected_sensors = data.sensors
+    time_periods = data.time_periods
 
 
 def run_radio():
@@ -391,41 +240,27 @@ def run_radio():
             time.sleep(delay)
 
 
-def retrieve_settings():
-    '''
-    Retrieves new settings from API and triggers node reinitialisation if new settings are found
-    -------
-
-    '''
+def load_settings():
     global settings
-    global connected_sensors
-
-    params = {
-        'api_key': api_key
-    }
-    settings_get_url = api_root + 'base-station-settings'
-    response = requests.get(settings_get_url, params=params)
-    response_data = response.json()
-    raw_settings = response_data['settings'].replace('\'', '"')
-    new_settings = json.loads(raw_settings)
-    settings = new_settings
+    settings = retrieve_settings(api_key, api_root)
 
 
 def run():
     """
     Initialise program and start radio loop
     """
-    retrieve_settings()
+    load_settings()
 
     # Initialise sensor communication time periods
-    init_time_periods()
+    global time_periods
+    time_periods = init_time_periods(number_of_time_periods)
 
     # Create scheduler
     scheduler = BackgroundScheduler()
 
     # Create job to remove inactive sensors every 10 minutes
     inactive_job = scheduler.add_job(remove_inactive_sensors, 'interval', minutes=25)
-    settings_job = scheduler.add_job(retrieve_settings, 'interval', minutes=5)
+    settings_job = scheduler.add_job(load_settings, 'interval', minutes=5)
     scheduler.start()
 
     if settings['measurement_interval']:
@@ -439,6 +274,6 @@ def run():
     settings_job.remove()
     scheduler.shutdown()
 
-
-# Start program
-run()
+if __name__ == '__main__':
+    # Start program
+    run()

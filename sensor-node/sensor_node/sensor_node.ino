@@ -409,7 +409,6 @@ void processPacket() {
 }
 
 void initialise() {
-  clearEEPROM();
   Serial.println("Attempting initialisation");
   long initial_delay = 0;
 
