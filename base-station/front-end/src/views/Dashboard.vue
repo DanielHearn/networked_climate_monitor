@@ -61,9 +61,7 @@
                 />
               </div>
               <div v-if="sensor.recent_climate_data">
-                <ul
-                  style="list-style: none; padding: 0; margin-top: 0.5em; display: flex; flex-direction: row;"
-                >
+                <ul>
                   <li
                     v-for="(data, index) in sensor.recent_climate_data
                       .climate_data"
@@ -89,14 +87,14 @@
                     </template>
                   </li>
                 </ul>
-                <p class="text">
-                  Date received: {{ sensor.recent_climate_data.date }}
+                <p class="text date-received">
+                  Recorded: {{ sensor.recent_climate_data.formattedDate }}
                 </p>
                 <p
                   class="text"
                   style="display: flex;"
                   :class="
-                    'battery-status--' +
+                    'battery-status battery-status--' +
                       getBatteryStatusFromVoltage(
                         sensor.recent_climate_data.battery_voltage
                       ).toLowerCase()
@@ -198,9 +196,9 @@
             />
             <template v-if="activeSensor && activeSensor.recent_climate_data">
               <h3 class="heading">Recent Climate Data</h3>
-              <p class="text">
-                Date received:
-                {{ activeSensor.recent_climate_data.date }}
+              <p class="text" style="margin-top:0.25em;">
+                Recorded:
+                {{ activeSensor.recent_climate_data.formattedDate }}
               </p>
               <recent-climate-data
                 :recent-climate-data="
@@ -326,7 +324,8 @@ import {
   startOfToday,
   startOfDay,
   endOfDay,
-  parseISO
+  parseISO,
+  format
 } from 'date-fns'
 
 const chartOptions = {
@@ -380,6 +379,10 @@ const typeColours = {
     light: '#be96f5',
     dark: '#9450ef'
   }
+}
+const dateFormat = {
+  fns: 'h:mma d MMM yyyy',
+  moment: 'h:mma D MMM'
 }
 
 function getTypeColors(lowercaseType) {
@@ -583,7 +586,7 @@ export default {
             time: {
               unit: 'custom',
               displayFormats: {
-                custom: 'h:mma D MMM'
+                custom: dateFormat.moment
               }
             },
             ticks: {
@@ -876,6 +879,20 @@ export default {
                 if (!sensor.previous_climate_data) {
                   sensor.previous_climate_data = {
                     climate_data: []
+                  }
+                }
+
+                if (
+                  sensor.recent_climate_data &&
+                  sensor.recent_climate_data.date
+                ) {
+                  try {
+                    sensor.recent_climate_data.formattedDate = format(
+                      parseISO(sensor.recent_climate_data.date),
+                      dateFormat.fns
+                    )
+                  } catch (e) {
+                    console.log(e)
                   }
                 }
 
