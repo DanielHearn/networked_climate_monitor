@@ -107,7 +107,7 @@
                     )
                   }}
                   <i
-                    v-if="sensor.recent_climate_data.battery_voltage < 3.9"
+                    v-if="sensor.recent_climate_data.battery_voltage < 3.8"
                     class="material-icons"
                     >battery_alert</i
                   >
