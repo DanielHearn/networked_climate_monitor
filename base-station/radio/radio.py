@@ -216,8 +216,8 @@ def remove_inactive_sensors():
     global connected_sensors
     global time_periods
     data = filter_inactive_sensors(connected_sensors, time_periods, intervalMappings[settings['measurement_interval']])
-    connected_sensors = data.sensors
-    time_periods = data.time_periods
+    connected_sensors = data['sensors']
+    time_periods = data['time_periods']
 
 
 def run_radio():
@@ -264,6 +264,8 @@ def run():
     scheduler.start()
 
     if settings['measurement_interval']:
+        print('Settings:')
+        print(settings)
         # Start processing incoming radio packets
         run_radio()
     else:

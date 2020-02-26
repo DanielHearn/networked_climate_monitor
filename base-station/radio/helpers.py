@@ -117,7 +117,6 @@ def milliseconds_to_time_period(now, interval, time_period):
     if interval == '5_min':
         start_time = now + timedelta(minutes=5)
         minutes = str(start_time.minute)
-        print(minutes)
         if len(minutes) == 1:
             if int(minutes[0]) < 5:
                 minutes = 0
@@ -128,24 +127,20 @@ def milliseconds_to_time_period(now, interval, time_period):
                 minutes = minutes[0] + str(0)
             else:
                 minutes = minutes[0] + str(5)
-        print(minutes)
         start_time = start_time.replace(minute=int(minutes), second=0, microsecond=0)
         start_time = start_time + timedelta(seconds=20 * adjusted_time_period)
     elif interval == '10_min':
         start_time = now + timedelta(minutes=10)
         minutes = str(start_time.minute)
-        print(minutes)
         if len(minutes) == 1:
             minutes = 0
         else:
             minutes = minutes[0] + '0'
-        print(minutes)
         start_time = start_time.replace(minute=int(minutes), second=0, microsecond=0)
         start_time = start_time + timedelta(seconds=30 * adjusted_time_period)
     elif interval == '30_min':
         start_time = now + timedelta(minutes=30)
         minutes = str(start_time.minute)
-        print(minutes)
         if len(minutes) == 1:
             minutes = 0
         else:
@@ -153,7 +148,6 @@ def milliseconds_to_time_period(now, interval, time_period):
                 minutes = 0
             else:
                 minutes = 30
-        print(minutes)
         start_time = start_time.replace(minute=int(minutes), second=0, microsecond=0)
         start_time = start_time + timedelta(seconds=30 * adjusted_time_period)
     elif interval == '60_min':
