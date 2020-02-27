@@ -593,7 +593,7 @@ export default {
               source: 'labels',
               fontFamily: 'Poppins',
               fontColor: darkestColour,
-              display: !this.mobile
+              autoSkip: true
             }
           }
         ]
@@ -667,7 +667,7 @@ export default {
                 source: 'labels',
                 fontFamily: 'Poppins',
                 fontColor: darkestColour,
-                display: !this.mobile
+                autoSkip: true
               }
             }
           ]

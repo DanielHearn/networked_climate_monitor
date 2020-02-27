@@ -806,8 +806,8 @@ class ClimateData(Resource):
 
                 # Only collect climate data at an interval depending on the range length and quantity of climate data
                 # stored by the sensor
-                if climate_data_length > 28:
-                    data_interval = round(climate_data_length/28)
+                if climate_data_length > 48:
+                    data_interval = round(climate_data_length/48)
 
                 # Get climate data between the two dates with descending date order
                 climate_data = climate_data.filter(ClimateModel.interval(data_interval))
