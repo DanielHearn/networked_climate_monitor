@@ -797,36 +797,20 @@ class ClimateData(Resource):
 
                 # Find climate data that matches sensor id
                 sensor_climate_data = ClimateModel.query.filter_by(sensor_id=sensor_id)
-
-                climate_data_length = sensor_climate_data.count()
-                days_in_range = (date_end - date_start).days
+                climate_data = sensor_climate_data.order_by(ClimateModel.id.desc()).filter(
+                    ClimateModel.sensor_id == sensor_id,
+                    ClimateModel.date <= date_end,
+                    ClimateModel.date >= date_start)
+                climate_data_length = climate_data.count()
                 data_interval = 1
 
                 # Only collect climate data at an interval depending on the range length and quantity of climate data
                 # stored by the sensor
-                if days_in_range > 120 and climate_data_length > 1440:
-                    data_interval = 20
-                elif days_in_range > 60 and climate_data_length > 720:
-                    data_interval = 10
-                elif days_in_range > 30 and climate_data_length > 360:
-                    data_interval = 9
-                elif days_in_range > 14 and climate_data_length > 180:
-                    data_interval = 8
-                elif days_in_range > 7 and climate_data_length > 92:
-                    data_interval = 7
-                elif days_in_range > 2 and climate_data_length > 48:
-                    data_interval = 6
-                elif days_in_range >= 1 and climate_data_length > 24:
-                    data_interval = 5
-                elif days_in_range < 1 and climate_data_length > 24:
-                    data_interval = 3
+                if climate_data_length > 28:
+                    data_interval = round(climate_data_length/28)
 
                 # Get climate data between the two dates with descending date order
-                climate_data = sensor_climate_data.order_by(ClimateModel.id.desc()).filter(
-                    ClimateModel.sensor_id == sensor_id,
-                    ClimateModel.interval(data_interval),
-                    ClimateModel.date <= date_end,
-                    ClimateModel.date >= date_start)
+                climate_data = climate_data.filter(ClimateModel.interval(data_interval))
             else:
                 # Get the most recent climate data limited by the specified quantity
                 climate_data = ClimateModel.query.order_by(ClimateModel.id.desc()).filter_by(sensor_id=sensor_id).limit(
