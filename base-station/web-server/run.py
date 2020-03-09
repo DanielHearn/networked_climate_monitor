@@ -808,9 +808,7 @@ class ClimateData(Resource):
                 # stored by the sensor
                 if climate_data_length > 48:
                     data_interval = round(climate_data_length/48)
-
-                # Get climate data between the two dates with descending date order
-                climate_data = climate_data.filter(ClimateModel.interval(data_interval))
+                    climate_data = [x for ind, x in enumerate(climate_data) if ind % data_interval == 0]
             else:
                 # Get the most recent climate data limited by the specified quantity
                 climate_data = ClimateModel.query.order_by(ClimateModel.id.desc()).filter_by(sensor_id=sensor_id).limit(
