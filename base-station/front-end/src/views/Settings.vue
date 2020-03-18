@@ -257,7 +257,7 @@
                   id="wifi_ssid_input"
                 />
                 <input
-                  type="text"
+                  type="password"
                   class="input--text input--small"
                   v-model="localWifi.password"
                   placeholder="Wifi Password"
