@@ -514,7 +514,6 @@ export default {
         .then(response => {
           const data = response.data
           if (data.status && data.trends) {
-            console.log(data.trends)
             this.trends = data.trends
           }
         })
@@ -826,6 +825,11 @@ export default {
             console.warn(e.response)
           }
         })
+      deleteClimateData(accessToken, sensorID).catch(e => {
+        if (e.response) {
+          console.warn(e.response)
+        }
+      })
     },
     // Deletes the sensors climate data from the database
     deleteClimate: function(sensorID, sensorName) {

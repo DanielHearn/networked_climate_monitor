@@ -95,14 +95,14 @@ def create_test_data():
             'climate_data': [{'id': 21, 'climate_id': 21, 'value': 23.25, 'type': 'Temperature', 'unit': 'c'}]
         },
         {
-            'id': 22, 'sensor_id': 1, 'battery_voltage': 4.01, 'date': datetime.now(),
+            'id': 22, 'sensor_id': 1, 'battery_voltage': 4.01, 'date': datetime(2020, 1, 17, 16, 30, 33, 619535),
+            'climate_data': [{'id': 23, 'climate_id': 22, 'value': 23.24, 'type': 'Temperature', 'unit': 'c'}]
+        },
+        {
+            'id': 23, 'sensor_id': 1, 'battery_voltage': 4.01, 'date': datetime.now(),
             'climate_data': [{'id': 22, 'climate_id': 23, 'value': 23.24, 'type': 'Temperature', 'unit': 'c'}]
 
         },
-        {
-            'id': 23, 'sensor_id': 1, 'battery_voltage': 4.01, 'date': datetime(2020, 1, 17, 16, 30, 33, 619535),
-            'climate_data': [{'id': 23, 'climate_id': 22, 'value': 23.24, 'type': 'Temperature', 'unit': 'c'}]
-        }
     ]
     for climate_data in climate_data_list:
         ClimateModel(sensor_id=climate_data['sensor_id'], battery_voltage=climate_data['battery_voltage'],

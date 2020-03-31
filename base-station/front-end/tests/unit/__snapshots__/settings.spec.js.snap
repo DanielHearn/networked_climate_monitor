@@ -1286,8 +1286,15 @@ exports[`Settings.vue wifi settings 1`] = `
             class="input--text input--small"
             id="wifi_password_input"
             placeholder="Wifi Password"
-            type="text"
+            type="password"
           />
+           
+          <button
+            class="button button--primary disabled"
+            id="wifi_save_button"
+          >
+            Save Settings
+          </button>
            
           <p>
             

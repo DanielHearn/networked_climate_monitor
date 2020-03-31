@@ -111,7 +111,7 @@
                 class="back-button"
               />
               <p v-if="!$store.state.user.logged_in">Please log in</p>
-              <template v-else-if="settings">
+              <template v-else-if="settings && settingsLoaded">
                 <div
                   v-if="settings.measurement_interval"
                   class="input-box measurement-interval-setting"
@@ -245,7 +245,7 @@
                 class="back-button"
               />
               <div
-                v-if="localWifi"
+                v-if="settingsLoaded && localWifi && settings.wifi"
                 class="input-box measurement-interval-setting"
               >
                 <p class="sub-heading">Wifi Settings</p>
@@ -270,8 +270,9 @@
                   :class="{
                     disabled: !wifiSettingsChanged
                   }"
+                  id="wifi_save_button"
                 />
-                <p v-if="localWifi.ssid">
+                <p v-if="settings.wifi.ssid">
                   The base station will connect to the '{{
                     settings.wifi.ssid
                   }}' wifi network if it is available, otherwise it will try to
@@ -311,6 +312,7 @@ export default {
   data: function() {
     return {
       activeCategoryID: -1,
+      settingsLoaded: false,
       settings: {},
       hasBeenEdited: false,
       measurementIntervalOptions: [
@@ -336,8 +338,10 @@ export default {
   watch: {
     settings: {
       handler(newSettings) {
-        this.localWifi.ssid = newSettings.wifi.ssid
-        this.localWifi.password = newSettings.wifi.password
+        if (newSettings.wifi && Object.keys(newSettings.wifi).length) {
+          this.localWifi.ssid = newSettings.wifi.ssid
+          this.localWifi.password = newSettings.wifi.password
+        }
 
         // Updates the settings in the database if the settings have changed values
         if (this.hasBeenEdited && Object.keys(newSettings).length) {
@@ -362,6 +366,7 @@ export default {
           .then(response => {
             const data = response.data
             if (data.status && data.account) {
+              this.settingsLoaded = true
               const user = cloneDeep(this.$store.state.user)
               user.settings = JSON.parse(
                 data.account.settings.replace(/'/g, '"')
@@ -409,6 +414,7 @@ export default {
     // Use the settings from the state or retrieve from the API
     if (Object.keys(this.$store.state.user.settings).length) {
       this.settings = this.$store.state.user.settings
+      this.settingsLoaded = true
     } else {
       setTimeout(() => {
         this.loadSettings()

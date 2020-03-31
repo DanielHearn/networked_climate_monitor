@@ -41,7 +41,8 @@ describe('LoginForm.vue', () => {
         status: 'Success',
         access_token: '1234',
         refresh_token: '1234',
-        email: 'email@email.com'
+        email: 'email@email.com',
+        settings: '{"test": ""}'
       }
     }
     login.mockResolvedValueOnce(response)
@@ -63,7 +64,7 @@ describe('LoginForm.vue', () => {
     wrapper.trigger('submit')
 
     await wrapper.vm.$nextTick()
-
+    console.log(wrapper.html())
     expect(actions.login).toHaveBeenCalledTimes(1)
     expect(wrapper.vm.errors).toEqual([])
   })

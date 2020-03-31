@@ -355,6 +355,8 @@ describe('Dashboard.vue', () => {
     getClimateData.mockResolvedValueOnce(historicalResponse)
     const deleteResponse = cloneDeep(deleteSensorData)
     deleteSensor.mockResolvedValueOnce(deleteResponse)
+    const deleteClimateResponse = cloneDeep(deleteClimateResponseData)
+    deleteClimateData.mockResolvedValueOnce(deleteClimateResponse)
     const trendResponse = cloneDeep(trendResponseData)
     getTrends.mockResolvedValueOnce(trendResponse)
 

@@ -241,14 +241,14 @@ def init_time_periods(number_of_time_periods):
     return time_periods
 
 
-def process_climate_data(packet_data, sensor_id, control_dict, main_data, api_key, api_root):
+def process_climate_data(packet_date, sensor_id, control_dict, main_data, api_key, api_root):
     """
     Process a climate data packet
 
     Parameters
     ----------
-    packet_data : string
-        String of the radio packet data
+    packet_date : datetime
+        Packet datetime
     sensor_id : integer
         Sensor ID assigned by the base station
     control_dict : dictionary
@@ -259,7 +259,7 @@ def process_climate_data(packet_data, sensor_id, control_dict, main_data, api_ke
 
     # Create object for API usage
     climate_api_object = {
-        'date': str(packet_data),
+        'date': str(packet_date),
         'battery_voltage': control_dict['V'],
         'climate_data': []
     }

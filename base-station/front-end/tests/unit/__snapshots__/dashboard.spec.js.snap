@@ -62,9 +62,7 @@ exports[`Dashboard.vue change active sensor 1`] = `
           </div>
            
           <div>
-            <ul
-              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
-            >
+            <ul>
               <li
                 style="padding-right: 0.5em;"
               >
@@ -97,15 +95,15 @@ exports[`Dashboard.vue change active sensor 1`] = `
             </ul>
              
             <p
-              class="text"
+              class="text date-received"
             >
               
-                Date received: 2020-01-06 11:20
+                Recorded: 11:20AM 6 Jan 2020
               
             </p>
              
             <p
-              class="text battery-status--medium"
+              class="text battery-status battery-status--medium"
               style="display: flex;"
             >
               
@@ -167,9 +165,7 @@ exports[`Dashboard.vue change active sensor 1`] = `
           </div>
            
           <div>
-            <ul
-              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
-            >
+            <ul>
               <li
                 style="padding-right: 0.5em;"
               >
@@ -202,15 +198,15 @@ exports[`Dashboard.vue change active sensor 1`] = `
             </ul>
              
             <p
-              class="text"
+              class="text date-received"
             >
               
-                Date received: 2020-01-26 19:00
+                Recorded: 7:00PM 26 Jan 2020
               
             </p>
              
             <p
-              class="text battery-status--low"
+              class="text battery-status battery-status--low"
               style="display: flex;"
             >
               
@@ -276,9 +272,7 @@ exports[`Dashboard.vue change active sensor 1`] = `
           </div>
            
           <div>
-            <ul
-              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
-            >
+            <ul>
               <li
                 style="padding-right: 0.5em;"
               >
@@ -311,15 +305,15 @@ exports[`Dashboard.vue change active sensor 1`] = `
             </ul>
              
             <p
-              class="text"
+              class="text date-received"
             >
               
-                Date received: 2020-01-26 19:00
+                Recorded: 7:00PM 26 Jan 2020
               
             </p>
              
             <p
-              class="text battery-status--high"
+              class="text battery-status battery-status--high"
               style="display: flex;"
             >
               
@@ -397,10 +391,11 @@ exports[`Dashboard.vue change active sensor 1`] = `
          
         <p
           class="text"
+          style="margin-top: 0.25em;"
         >
           
-              Date received:
-              2020-01-26 19:00
+              Recorded:
+              7:00PM 26 Jan 2020
             
         </p>
          
@@ -650,9 +645,7 @@ exports[`Dashboard.vue delete climate data 1`] = `
           </div>
            
           <div>
-            <ul
-              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
-            >
+            <ul>
               <li
                 style="padding-right: 0.5em;"
               >
@@ -685,15 +678,15 @@ exports[`Dashboard.vue delete climate data 1`] = `
             </ul>
              
             <p
-              class="text"
+              class="text date-received"
             >
               
-                Date received: 2020-01-26 19:00
+                Recorded: 7:00PM 26 Jan 2020
               
             </p>
              
             <p
-              class="text battery-status--low"
+              class="text battery-status battery-status--low"
               style="display: flex;"
             >
               
@@ -759,9 +752,7 @@ exports[`Dashboard.vue delete climate data 1`] = `
           </div>
            
           <div>
-            <ul
-              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
-            >
+            <ul>
               <li
                 style="padding-right: 0.5em;"
               >
@@ -794,15 +785,15 @@ exports[`Dashboard.vue delete climate data 1`] = `
             </ul>
              
             <p
-              class="text"
+              class="text date-received"
             >
               
-                Date received: 2020-01-26 19:00
+                Recorded: 7:00PM 26 Jan 2020
               
             </p>
              
             <p
-              class="text battery-status--high"
+              class="text battery-status battery-status--high"
               style="display: flex;"
             >
               
@@ -874,6 +865,7 @@ exports[`Dashboard.vue delete climate data 1`] = `
          
         <p
           class="heading"
+          style="margin-top: 0.25em;"
         >
           Sensor has no climate data.
         </p>
@@ -945,9 +937,7 @@ exports[`Dashboard.vue delete sensor 1`] = `
           </div>
            
           <div>
-            <ul
-              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
-            >
+            <ul>
               <li
                 style="padding-right: 0.5em;"
               >
@@ -980,15 +970,15 @@ exports[`Dashboard.vue delete sensor 1`] = `
             </ul>
              
             <p
-              class="text"
+              class="text date-received"
             >
               
-                Date received: 2020-01-26 19:00
+                Recorded: 7:00PM 26 Jan 2020
               
             </p>
              
             <p
-              class="text battery-status--low"
+              class="text battery-status battery-status--low"
               style="display: flex;"
             >
               
@@ -1054,9 +1044,7 @@ exports[`Dashboard.vue delete sensor 1`] = `
           </div>
            
           <div>
-            <ul
-              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
-            >
+            <ul>
               <li
                 style="padding-right: 0.5em;"
               >
@@ -1089,15 +1077,15 @@ exports[`Dashboard.vue delete sensor 1`] = `
             </ul>
              
             <p
-              class="text"
+              class="text date-received"
             >
               
-                Date received: 2020-01-26 19:00
+                Recorded: 7:00PM 26 Jan 2020
               
             </p>
              
             <p
-              class="text battery-status--high"
+              class="text battery-status battery-status--high"
               style="display: flex;"
             >
               
@@ -1175,10 +1163,11 @@ exports[`Dashboard.vue delete sensor 1`] = `
          
         <p
           class="text"
+          style="margin-top: 0.25em;"
         >
           
-              Date received:
-              2020-01-26 19:00
+              Recorded:
+              7:00PM 26 Jan 2020
             
         </p>
          
@@ -1355,9 +1344,7 @@ exports[`Dashboard.vue historical data time period 1`] = `
           </div>
            
           <div>
-            <ul
-              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
-            >
+            <ul>
               <li
                 style="padding-right: 0.5em;"
               >
@@ -1390,15 +1377,15 @@ exports[`Dashboard.vue historical data time period 1`] = `
             </ul>
              
             <p
-              class="text"
+              class="text date-received"
             >
               
-                Date received: 2020-01-06 11:20
+                Recorded: 11:20AM 6 Jan 2020
               
             </p>
              
             <p
-              class="text battery-status--medium"
+              class="text battery-status battery-status--medium"
               style="display: flex;"
             >
               
@@ -1460,9 +1447,7 @@ exports[`Dashboard.vue historical data time period 1`] = `
           </div>
            
           <div>
-            <ul
-              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
-            >
+            <ul>
               <li
                 style="padding-right: 0.5em;"
               >
@@ -1495,15 +1480,15 @@ exports[`Dashboard.vue historical data time period 1`] = `
             </ul>
              
             <p
-              class="text"
+              class="text date-received"
             >
               
-                Date received: 2020-01-26 19:00
+                Recorded: 7:00PM 26 Jan 2020
               
             </p>
              
             <p
-              class="text battery-status--low"
+              class="text battery-status battery-status--low"
               style="display: flex;"
             >
               
@@ -1569,9 +1554,7 @@ exports[`Dashboard.vue historical data time period 1`] = `
           </div>
            
           <div>
-            <ul
-              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
-            >
+            <ul>
               <li
                 style="padding-right: 0.5em;"
               >
@@ -1604,15 +1587,15 @@ exports[`Dashboard.vue historical data time period 1`] = `
             </ul>
              
             <p
-              class="text"
+              class="text date-received"
             >
               
-                Date received: 2020-01-26 19:00
+                Recorded: 7:00PM 26 Jan 2020
               
             </p>
              
             <p
-              class="text battery-status--high"
+              class="text battery-status battery-status--high"
               style="display: flex;"
             >
               
@@ -1690,10 +1673,11 @@ exports[`Dashboard.vue historical data time period 1`] = `
          
         <p
           class="text"
+          style="margin-top: 0.25em;"
         >
           
-              Date received:
-              2020-01-06 11:20
+              Recorded:
+              11:20AM 6 Jan 2020
             
         </p>
          
@@ -1870,9 +1854,7 @@ exports[`Dashboard.vue multiple sensors 1`] = `
           </div>
            
           <div>
-            <ul
-              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
-            >
+            <ul>
               <li
                 style="padding-right: 0.5em;"
               >
@@ -1905,15 +1887,15 @@ exports[`Dashboard.vue multiple sensors 1`] = `
             </ul>
              
             <p
-              class="text"
+              class="text date-received"
             >
               
-                Date received: 2020-01-06 11:20
+                Recorded: 11:20AM 6 Jan 2020
               
             </p>
              
             <p
-              class="text battery-status--medium"
+              class="text battery-status battery-status--medium"
               style="display: flex;"
             >
               
@@ -1975,9 +1957,7 @@ exports[`Dashboard.vue multiple sensors 1`] = `
           </div>
            
           <div>
-            <ul
-              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
-            >
+            <ul>
               <li
                 style="padding-right: 0.5em;"
               >
@@ -2010,15 +1990,15 @@ exports[`Dashboard.vue multiple sensors 1`] = `
             </ul>
              
             <p
-              class="text"
+              class="text date-received"
             >
               
-                Date received: 2020-01-26 19:00
+                Recorded: 7:00PM 26 Jan 2020
               
             </p>
              
             <p
-              class="text battery-status--low"
+              class="text battery-status battery-status--low"
               style="display: flex;"
             >
               
@@ -2084,9 +2064,7 @@ exports[`Dashboard.vue multiple sensors 1`] = `
           </div>
            
           <div>
-            <ul
-              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
-            >
+            <ul>
               <li
                 style="padding-right: 0.5em;"
               >
@@ -2119,15 +2097,15 @@ exports[`Dashboard.vue multiple sensors 1`] = `
             </ul>
              
             <p
-              class="text"
+              class="text date-received"
             >
               
-                Date received: 2020-01-26 19:00
+                Recorded: 7:00PM 26 Jan 2020
               
             </p>
              
             <p
-              class="text battery-status--high"
+              class="text battery-status battery-status--high"
               style="display: flex;"
             >
               
@@ -2205,10 +2183,11 @@ exports[`Dashboard.vue multiple sensors 1`] = `
          
         <p
           class="text"
+          style="margin-top: 0.25em;"
         >
           
-              Date received:
-              2020-01-06 11:20
+              Recorded:
+              11:20AM 6 Jan 2020
             
         </p>
          
@@ -2462,9 +2441,7 @@ exports[`Dashboard.vue refresh 1`] = `
           </div>
            
           <div>
-            <ul
-              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
-            >
+            <ul>
               <li
                 style="padding-right: 0.5em;"
               >
@@ -2497,15 +2474,15 @@ exports[`Dashboard.vue refresh 1`] = `
             </ul>
              
             <p
-              class="text"
+              class="text date-received"
             >
               
-                Date received: 2020-01-06 11:20
+                Recorded: 11:20AM 6 Jan 2020
               
             </p>
              
             <p
-              class="text battery-status--medium"
+              class="text battery-status battery-status--medium"
               style="display: flex;"
             >
               
@@ -2567,9 +2544,7 @@ exports[`Dashboard.vue refresh 1`] = `
           </div>
            
           <div>
-            <ul
-              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
-            >
+            <ul>
               <li
                 style="padding-right: 0.5em;"
               >
@@ -2602,15 +2577,15 @@ exports[`Dashboard.vue refresh 1`] = `
             </ul>
              
             <p
-              class="text"
+              class="text date-received"
             >
               
-                Date received: 2020-01-26 19:00
+                Recorded: 7:00PM 26 Jan 2020
               
             </p>
              
             <p
-              class="text battery-status--low"
+              class="text battery-status battery-status--low"
               style="display: flex;"
             >
               
@@ -2676,9 +2651,7 @@ exports[`Dashboard.vue refresh 1`] = `
           </div>
            
           <div>
-            <ul
-              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
-            >
+            <ul>
               <li
                 style="padding-right: 0.5em;"
               >
@@ -2711,15 +2684,15 @@ exports[`Dashboard.vue refresh 1`] = `
             </ul>
              
             <p
-              class="text"
+              class="text date-received"
             >
               
-                Date received: 2020-01-26 19:00
+                Recorded: 7:00PM 26 Jan 2020
               
             </p>
              
             <p
-              class="text battery-status--high"
+              class="text battery-status battery-status--high"
               style="display: flex;"
             >
               
@@ -2781,9 +2754,7 @@ exports[`Dashboard.vue refresh 1`] = `
           </div>
            
           <div>
-            <ul
-              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
-            >
+            <ul>
               <li
                 style="padding-right: 0.5em;"
               >
@@ -2816,15 +2787,15 @@ exports[`Dashboard.vue refresh 1`] = `
             </ul>
              
             <p
-              class="text"
+              class="text date-received"
             >
               
-                Date received: 2020-01-06 11:20
+                Recorded: 
               
             </p>
              
             <p
-              class="text battery-status--medium"
+              class="text battery-status battery-status--medium"
               style="display: flex;"
             >
               
@@ -2902,10 +2873,11 @@ exports[`Dashboard.vue refresh 1`] = `
          
         <p
           class="text"
+          style="margin-top: 0.25em;"
         >
           
-              Date received:
-              2020-01-06 11:20
+              Recorded:
+              11:20AM 6 Jan 2020
             
         </p>
          
@@ -3082,9 +3054,7 @@ exports[`Dashboard.vue rename sensor 1`] = `
           </div>
            
           <div>
-            <ul
-              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
-            >
+            <ul>
               <li
                 style="padding-right: 0.5em;"
               >
@@ -3117,15 +3087,15 @@ exports[`Dashboard.vue rename sensor 1`] = `
             </ul>
              
             <p
-              class="text"
+              class="text date-received"
             >
               
-                Date received: 2020-01-06 11:20
+                Recorded: 11:20AM 6 Jan 2020
               
             </p>
              
             <p
-              class="text battery-status--medium"
+              class="text battery-status battery-status--medium"
               style="display: flex;"
             >
               
@@ -3187,9 +3157,7 @@ exports[`Dashboard.vue rename sensor 1`] = `
           </div>
            
           <div>
-            <ul
-              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
-            >
+            <ul>
               <li
                 style="padding-right: 0.5em;"
               >
@@ -3222,15 +3190,15 @@ exports[`Dashboard.vue rename sensor 1`] = `
             </ul>
              
             <p
-              class="text"
+              class="text date-received"
             >
               
-                Date received: 2020-01-26 19:00
+                Recorded: 7:00PM 26 Jan 2020
               
             </p>
              
             <p
-              class="text battery-status--low"
+              class="text battery-status battery-status--low"
               style="display: flex;"
             >
               
@@ -3296,9 +3264,7 @@ exports[`Dashboard.vue rename sensor 1`] = `
           </div>
            
           <div>
-            <ul
-              style="list-style: none; padding: 0px; margin-top: 0.5em; display: flex; flex-direction: row;"
-            >
+            <ul>
               <li
                 style="padding-right: 0.5em;"
               >
@@ -3331,15 +3297,15 @@ exports[`Dashboard.vue rename sensor 1`] = `
             </ul>
              
             <p
-              class="text"
+              class="text date-received"
             >
               
-                Date received: 2020-01-26 19:00
+                Recorded: 7:00PM 26 Jan 2020
               
             </p>
              
             <p
-              class="text battery-status--high"
+              class="text battery-status battery-status--high"
               style="display: flex;"
             >
               
@@ -3417,10 +3383,11 @@ exports[`Dashboard.vue rename sensor 1`] = `
          
         <p
           class="text"
+          style="margin-top: 0.25em;"
         >
           
-              Date received:
-              2020-01-06 11:20
+              Recorded:
+              11:20AM 6 Jan 2020
             
         </p>
          

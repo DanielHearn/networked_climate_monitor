@@ -114,9 +114,7 @@ describe('Climate Monitor', function() {
     cy.get('.side-panel .list .list-item.active').contains(
       'Temperature: 23.24°C'
     )
-    cy.get('.side-panel .list .list-item.active').contains(
-      'Date received: 2020-01-17 16:30'
-    )
+    cy.get('.side-panel .list .list-item.active').contains('Recorded:')
     cy.get('.main-panel .sub-heading').contains('Node 1: Sensor 1')
     cy.get('.main-panel .recent-data-list').contains('Temperature')
     cy.get('.main-panel .recent-data-list').contains('23.24°C')
@@ -164,9 +162,7 @@ describe('Climate Monitor', function() {
 
     cy.get('.side-panel .list .list-item').contains('Node 1: Sensor 1')
     cy.get('.side-panel .list .list-item').contains('Temperature: 23.24°C')
-    cy.get('.side-panel .list .list-item').contains(
-      'Date received: 2020-01-17 16:30'
-    )
+    cy.get('.side-panel .list .list-item').contains('Recorded:')
 
     cy.get('.side-panel .list .list-item')
       .eq(0)
@@ -265,6 +261,7 @@ describe('Climate Monitor', function() {
     )
     cy.get('#wifi_ssid_input').type('wifi-ssid')
     cy.get('#wifi_password_input').type('wifi-password')
+    cy.get('#wifi_save_button').click()
     cy.get('.main-panel').contains(
       "The base station will connect to the 'wifi-ssid' wifi network"
     )
@@ -298,9 +295,7 @@ describe('Climate Monitor', function() {
     cy.get('.side-panel .list .list-item.active').contains(
       'Temperature: 73.83°F'
     )
-    cy.get('.side-panel .list .list-item.active').contains(
-      'Date received: 2020-01-17 16:30'
-    )
+    cy.get('.side-panel .list .list-item.active').contains('Recorded:')
     cy.get('.main-panel .sub-heading').contains('Node 1: Garden Sensor')
     cy.get('.main-panel .recent-data-list').contains('Temperature')
     cy.get('.main-panel .recent-data-list').contains('73.83°F')

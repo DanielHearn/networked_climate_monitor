@@ -16,7 +16,7 @@ const accountData = {
   status: 'Account successfully retrieved',
   account: {
     settings:
-      "{'temperature_unit':'f','measurement_interval':'30_min','wifi':{'ssid':'test-wifi','password':'test-password'}}",
+      '{\'temperature_unit\':\'f\',\'measurement_interval\':\'30_min\',\'wifi\':{\'ssid\':\'\',\'password\':\'\'}}',
     id: 1,
     reset_token: '1234',
     email: 'email@email.com'
@@ -24,7 +24,9 @@ const accountData = {
 }
 
 const patchAccountData = {
-  status: 'Account successfully updated'
+  data: {
+    status: 'Account successfully updated'
+  }
 }
 
 const factory = () => {
@@ -38,8 +40,8 @@ const factory = () => {
     temperature_unit: 'c',
     measurement_interval: '10_min',
     wifi: {
-      ssid: 'test-wifi',
-      password: 'test-password'
+      ssid: '',
+      password: ''
     }
   }
 
@@ -183,30 +185,53 @@ describe('Settings.vue', () => {
 
     await wrapper.vm.$nextTick()
 
+    expect(wrapper.vm.settings.wifi.ssid).toBe('')
+    expect(wrapper.vm.settings.wifi.password).toBe('')
+    expect(wrapper.vm.localWifi.ssid).toBe('')
+    expect(wrapper.vm.localWifi.password).toBe('')
+
     wrapper
       .findAll('.side-panel .list-item')
       .at(2)
       .find('.actions .button')
       .trigger('click')
     expect(wrapper.vm.activeCategoryID).toBe(2)
+    expect(wrapper.vm.wifiSettingsChanged).toBe(false)
+
+    const saveButton = wrapper.find('#wifi_save_button')
+    expect(saveButton.classes()).toContain('disabled')
 
     const ssidInput = wrapper.find('#wifi_ssid_input')
     ssidInput.trigger('focus')
     ssidInput.setValue('wifi-name')
+    ssidInput.trigger('input')
 
     const passwordInput = wrapper.find('#wifi_password_input')
     passwordInput.trigger('focus')
     passwordInput.setValue('wifi-password')
+    passwordInput.trigger('input')
 
+    expect(wrapper.vm.localWifi.ssid).toBe('wifi-name')
+    expect(wrapper.vm.localWifi.password).toBe('wifi-password')
+    expect(wrapper.vm.settings.wifi.ssid).toBe('')
+    expect(wrapper.vm.settings.wifi.password).toBe('')
+    expect(wrapper.vm.wifiSettingsChanged).toBe(true)
+    expect(wrapper.vm.hasBeenEdited).toBe(true)
+    expect(saveButton.classes()).not.toContain('disabled')
+
+    saveButton.trigger('click')
+
+    await wrapper.vm.$nextTick()
+
+    expect(saveButton.classes()).toContain('disabled')
     const stringifiedSettings = JSON.stringify(wrapper.vm.settings)
-    expect(wrapper.vm.settings.wifi.ssid).toBe('wifi-name')
-    expect(wrapper.vm.settings.wifi.password).toBe('wifi-password')
-    expect(wrapper.find('.main-panel').text()).toContain(
-      'The base station will connect to the \'wifi-name\' wifi network'
-    )
     expect(patchAccount).toBeCalledWith(store.state.user.access_token, {
       settings: stringifiedSettings
     })
+    expect(wrapper.vm.wifiSettingsChanged).toBe(false)
+    expect(wrapper.find('.main-panel').text()).toContain(
+      'The base station will connect to the \'wifi-name\' wifi network'
+    )
     expect(wrapper.element).toMatchSnapshot()
   })
 

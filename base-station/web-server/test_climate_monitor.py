@@ -1666,8 +1666,6 @@ def test_delete_sensor_endpoint(client, init_database):
     json_data = rv.get_json()
 
     assert len(SensorModel.query.all()) == 0
-    assert len(ClimateModel.query.all()) == 0
-    assert len(SensorDataModel.query.all()) == 0
     assert json_data['status'] == 'Sensor successfully deleted'
 
     '''
@@ -2156,7 +2154,7 @@ def test_delete_climate_data_endpoint(client, init_database):
 
     assert len(SensorModel.query.all()) == 0
     assert json_data['status'] == 'Error'
-    assert json_data['errors'] == ['Sensor doesn\'t exist']
+    assert json_data['errors'] == ['No climate data for the sensor ID']
 
     '''
     Missing auth
@@ -2194,7 +2192,6 @@ def test_delete_climate_data_endpoint(client, init_database):
     assert json_data['status'] == 'Sensor climate data successfully deleted'
     assert len(SensorModel.query.all()) == 1
     assert len(ClimateModel.query.all()) == 0
-    assert len(SensorDataModel.query.all()) == 0
 
     '''
     Invalid token

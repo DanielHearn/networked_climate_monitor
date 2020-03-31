@@ -829,18 +829,12 @@ class ClimateData(Resource):
         Deletes all climate data for the sensor id
         """
 
-        # Check if sensor exists
-        sensor = SensorModel.query.filter_by(id=sensor_id).first()
-        if sensor:
-            # Get all climate data for that sensor
-            climate_data = ClimateModel.query.filter_by(sensor_id=sensor_id)
-
-            # Delete all climate data
-            for climate in climate_data:
-                climate.delete()
-
+        # Check if climate data exists
+        climate_data_rows_deleted = db.session.query(ClimateModel).filter(sensor_id == sensor_id).delete()
+        if climate_data_rows_deleted > 0:
+            db.session.commit()
             return {'status': 'Sensor climate data successfully deleted'}, 200
-        return {'status': 'Error', 'errors': ['Sensor doesn\'t exist']}, 500
+        return {'status': 'Error', 'errors': ['No climate data for the sensor ID']}, 500
 
 
 class Sensor(Resource):
@@ -892,14 +886,6 @@ class Sensor(Resource):
         if sensor:
             # Delete sensor
             sensor.delete()
-
-            # Get all climate data for that sensor
-            climate_data = ClimateModel.query.filter_by(sensor_id=sensor_id)
-
-            # Delete all climate data
-            for climate in climate_data:
-                climate.delete()
-
             return {'status': 'Sensor successfully deleted'}, 200
         return {'status': 'Error', 'errors': ['Sensor doesn\'t exist']}, 500
 

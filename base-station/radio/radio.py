@@ -1,6 +1,7 @@
 # Imports
 from RFM69 import Radio, FREQ_433MHZ
 from datetime import timedelta, datetime
+from dateutil import tz
 import requests
 import time
 import dateutil.parser
@@ -10,6 +11,8 @@ from helpers import ascii_to_string, milliseconds_to_time_period, create_sensor,
     retrieve_settings, get_next_available_sensor_id, init_time_periods, process_climate_data, filter_inactive_sensors
 
 # Config variables
+from_zone = tz.tzutc()
+to_zone = tz.tzlocal()
 base_station_id = 255
 network_id = 100
 api_root = 'http://0.0.0.0/api/'
@@ -133,11 +136,13 @@ def process_packet(packet, radio):
     sensor_id = packet.sender
     packet_date = str(packet.received)
     packet_datetime = dateutil.parser.parse(packet_date)
+    packet_datetime = packet_datetime.replace(tzinfo=from_zone)
+    packet_datetime = packet_datetime.astimezone(to_zone)
 
     # Display packet data
     print('Packet From: Node: ' + str(sensor_id))
     print('Signal: ' + str(packet.RSSI))
-    print('Date: ' + packet_date)
+    print('Date: ' + str(packet_datetime))
     print('Data: ' + packet_data)
 
     data_parts = packet_data.split('|')
@@ -198,7 +203,7 @@ def process_packet(packet, radio):
                     print('No ack')
 
             # Send climate data to API
-            process_climate_data(packet.received, sensor_id, control_dict, main_data, api_key, api_root)
+            process_climate_data(packet_datetime, sensor_id, control_dict, main_data, api_key, api_root)
 
         elif packet_type == 'I':
             process_initialisation(radio, sensor_id, packet_datetime)
