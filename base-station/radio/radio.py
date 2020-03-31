@@ -11,8 +11,6 @@ from helpers import ascii_to_string, milliseconds_to_time_period, create_sensor,
     retrieve_settings, get_next_available_sensor_id, init_time_periods, process_climate_data, filter_inactive_sensors
 
 # Config variables
-from_zone = tz.tzutc()
-to_zone = tz.tzlocal()
 base_station_id = 255
 network_id = 100
 api_root = 'http://0.0.0.0/api/'
@@ -137,6 +135,8 @@ def process_packet(packet, radio):
     sensor_id = packet.sender
     packet_date = str(packet.received)
     packet_datetime = dateutil.parser.parse(packet_date)
+    from_zone = tz.tzutc()
+    to_zone = tz.tzlocal()
     packet_datetime = packet_datetime.replace(tzinfo=from_zone)
     packet_datetime = packet_datetime.astimezone(to_zone)
 

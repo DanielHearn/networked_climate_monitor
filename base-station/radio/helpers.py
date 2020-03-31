@@ -1,4 +1,5 @@
 from datetime import timedelta, datetime
+from dateutil import tz
 import requests
 import json
 
@@ -320,7 +321,10 @@ def filter_inactive_sensors(sensors, time_periods, interval):
     """
 
     # Calculate date based on the current interval period
-    inactive_time = datetime.now() - timedelta(milliseconds=interval * 2)
+    to_zone = tz.tzlocal()
+    now = datetime.now()
+    now_tz_aware = now.replace(tzinfo=to_zone)
+    inactive_time = now_tz_aware - timedelta(milliseconds=interval * 2)
 
     temp_sensors = {}
     temp_time_periods = time_periods
