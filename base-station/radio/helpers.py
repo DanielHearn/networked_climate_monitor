@@ -198,12 +198,20 @@ def retrieve_settings(api_key, api_root):
     params = {
         'api_key': api_key
     }
-    settings_get_url = api_root + 'base-station-settings'
-    response = requests.get(settings_get_url, params=params)
-    response_data = response.json()
-    raw_settings = response_data['settings'].replace('\'', '"')
-    new_settings = json.loads(raw_settings)
-    return new_settings
+    try:
+        settings_get_url = api_root + 'base-station-settings'
+        response = requests.get(settings_get_url, params=params)
+        response_data = response.json()
+        if 'settings' in response_data:
+            raw_settings = response_data['settings'].replace('\'', '"')
+            new_settings = json.loads(raw_settings)
+            return new_settings
+        else:
+            print('Bad response for settings retrieval')
+            return None
+    except:
+        print('Bad response for settings retrieval')
+        return None
 
 
 def get_next_available_sensor_id(api_key, api_root):
@@ -295,6 +303,7 @@ def process_climate_data(packet_date, sensor_id, control_dict, main_data, api_ke
     except:
         print('Error sending data to API')
 
+
 def filter_inactive_sensors(sensors, time_periods, interval):
     """
     Removes sensors that have not send data in the last 10 minutes
@@ -327,6 +336,5 @@ def filter_inactive_sensors(sensors, time_periods, interval):
             print('Removed sensor with id: ' + sensor_id)
             # Remove sensor from assigned time period
             temp_time_periods[str(sensor_id)] = None
-
 
     return {'sensors': temp_sensors, 'time_periods': temp_time_periods}

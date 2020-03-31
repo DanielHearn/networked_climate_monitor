@@ -14,6 +14,7 @@ const mobileWifi = {
 const apiRoot = 'http://0.0.0.0/api/'
 const apiKey = 'xgLxTX7Nkem5qc9jllg2'
 const searchInterval = 30000
+let settings_retrieved = false
 
 function searchNetworks() {
   wifi.scan(function(err, networks) {
@@ -103,13 +104,15 @@ async function setupSettingsReloading() {
       try {
         const response = await fetch(url)
         const data = await response.json()
-        if (data && data.status) {
+        if (data && data.status && data.settings) {
           const settings = JSON.parse(data.settings.replace(/'/g, '"'))
           if (settings.wifi) {
             storedWifi.ssid = settings.wifi.ssid
             storedWifi.password = settings.wifi.password
           }
           console.log(storedWifi)
+        } else {
+          console.log('Bad response for settings retrieval')
         }
       } catch(e) {
         console.log(e)
@@ -122,15 +125,18 @@ async function loadInitialSettings() {
   try {
     const response = await fetch(url)
     const data = await response.json()
-    if (data && data.status) {
+    if (data && data.status && data.settings) {
       const settings = JSON.parse(data.settings.replace(/'/g, '"'))
       if (settings.wifi) {
         storedWifi.ssid = settings.wifi.ssid
         storedWifi.password = settings.wifi.password
+        settings_retrieved = true
+        console.log(storedWifi)
+        searchNetworks()
+        setupSettingsReloading()
       }
-      console.log(storedWifi)
-      searchNetworks()
-      setupSettingsReloading()
+    } else {
+      console.log('Bad response for settings retrieval')
     }
   } catch(e) {
     console.log(e)
@@ -142,6 +148,11 @@ function init() {
     iface: 'wlan0'
   });
   loadInitialSettings()
+  setInterval(() => {
+    if(!settings_retrieved) {
+      loadInitialSettings()
+    }
+  }, 60000)
 }
 
 init()

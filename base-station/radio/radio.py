@@ -7,7 +7,7 @@ import time
 import dateutil.parser
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from helpers import ascii_to_string, milliseconds_to_time_period, create_sensor, process_packet_control,\
+from helpers import ascii_to_string, milliseconds_to_time_period, create_sensor, process_packet_control, \
     retrieve_settings, get_next_available_sensor_id, init_time_periods, process_climate_data, filter_inactive_sensors
 
 # Config variables
@@ -19,6 +19,7 @@ api_root = 'http://0.0.0.0/api/'
 api_key = 'xgLxTX7Nkem5qc9jllg2'
 encrypt_key = 'pnOvzy105sF5g8Ot'
 number_of_time_periods = 10
+radio_active = False
 
 # State variables
 connected_sensors = {}
@@ -247,8 +248,9 @@ def run_radio():
 
 def load_settings():
     global settings
-    settings = retrieve_settings(api_key, api_root)
-
+    new_settings = retrieve_settings(api_key, api_root)
+    if new_settings is not None:
+        settings = new_settings
 
 def run():
     """
@@ -268,18 +270,21 @@ def run():
     settings_job = scheduler.add_job(load_settings, 'interval', minutes=5)
     scheduler.start()
 
-    if settings['measurement_interval']:
-        print('Settings:')
-        print(settings)
-        # Start processing incoming radio packets
-        run_radio()
-    else:
-        print('Settings not loaded')
+    while True:
+        global radio_active
+        if not radio_active and settings and 'measurement_interval' in settings:
+            radio_active = True
 
-    # Shutdown any scheduler jobs
-    inactive_job.remove()
-    settings_job.remove()
-    scheduler.shutdown()
+        if radio_active:
+            print('Radio active')
+            print('Settings:')
+            print(settings)
+            # Start processing incoming radio packets
+            run_radio()
+        else:
+            print('Radio inactive')
+        time.sleep(60)
+
 
 if __name__ == '__main__':
     # Start program
