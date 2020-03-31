@@ -2192,6 +2192,7 @@ def test_delete_climate_data_endpoint(client, init_database):
     assert json_data['status'] == 'Sensor climate data successfully deleted'
     assert len(SensorModel.query.all()) == 1
     assert len(ClimateModel.query.all()) == 0
+    assert len(SensorDataModel.query.all()) == 0
 
     '''
     Invalid token

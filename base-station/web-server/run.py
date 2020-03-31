@@ -359,7 +359,7 @@ class ClimateModel(db.Model, SerializerMixin):
     sensor_id = db.Column(db.Integer, db.ForeignKey('sensor.id'), nullable=False)
     battery_voltage = db.Column(db.Float, nullable=False)
     date = db.Column(db.DateTime, nullable=False)
-    climate_data = db.relationship('SensorDataModel', lazy=True, cascade="all, delete, delete-orphan")
+    climate_data = db.relationship('SensorDataModel', lazy=True, cascade='all, delete, delete-orphan')
 
     def __repr__(self):
         """
@@ -829,9 +829,13 @@ class ClimateData(Resource):
         Deletes all climate data for the sensor id
         """
 
-        # Check if climate data exists
-        climate_data_rows_deleted = db.session.query(ClimateModel).filter(sensor_id == sensor_id).delete()
-        if climate_data_rows_deleted > 0:
+        # Get all climate data for that sensor
+        climate_data = ClimateModel.query.filter_by(sensor_id=sensor_id)
+
+        if climate_data.count() > 0:
+            # Delete all climate data
+            for climate in climate_data:
+                db.session.delete(climate)
             db.session.commit()
             return {'status': 'Sensor climate data successfully deleted'}, 200
         return {'status': 'Error', 'errors': ['No climate data for the sensor ID']}, 500
