@@ -21,14 +21,11 @@ export default {
     // Send login request to API and update user state if request is valid
     login: function(email, password) {
       this.$toasted.show('Sending login request')
-      console.log(2)
       login(email, password)
         .then(response => {
           const data = response.data
-          console.log(3)
           if (data.status && data.access_token && data.refresh_token) {
             data.logged_in = true
-            console.log(4)
             data.settings = JSON.parse(data.settings.replace(/'/g, '"'))
             this.$store.dispatch('login', data)
           }
@@ -49,7 +46,7 @@ export default {
       const password = this.password
       const numOfRequiredInputs = 2
       const validInputs = []
-      console.log(1)
+
       if (email === '') {
         this.errors.push('Enter an email.')
       } else if (email.indexOf('@') === -1) {

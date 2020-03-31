@@ -64,7 +64,7 @@ describe('LoginForm.vue', () => {
     wrapper.trigger('submit')
 
     await wrapper.vm.$nextTick()
-    console.log(wrapper.html())
+
     expect(actions.login).toHaveBeenCalledTimes(1)
     expect(wrapper.vm.errors).toEqual([])
   })
