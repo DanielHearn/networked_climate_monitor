@@ -70,7 +70,7 @@
               </p>
             </li>
           </ol>
-          <router-link to="/dashboard" class="link"
+          <router-link to="/dashboard" class="link" id="dashboard_link"
             >Completed the setup? Click here to view the dashboard</router-link
           >
         </template>

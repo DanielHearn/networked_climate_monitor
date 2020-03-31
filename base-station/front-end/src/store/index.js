@@ -72,8 +72,6 @@ export const actions = {
         if (data.status && data.account) {
           const user = state.user
           user.email = data.account.email
-          user.access_token = data.account.access_token
-          user.refresh_token = data.account.refresh_token
           user.reset_token = data.account.reset_token
           user.settings = JSON.parse(data.account.settings.replace(/'/g, '"'))
 

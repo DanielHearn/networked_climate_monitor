@@ -79,6 +79,13 @@ describe('Climate Monitor', function() {
     cy.get('.reset-token').then($element => {
       resetToken = $element.text().split(': ')[1]
     })
+    cy.get('#dashboard_link').click()
+    cy.title().should('eq', 'Dashboard - Climate Monitor')
+    cy.get('.side-panel .list .list-item').should('have.length', 3)
+    cy.get('.side-panel .list .list-item.active').contains('Node 1: Sensor 1')
+    cy.get('.side-panel .list .list-item.active').contains(
+      'Temperature: 23.24°C'
+    )
   })
   it('login loads', function() {
     cy.clearLocalStorageCache()
@@ -263,7 +270,7 @@ describe('Climate Monitor', function() {
     cy.get('#wifi_password_input').type('wifi-password')
     cy.get('#wifi_save_button').click()
     cy.get('.main-panel').contains(
-      "The base station will connect to the 'wifi-ssid' wifi network"
+      'The base station will connect to the \'wifi-ssid\' wifi network'
     )
   })
   it('change measurement interval', function() {
