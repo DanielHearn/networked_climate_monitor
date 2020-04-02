@@ -5,9 +5,16 @@
 @import './scss/text.scss';
 @import './scss/toasted.scss';
 
+html {
+  height: 100%;
+  width: 100%;
+}
+
 body {
   margin: 0;
   padding: 0;
+  height: 100%;
+  width: 100%;
 }
 
 #app {
@@ -18,8 +25,8 @@ body {
   display: flex;
   flex: 1 auto;
   flex-direction: column;
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 100%;
   margin: 0;
   padding: 0;
   overflow: hidden;
